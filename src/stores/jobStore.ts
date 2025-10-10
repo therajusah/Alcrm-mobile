@@ -22,7 +22,11 @@ interface JobState {
     pageSize?: number;
   }) => Promise<void>;
   fetchJobDetail: (id: string) => Promise<void>;
-  applyForJob: (id: string, coverLetter?: string) => Promise<void>;
+  applyForJob: (
+    id: string,
+    coverLetter?: string,
+    resumeUrl?: string
+  ) => Promise<void>;
   clearSelectedJob: () => void;
   clearError: () => void;
 }
@@ -70,10 +74,13 @@ export const useJobStore = create<JobState>((set, get) => ({
     }
   },
 
-  applyForJob: async (id: string, coverLetter?: string) => {
+  applyForJob: async (id: string, coverLetter?: string, resumeUrl?: string) => {
     try {
       set({ isLoading: true, error: null });
-      await userApi.applyJob(id, { cover_letter: coverLetter });
+      await userApi.applyJob(id, {
+        cover_letter: coverLetter,
+        resume_url: resumeUrl,
+      });
 
       // Refresh job detail to get updated application status
       await get().fetchJobDetail(id);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, RefreshControl, Alert } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
 import { useAuthStore } from '../../stores/authStore';
 import { userApi } from '../../services/api';
 import Button from '../../components/Button';
@@ -25,6 +26,7 @@ export default function ProfileScreen({ navigation }: any) {
   const [currentLocation, setCurrentLocation] = useState('');
   const [qualification, setQualification] = useState('');
   const [whatsappNumber, setWhatsappNumber] = useState('');
+  const [isUploadingResume, setIsUploadingResume] = useState(false);
 
   const loadProfile = async () => {
     try {
@@ -97,6 +99,72 @@ export default function ProfileScreen({ navigation }: any) {
       setWhatsappNumber(profile.whatsapp_number || '');
     }
     setIsEditing(false);
+  };
+
+  const handleResumeUpload = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ],
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled && result.assets && result.assets[0]) {
+        const file = result.assets[0];
+        setIsUploadingResume(true);
+
+        try {
+          const response = await userApi.uploadResume(file.uri, file.name);
+
+          // Update profile with new resume URL
+          const updates = { resume_url: response.resume_url };
+          await userApi.updateProfile(updates);
+          updateUserProfile(updates);
+
+          Alert.alert('Success', 'Resume uploaded successfully');
+          await loadProfile();
+        } catch (error: any) {
+          Alert.alert('Error', error.message || 'Failed to upload resume');
+        } finally {
+          setIsUploadingResume(false);
+        }
+      }
+    } catch (error) {
+      console.log('Document picker error:', error);
+      Alert.alert('Error', 'Failed to select resume file');
+    }
+  };
+
+  const handleResumeDelete = async () => {
+    Alert.alert(
+      'Delete Resume',
+      'Are you sure you want to delete your resume?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await userApi.deleteResume();
+
+              // Update profile to remove resume URL
+              const updates = { resume_url: undefined };
+              await userApi.updateProfile(updates);
+              updateUserProfile(updates);
+
+              Alert.alert('Success', 'Resume deleted successfully');
+              await loadProfile();
+            } catch (error: any) {
+              Alert.alert('Error', error.message || 'Failed to delete resume');
+            }
+          },
+        },
+      ]
+    );
   };
 
   if (isLoading) {
@@ -225,6 +293,64 @@ export default function ProfileScreen({ navigation }: any) {
               </View>
             </View>
           )}
+        </Card>
+
+        {/* Resume Section */}
+        <Card title="Resume">
+          {profile?.resume_url ? (
+            <View>
+              <View className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <Text className="text-green-800 font-semibold mb-1">
+                  ✓ Resume Uploaded
+                </Text>
+                <Text className="text-green-700 text-sm">
+                  Your resume is ready for job applications
+                </Text>
+              </View>
+
+              <View className="flex-row gap-3">
+                <View className="flex-1">
+                  <Button
+                    title="Update Resume"
+                    onPress={handleResumeUpload}
+                    variant="outline"
+                    loading={isUploadingResume}
+                    disabled={isUploadingResume}
+                  />
+                </View>
+                <View className="flex-1">
+                  <Button
+                    title="Delete Resume"
+                    onPress={handleResumeDelete}
+                    variant="outline"
+                    className="border-red-300"
+                  />
+                </View>
+              </View>
+            </View>
+          ) : (
+            <View>
+              <View className="border-2 border-dashed border-gray-300 rounded-lg p-6 mb-4">
+                <Text className="text-gray-500 text-center mb-2">
+                  📄 No resume uploaded
+                </Text>
+                <Text className="text-gray-400 text-sm text-center">
+                  Upload your resume to apply for jobs
+                </Text>
+              </View>
+
+              <Button
+                title="Upload Resume"
+                onPress={handleResumeUpload}
+                loading={isUploadingResume}
+                disabled={isUploadingResume}
+              />
+            </View>
+          )}
+
+          <Text className="text-gray-500 text-xs mt-3">
+            Supported formats: PDF, DOC, DOCX (Max 10MB)
+          </Text>
         </Card>
 
         {/* Account Actions */}

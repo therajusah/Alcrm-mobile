@@ -26,7 +26,7 @@ const api: AxiosInstance = axios.create({
 // Log API configuration for debugging
 console.log('API Configuration:', {
   baseURL: API_BASE_URL,
-  platform: require('react-native').Platform.OS,
+  platform: 'react-native',
 });
 
 // Request interceptor to add auth token
@@ -38,7 +38,7 @@ api.interceptors.request.use(
       baseURL: config.baseURL,
       fullURL: `${config.baseURL}${config.url}`,
     });
-    
+
     const token = await AsyncStorage.getItem(TOKEN_KEY);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -67,10 +67,12 @@ api.interceptors.response.use(
       code: error.code,
       status: error.response?.status,
       url: error.config?.url,
-      fullURL: error.config ? `${error.config.baseURL}${error.config.url}` : 'unknown',
+      fullURL: error.config
+        ? `${error.config.baseURL}${error.config.url}`
+        : 'unknown',
       data: error.response?.data,
     });
-    
+
     if (error.response?.status === 401) {
       // Token expired or invalid, clear storage
       await AsyncStorage.removeItem(TOKEN_KEY);
@@ -311,6 +313,28 @@ export const userApi = {
 
   deletePhoto: async () => {
     const response = await api.delete('/user/uploads/photo');
+    return response.data;
+  },
+
+  // Onboarding management
+  getOnboardingState: async () => {
+    const response = await api.get('/user/onboarding/state');
+    return response.data;
+  },
+
+  setOnboardingStep: async (step: number) => {
+    const response = await api.post('/user/onboarding/step', { step });
+    return response.data;
+  },
+
+  completeOnboarding: async () => {
+    const response = await api.post('/user/onboarding/complete');
+    return response.data;
+  },
+
+  // Mentorship session detail
+  getSessionDetail: async (id: string) => {
+    const response = await api.get(`/user/mentorship-sessions/${id}`);
     return response.data;
   },
 };

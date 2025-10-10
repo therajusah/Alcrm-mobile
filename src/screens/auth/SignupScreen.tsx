@@ -97,7 +97,9 @@ export default function SignupScreen({ navigation }: any) {
       setStep('details');
       Alert.alert('Success', 'Email verified successfully');
       setErrors({});
-      console.log('SignupScreen: OTP verification successful, moved to details step');
+      console.log(
+        'SignupScreen: OTP verification successful, moved to details step'
+      );
     } catch (err: any) {
       console.log('SignupScreen: OTP verification error:', err);
       Alert.alert('Error', err.message || 'Invalid OTP');
@@ -111,11 +113,15 @@ export default function SignupScreen({ navigation }: any) {
 
     setIsLoading(true);
     try {
-      console.log('SignupScreen: Starting signup process with:', { email, phone });
+      console.log('SignupScreen: Starting signup process with:', {
+        email,
+        phone,
+      });
       await signup(email, password, phone);
       Alert.alert('Success', 'Account created successfully');
       console.log('SignupScreen: Signup completed successfully');
-      // Navigation will be handled automatically
+      // Navigate to onboarding instead of main app
+      navigation.navigate('Onboarding');
     } catch (err: any) {
       console.log('SignupScreen: Signup error:', err);
       Alert.alert('Error', err.message || 'Failed to create account');

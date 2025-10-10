@@ -10,6 +10,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignupScreen from '../screens/auth/SignupScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
+import OnboardingScreen from '../screens/auth/OnboardingScreen';
 
 // User Screens
 import DashboardScreen from '../screens/user/DashboardScreen';
@@ -20,6 +21,7 @@ import ResourcesScreen from '../screens/user/ResourcesScreen';
 import ProfileScreen from '../screens/user/ProfileScreen';
 import SettingsScreen from '../screens/user/SettingsScreen';
 import ChangePasswordScreen from '../screens/user/ChangePasswordScreen';
+import MentorshipSessionDetailScreen from '../screens/user/MentorshipSessionDetailScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -101,6 +103,7 @@ function AuthStack() {
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
     </Stack.Navigator>
   );
 }
@@ -140,6 +143,11 @@ export default function AppNavigator() {
             name="ChangePassword"
             component={ChangePasswordScreen}
             options={{ headerTitle: 'Change Password' }}
+          />
+          <Stack.Screen
+            name="MentorshipSessionDetail"
+            component={MentorshipSessionDetailScreen}
+            options={{ headerTitle: 'Session Details' }}
           />
         </Stack.Navigator>
       ) : (

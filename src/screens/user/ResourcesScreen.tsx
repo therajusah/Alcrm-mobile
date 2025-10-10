@@ -100,7 +100,7 @@ export default function ResourcesScreen() {
               <View className="flex-row items-center justify-between">
                 {getResourceTypeBadge(resource.resource_type)}
                 <Text className="text-gray-500 text-xs">
-                  {new Date(resource.created_at).toLocaleDateString()}
+                  {new Date(resource.created_at || '').toLocaleDateString()}
                 </Text>
               </View>
 

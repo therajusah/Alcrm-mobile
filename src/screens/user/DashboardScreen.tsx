@@ -125,9 +125,9 @@ export default function DashboardScreen({ navigation }: any) {
           ) : (
             jobs.map(job => (
               <Card
-                key={job.id}
+                key={job.job_id}
                 onPress={() =>
-                  navigation.navigate('JobDetail', { jobId: job.id })
+                  navigation.navigate('JobDetail', { jobId: job.job_id })
                 }
               >
                 <View className="mb-3">
@@ -145,13 +145,15 @@ export default function DashboardScreen({ navigation }: any) {
                   <Text className="text-gray-600 text-sm mr-4">
                     📍 {job.location}
                   </Text>
-                  <Text className="text-gray-600 text-sm">💰 {job.salary}</Text>
+                  <Text className="text-gray-600 text-sm">
+                    💰 {job.salary_range}
+                  </Text>
                 </View>
 
                 <View className="flex-row items-center justify-between">
-                  {getJobTypeBadge(job.type)}
+                  {getJobTypeBadge(job.job_type)}
                   <Text className="text-gray-500 text-xs">
-                    {new Date(job.postedDate).toLocaleDateString()}
+                    {new Date(job.created_at || '').toLocaleDateString()}
                   </Text>
                 </View>
               </Card>

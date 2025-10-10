@@ -52,5 +52,10 @@ export const API_ENDPOINTS = {
     DELETE_RESUME: '/user/uploads/resume',
     UPLOAD_PHOTO: '/user/uploads/photo',
     DELETE_PHOTO: '/user/uploads/photo',
+    // Optional additions if you want full feature parity:
+    ONBOARDING_STATE: '/user/onboarding/state',
+    SET_ONBOARDING_STEP: '/user/onboarding/step',
+    COMPLETE_ONBOARDING: '/user/onboarding/complete',
+    SESSION_DETAIL: (id: string) => `/user/mentorship-sessions/${id}`,
   },
 };

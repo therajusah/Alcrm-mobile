@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Alert, TextInput } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
 import { useJobStore } from '../../stores/jobStore';
+import { useAuthStore } from '../../stores/authStore';
+import { userApi } from '../../services/api';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
@@ -9,9 +12,13 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 export default function JobDetailScreen({ route, navigation }: any) {
   const { jobId } = route.params;
   const { selectedJob, fetchJobDetail, applyForJob, isLoading } = useJobStore();
+  const { user } = useAuthStore();
   const [coverLetter, setCoverLetter] = useState('');
   const [showApplyForm, setShowApplyForm] = useState(false);
   const [applying, setApplying] = useState(false);
+  const [resumeFile, setResumeFile] = useState<any>(null);
+  const [resumeFileName, setResumeFileName] = useState('');
+  const [isUploadingResume, setIsUploadingResume] = useState(false);
 
   useEffect(() => {
     fetchJobDetail(jobId);
@@ -21,6 +28,28 @@ export default function JobDetailScreen({ route, navigation }: any) {
     };
   }, [jobId, fetchJobDetail]);
 
+  const handleResumeUpload = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ],
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled && result.assets && result.assets[0]) {
+        const file = result.assets[0];
+        setResumeFile(file);
+        setResumeFileName(file.name);
+      }
+    } catch (error) {
+      console.log('Document picker error:', error);
+      Alert.alert('Error', 'Failed to select resume file');
+    }
+  };
+
   const handleApply = async () => {
     if (!coverLetter.trim()) {
       Alert.alert('Required', 'Please write a cover letter');
@@ -29,7 +58,27 @@ export default function JobDetailScreen({ route, navigation }: any) {
 
     setApplying(true);
     try {
-      await applyForJob(jobId, coverLetter);
+      let resumeUrl = user?.resume_url;
+
+      // If user uploaded a new resume, upload it first
+      if (resumeFile) {
+        setIsUploadingResume(true);
+        try {
+          const response = await userApi.uploadResume(
+            resumeFile.uri,
+            resumeFileName
+          );
+          resumeUrl = response.resume_url;
+        } catch (error: any) {
+          Alert.alert('Error', `Failed to upload resume: ${error.message}`);
+          return;
+        } finally {
+          setIsUploadingResume(false);
+        }
+      }
+
+      // Apply for job with cover letter and resume
+      await applyForJob(jobId, coverLetter, resumeUrl);
       Alert.alert('Success', 'Application submitted successfully!', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
@@ -88,7 +137,7 @@ export default function JobDetailScreen({ route, navigation }: any) {
           )}
 
           <View className="flex-row flex-wrap items-center gap-2 mb-4">
-            {getJobTypeBadge(selectedJob.type)}
+            {getJobTypeBadge(selectedJob.job_type)}
             {getStatusBadge(selectedJob.status)}
           </View>
 
@@ -103,14 +152,14 @@ export default function JobDetailScreen({ route, navigation }: any) {
             <View className="mb-3">
               <Text className="text-gray-600 text-sm mb-1">💰 Salary</Text>
               <Text className="text-gray-900 font-semibold">
-                {selectedJob.salary}
+                {selectedJob.salary_range}
               </Text>
             </View>
 
             <View>
               <Text className="text-gray-600 text-sm mb-1">📅 Posted</Text>
               <Text className="text-gray-900 font-semibold">
-                {new Date(selectedJob.postedDate).toLocaleDateString()}
+                {new Date(selectedJob.created_at || '').toLocaleDateString()}
               </Text>
             </View>
           </View>
@@ -130,11 +179,7 @@ export default function JobDetailScreen({ route, navigation }: any) {
               <Text className="text-lg font-semibold text-gray-900 mb-2">
                 Application Status
               </Text>
-              <Badge
-                text="Applied"
-                variant="info"
-                className="px-4 py-2"
-              />
+              <Badge text="Applied" variant="info" className="px-4 py-2" />
               <Text className="text-gray-600 mt-4 text-center">
                 You have already applied for this job
               </Text>
@@ -166,6 +211,55 @@ export default function JobDetailScreen({ route, navigation }: any) {
                   onChangeText={setCoverLetter}
                 />
 
+                {/* Resume Section */}
+                <View className="mb-4">
+                  <Text className="text-gray-700 font-semibold mb-2">
+                    Resume
+                  </Text>
+
+                  {user?.resume_url && !resumeFile ? (
+                    <View className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                      <Text className="text-blue-800 font-semibold mb-1">
+                        ✓ Using Profile Resume
+                      </Text>
+                      <Text className="text-blue-700 text-sm">
+                        Your profile resume will be used for this application
+                      </Text>
+                    </View>
+                  ) : resumeFile ? (
+                    <View className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
+                      <Text className="text-green-800 font-semibold mb-1">
+                        ✓ New Resume Selected
+                      </Text>
+                      <Text className="text-green-700 text-sm">
+                        {resumeFileName}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View className="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-3">
+                      <Text className="text-gray-500 text-center mb-2">
+                        📄 No resume selected
+                      </Text>
+                      <Text className="text-gray-400 text-sm text-center">
+                        {user?.resume_url
+                          ? 'Using profile resume or upload a new one'
+                          : 'Upload your resume to apply'}
+                      </Text>
+                    </View>
+                  )}
+
+                  <Button
+                    title={resumeFile ? 'Change Resume' : 'Upload Resume'}
+                    onPress={handleResumeUpload}
+                    variant="outline"
+                    className="mb-2"
+                  />
+
+                  <Text className="text-gray-500 text-xs">
+                    Supported formats: PDF, DOC, DOCX (Max 10MB)
+                  </Text>
+                </View>
+
                 <View className="flex-row gap-3">
                   <View className="flex-1">
                     <Button
@@ -179,7 +273,8 @@ export default function JobDetailScreen({ route, navigation }: any) {
                     <Button
                       title="Submit"
                       onPress={handleApply}
-                      loading={applying}
+                      loading={applying || isUploadingResume}
+                      disabled={applying || isUploadingResume}
                     />
                   </View>
                 </View>
