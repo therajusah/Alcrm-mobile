@@ -12,7 +12,13 @@ import { useAuthStore } from '../../stores/authStore';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 
-export default function LoginScreen({ navigation }: any) {
+interface LoginScreenProps {
+  navigation: {
+    navigate: (screen: string) => void;
+  };
+}
+
+export default function LoginScreen({ navigation }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(

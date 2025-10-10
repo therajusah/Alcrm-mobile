@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -47,12 +47,7 @@ export default function OnboardingScreen({
 
   const { updateUserProfile } = useAuthStore();
 
-  // Load onboarding state on component mount
-  useEffect(() => {
-    loadOnboardingState();
-  }, []);
-
-  const loadOnboardingState = async () => {
+  const loadOnboardingState = useCallback(async () => {
     try {
       const state = await userApi.getOnboardingState();
       setOnboardingState(state);
@@ -71,7 +66,12 @@ export default function OnboardingScreen({
       console.log('Failed to load onboarding state:', error);
       // Continue with default step 1 if API fails
     }
-  };
+  }, [navigation]);
+
+  // Load onboarding state on component mount
+  useEffect(() => {
+    loadOnboardingState();
+  }, [loadOnboardingState]);
 
   const validateStep1 = () => {
     const newErrors: any = {};

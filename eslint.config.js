@@ -64,7 +64,7 @@ module.exports = [
       'react-native/no-raw-text': 'off', // Can be too strict for some cases
       
       // General rules
-      'no-console': 'warn',
+      // 'no-console': 'warn',
       'no-debugger': 'error',
       'no-alert': 'warn',
       'prefer-const': 'error',

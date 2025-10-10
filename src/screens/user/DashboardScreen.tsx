@@ -14,7 +14,13 @@ import Badge from '../../components/Badge';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import type { UserProfile } from '../../types';
 
-export default function DashboardScreen({ navigation }: any) {
+interface DashboardScreenProps {
+  navigation: {
+    navigate: (screen: string, params?: any) => void;
+  };
+}
+
+export default function DashboardScreen({ navigation }: DashboardScreenProps) {
   const { user } = useAuthStore();
   const { jobs, fetchJobs, isLoading } = useJobStore();
   const [profile, setProfile] = useState<UserProfile | null>(null);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -31,7 +31,7 @@ export default function MentorshipSessionDetailScreen({
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState('');
 
-  const loadSessionDetail = async () => {
+  const loadSessionDetail = useCallback(async () => {
     try {
       const sessionData = await userApi.getSessionDetail(sessionId);
       setSession(sessionData);
@@ -49,11 +49,11 @@ export default function MentorshipSessionDetailScreen({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [sessionId]);
 
   useEffect(() => {
     loadSessionDetail();
-  }, [sessionId]);
+  }, [loadSessionDetail]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -160,8 +160,8 @@ export default function MentorshipSessionDetailScreen({
           Session Not Found
         </Text>
         <Text className="text-gray-600 text-center mb-6">
-          The session you're looking for doesn't exist or you don't have access
-          to it.
+          The session you&apos;re looking for doesn&apos;t exist or you
+          don&apos;t have access to it.
         </Text>
         <Button title="Go Back" onPress={() => navigation.goBack()} />
       </View>

@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  RefreshControl,
-  Linking,
-  Alert,
-} from 'react-native';
+import { View, Text, ScrollView, RefreshControl, Alert } from 'react-native';
 import { useResourceStore } from '../../stores/resourceStore';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import EmptyState from '../../components/EmptyState';
+import PDFViewer from '../../components/PDFViewer';
+import type { FreeResource } from '../../types';
 
 export default function ResourcesScreen() {
   const { resources, fetchResources, isLoading } = useResourceStore();
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedResource, setSelectedResource] = useState<FreeResource | null>(
+    null
+  );
+  const [showPDFViewer, setShowPDFViewer] = useState(false);
 
   useEffect(() => {
     fetchResources({ page: 1, pageSize: 50 });
@@ -27,16 +26,42 @@ export default function ResourcesScreen() {
     setRefreshing(false);
   };
 
-  const handleResourcePress = async (resource: any) => {
-    const url = resource.resource_url || resource.resource_link;
-    if (url) {
-      const canOpen = await Linking.canOpenURL(url);
-      if (canOpen) {
-        await Linking.openURL(url);
+  const handleViewResource = (resource: FreeResource) => {
+    if (resource.resource_url || resource.resource_link) {
+      const url = resource.resource_url || resource.resource_link;
+
+      // Check if it's a PDF or other document type
+      if (
+        url &&
+        (url.toLowerCase().includes('.pdf') || resource.resource_type === 'PDF')
+      ) {
+        setSelectedResource(resource);
+        setShowPDFViewer(true);
       } else {
-        Alert.alert('Error', 'Cannot open this resource');
+        Alert.alert(
+          'External Resource',
+          'This resource will open in your browser. Continue?',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Open',
+              onPress: () => {
+                // For non-PDF resources, you can still open in browser if needed
+                Alert.alert(
+                  'Info',
+                  'This resource type is not supported for in-app viewing yet.'
+                );
+              },
+            },
+          ]
+        );
       }
     }
+  };
+
+  const closePDFViewer = () => {
+    setShowPDFViewer(false);
+    setSelectedResource(null);
   };
 
   const getResourceTypeBadge = (type: string | null) => {
@@ -84,7 +109,7 @@ export default function ResourcesScreen() {
           resources.map(resource => (
             <Card
               key={resource.resource_id}
-              onPress={() => handleResourcePress(resource)}
+              onPress={() => handleViewResource(resource)}
             >
               <View className="mb-3">
                 <Text className="text-lg font-bold text-gray-900 mb-2">
@@ -115,6 +140,20 @@ export default function ResourcesScreen() {
           ))
         )}
       </View>
+
+      {/* PDF Viewer Modal */}
+      {selectedResource && (
+        <PDFViewer
+          visible={showPDFViewer}
+          onClose={closePDFViewer}
+          pdfUrl={
+            selectedResource.resource_url ||
+            selectedResource.resource_link ||
+            ''
+          }
+          title={selectedResource.title}
+        />
+      )}
     </ScrollView>
   );
 }

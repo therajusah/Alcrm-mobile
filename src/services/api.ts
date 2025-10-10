@@ -78,7 +78,7 @@ api.interceptors.response.use(
       await AsyncStorage.removeItem(TOKEN_KEY);
     }
     const message =
-      (error.response?.data as any)?.error ||
+      (error.response?.data as { error?: string })?.error ||
       error.message ||
       'An error occurred';
     return Promise.reject(new Error(message));
