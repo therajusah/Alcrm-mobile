@@ -5,13 +5,19 @@
     android:viewportWidth="200"
     android:viewportHeight="200">
     
-    <!-- Simple logo placeholder -->
+    <!-- Background circle -->
     <path
-        android:fillColor="#4F46E5"
-        android:pathData="M100,20 L180,100 L100,180 L20,100 Z" />
+        android:fillColor="#3B82F6"
+        android:pathData="M100,100m-90,0a90,90 0,1 1,180 0a90,90 0,1 1,-180 0" />
     
+    <!-- App icon placeholder -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M100,40 L160,100 L100,160 L40,100 Z" />
-        
+        android:pathData="M80,70 L120,70 L120,110 L80,110 Z" />
+    
+    <!-- Text placeholder -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M70,130 L130,130 L130,140 L70,140 Z" />
+    
 </vector>
