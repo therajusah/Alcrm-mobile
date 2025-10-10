@@ -23,22 +23,54 @@ const api: AxiosInstance = axios.create({
   },
 });
 
+// Log API configuration for debugging
+console.log('API Configuration:', {
+  baseURL: API_BASE_URL,
+  platform: require('react-native').Platform.OS,
+});
+
 // Request interceptor to add auth token
 api.interceptors.request.use(
   async config => {
+    console.log('API Request:', {
+      method: config.method?.toUpperCase(),
+      url: config.url,
+      baseURL: config.baseURL,
+      fullURL: `${config.baseURL}${config.url}`,
+    });
+    
     const token = await AsyncStorage.getItem(TOKEN_KEY);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  error => Promise.reject(error)
+  error => {
+    console.log('API Request Error:', error);
+    return Promise.reject(error);
+  }
 );
 
 // Response interceptor for error handling
 api.interceptors.response.use(
-  response => response,
+  response => {
+    console.log('API Response:', {
+      status: response.status,
+      url: response.config.url,
+      data: response.data,
+    });
+    return response;
+  },
   async (error: AxiosError) => {
+    console.log('API Response Error:', {
+      message: error.message,
+      code: error.code,
+      status: error.response?.status,
+      url: error.config?.url,
+      fullURL: error.config ? `${error.config.baseURL}${error.config.url}` : 'unknown',
+      data: error.response?.data,
+    });
+    
     if (error.response?.status === 401) {
       // Token expired or invalid, clear storage
       await AsyncStorage.removeItem(TOKEN_KEY);
