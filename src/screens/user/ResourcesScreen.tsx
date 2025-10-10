@@ -27,14 +27,17 @@ export default function ResourcesScreen() {
   };
 
   const handleViewResource = (resource: FreeResource) => {
+    console.log('Viewing resource:', resource);
     if (resource.resource_url || resource.resource_link) {
       const url = resource.resource_url || resource.resource_link;
+      console.log('Resource URL:', url);
 
       // Check if it's a PDF or other document type
       if (
         url &&
         (url.toLowerCase().includes('.pdf') || resource.resource_type === 'PDF')
       ) {
+        console.log('Opening PDF viewer for:', url);
         setSelectedResource(resource);
         setShowPDFViewer(true);
       } else {

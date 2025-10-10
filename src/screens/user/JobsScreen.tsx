@@ -90,9 +90,9 @@ export default function JobsScreen({ navigation }: JobsScreenProps) {
           ) : (
             jobs.map(job => (
               <Card
-                key={job.job_id}
+                key={job.id}
                 onPress={() =>
-                  navigation.navigate('JobDetail', { jobId: job.job_id })
+                  navigation.navigate('JobDetail', { jobId: job.id })
                 }
               >
                 <View className="mb-3">
@@ -115,14 +115,14 @@ export default function JobsScreen({ navigation }: JobsScreenProps) {
                     📍 {job.location}
                   </Text>
                   <Text className="text-gray-600 text-sm">
-                    💰 {job.salary_range}
+                    💰 {job.salary ? `₹${job.salary}L` : 'Salary not specified'}
                   </Text>
                 </View>
 
                 <View className="flex-row items-center justify-between">
-                  {getJobTypeBadge(job.job_type)}
+                  {getJobTypeBadge(job.type)}
                   <Text className="text-gray-500 text-xs">
-                    {new Date(job.created_at || '').toLocaleDateString()}
+                    {new Date(job.postedDate || '').toLocaleDateString()}
                   </Text>
                 </View>
               </Card>

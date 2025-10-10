@@ -5,6 +5,7 @@ import {
   ScrollView,
   RefreshControl,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { useAuthStore } from '../../stores/authStore';
 import { useJobStore } from '../../stores/jobStore';
@@ -93,6 +94,7 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
         <Card title="Quick Actions" className="mb-4">
           <View className="flex-row justify-between">
             <TouchableOpacity
+              key="browse-jobs"
               onPress={() => navigation.navigate('Jobs')}
               className="bg-primary-50 p-4 rounded-lg flex-1 mr-2"
             >
@@ -101,6 +103,7 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
+              key="my-applications"
               onPress={() => navigation.navigate('Applications')}
               className="bg-green-50 p-4 rounded-lg flex-1 ml-2"
             >
@@ -131,10 +134,15 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
           ) : (
             jobs.map(job => (
               <Card
-                key={job.job_id}
-                onPress={() =>
-                  navigation.navigate('JobDetail', { jobId: job.job_id })
-                }
+                key={job.id}
+                onPress={() => {
+                  if (job.id) {
+                    navigation.navigate('JobDetail', { jobId: job.id });
+                  } else {
+                    console.error('Job ID is missing:', job);
+                    Alert.alert('Error', 'Job ID is missing. Please try again.');
+                  }
+                }}
               >
                 <View className="mb-3">
                   <Text className="text-lg font-bold text-gray-900 mb-1">
@@ -152,14 +160,14 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
                     📍 {job.location}
                   </Text>
                   <Text className="text-gray-600 text-sm">
-                    💰 {job.salary_range}
+                    💰 {job.salary ? `₹${job.salary}L` : 'Salary not specified'}
                   </Text>
                 </View>
 
                 <View className="flex-row items-center justify-between">
-                  {getJobTypeBadge(job.job_type)}
+                  {getJobTypeBadge(job.type)}
                   <Text className="text-gray-500 text-xs">
-                    {new Date(job.created_at || '').toLocaleDateString()}
+                    {new Date(job.postedDate || '').toLocaleDateString()}
                   </Text>
                 </View>
               </Card>

@@ -79,16 +79,16 @@ export type JobType = 'FULL-TIME' | 'PART-TIME' | 'CONTRACT' | 'INTERNSHIP';
 export type JobStatus = 'OPEN' | 'CLOSED' | 'ARCHIVED';
 
 export interface Job {
-  job_id: string;
+  id: string; // Changed from job_id to id
   company_id?: string;
   title: string;
   description: string;
-  job_type: JobType;
+  type: JobType; // Changed from job_type to type
   location?: string;
   status: JobStatus;
-  created_at?: string;
+  postedDate?: string; // Changed from created_at to postedDate
   updated_at?: string;
-  salary_range?: string;
+  salary?: string; // Changed from salary_range to salary
   // Additional fields for UI
   company_name?: string;
   applicationStatus?: ApplicationStatusInfo;

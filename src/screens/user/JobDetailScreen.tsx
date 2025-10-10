@@ -13,6 +13,16 @@ export default function JobDetailScreen({ route, navigation }: any) {
   const { jobId } = route.params;
   const { selectedJob, fetchJobDetail, applyForJob, isLoading } = useJobStore();
   const { user } = useAuthStore();
+
+  // Check if jobId is valid
+  if (!jobId) {
+    return (
+      <View className="flex-1 justify-center items-center bg-gray-50">
+        <Text className="text-red-600 text-lg mb-4">Invalid Job ID</Text>
+        <Button title="Go Back" onPress={() => navigation.goBack()} />
+      </View>
+    );
+  }
   const [coverLetter, setCoverLetter] = useState('');
   const [showApplyForm, setShowApplyForm] = useState(false);
   const [applying, setApplying] = useState(false);
@@ -137,7 +147,7 @@ export default function JobDetailScreen({ route, navigation }: any) {
           )}
 
           <View className="flex-row flex-wrap items-center gap-2 mb-4">
-            {getJobTypeBadge(selectedJob.job_type)}
+            {getJobTypeBadge(selectedJob.type)}
             {getStatusBadge(selectedJob.status)}
           </View>
 
@@ -152,14 +162,14 @@ export default function JobDetailScreen({ route, navigation }: any) {
             <View className="mb-3">
               <Text className="text-gray-600 text-sm mb-1">💰 Salary</Text>
               <Text className="text-gray-900 font-semibold">
-                {selectedJob.salary_range}
+                {selectedJob.salary ? `₹${selectedJob.salary}L` : 'Salary not specified'}
               </Text>
             </View>
 
             <View>
               <Text className="text-gray-600 text-sm mb-1">📅 Posted</Text>
               <Text className="text-gray-900 font-semibold">
-                {new Date(selectedJob.created_at || '').toLocaleDateString()}
+                {new Date(selectedJob.postedDate || '').toLocaleDateString()}
               </Text>
             </View>
           </View>
