@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Card from '../../components/Card';
@@ -54,7 +61,7 @@ export default function ChangePasswordScreen({ navigation }: any) {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1"
     >
@@ -69,9 +76,10 @@ export default function ChangePasswordScreen({ navigation }: any) {
               label="Current Password"
               placeholder="Enter current password"
               value={currentPassword}
-              onChangeText={(text) => {
+              onChangeText={text => {
                 setCurrentPassword(text);
-                if (errors.currentPassword) setErrors({ ...errors, currentPassword: undefined });
+                if (errors.currentPassword)
+                  setErrors({ ...errors, currentPassword: undefined });
               }}
               error={errors.currentPassword}
               secureTextEntry
@@ -82,9 +90,10 @@ export default function ChangePasswordScreen({ navigation }: any) {
               label="New Password"
               placeholder="Enter new password"
               value={newPassword}
-              onChangeText={(text) => {
+              onChangeText={text => {
                 setNewPassword(text);
-                if (errors.newPassword) setErrors({ ...errors, newPassword: undefined });
+                if (errors.newPassword)
+                  setErrors({ ...errors, newPassword: undefined });
               }}
               error={errors.newPassword}
               secureTextEntry
@@ -95,9 +104,10 @@ export default function ChangePasswordScreen({ navigation }: any) {
               label="Confirm New Password"
               placeholder="Confirm new password"
               value={confirmPassword}
-              onChangeText={(text) => {
+              onChangeText={text => {
                 setConfirmPassword(text);
-                if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
+                if (errors.confirmPassword)
+                  setErrors({ ...errors, confirmPassword: undefined });
               }}
               error={errors.confirmPassword}
               secureTextEntry
@@ -116,4 +126,3 @@ export default function ChangePasswordScreen({ navigation }: any) {
     </KeyboardAvoidingView>
   );
 }
-

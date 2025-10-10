@@ -1,4 +1,4 @@
-import 'react-native-reanimated'; 
+import 'react-native-reanimated';
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AppNavigator from './src/navigation/AppNavigator';
@@ -11,4 +11,3 @@ export default function App() {
     </>
   );
 }
-

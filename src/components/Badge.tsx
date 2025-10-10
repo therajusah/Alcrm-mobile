@@ -7,7 +7,11 @@ interface BadgeProps {
   className?: string;
 }
 
-export default function Badge({ text, variant = 'default', className = '' }: BadgeProps) {
+export default function Badge({
+  text,
+  variant = 'default',
+  className = '',
+}: BadgeProps) {
   const getVariantStyles = () => {
     switch (variant) {
       case 'success':
@@ -39,9 +43,12 @@ export default function Badge({ text, variant = 'default', className = '' }: Bad
   };
 
   return (
-    <View className={`px-2 py-1 rounded-full border ${getVariantStyles()} ${className}`.trim()}>
-      <Text className={`text-xs font-semibold ${getTextStyles()}`.trim()}>{text}</Text>
+    <View
+      className={`px-2 py-1 rounded-full border ${getVariantStyles()} ${className}`.trim()}
+    >
+      <Text className={`text-xs font-semibold ${getTextStyles()}`.trim()}>
+        {text}
+      </Text>
     </View>
   );
 }
-

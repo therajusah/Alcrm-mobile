@@ -11,7 +11,7 @@ interface ApplicationState {
     page: number;
     pageSize: number;
   };
-  
+
   // Actions
   fetchApplications: (params?: {
     page?: number;
@@ -21,7 +21,7 @@ interface ApplicationState {
   clearError: () => void;
 }
 
-export const useApplicationStore = create<ApplicationState>((set) => ({
+export const useApplicationStore = create<ApplicationState>(set => ({
   applications: [],
   isLoading: false,
   error: null,
@@ -31,10 +31,11 @@ export const useApplicationStore = create<ApplicationState>((set) => ({
     pageSize: 10,
   },
 
-  fetchApplications: async (params) => {
+  fetchApplications: async params => {
     try {
       set({ isLoading: true, error: null });
-      const response: GenericList<Application> = await userApi.getApplications(params);
+      const response: GenericList<Application> =
+        await userApi.getApplications(params);
       set({
         applications: response.items,
         pagination: {
@@ -45,7 +46,8 @@ export const useApplicationStore = create<ApplicationState>((set) => ({
         isLoading: false,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to fetch applications';
+      const message =
+        error instanceof Error ? error.message : 'Failed to fetch applications';
       set({ error: message, isLoading: false });
     }
   },
@@ -54,4 +56,3 @@ export const useApplicationStore = create<ApplicationState>((set) => ({
     set({ error: null });
   },
 }));
-

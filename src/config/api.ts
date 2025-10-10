@@ -1,8 +1,8 @@
 // API Configuration
 // Update this to match your backend URL
-export const API_BASE_URL = __DEV__ 
-  ? 'http://localhost:4000/api'  // For development
-  : 'https://alcrm-backend.vercel.app/api/';  // For production
+export const API_BASE_URL = __DEV__
+  ? 'http://localhost:4000/api' // For development
+  : 'https://alcrm-backend.vercel.app/api/'; // For production
 
 export const API_ENDPOINTS = {
   // Auth endpoints
@@ -40,4 +40,3 @@ export const API_ENDPOINTS = {
     DELETE_PHOTO: '/user/uploads/photo',
   },
 };
-

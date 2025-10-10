@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { StyleSheet } from 'react-native';
 import { useAuthStore } from '../stores/authStore';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -47,9 +48,7 @@ function UserTabs() {
         options={{
           headerShown: false,
           tabBarLabel: 'Home',
-          tabBarIcon: ({ color }) => (
-            <TabIcon icon="🏠" color={color} />
-          ),
+          tabBarIcon: ({ color }) => <TabIcon icon="🏠" color={color} />,
         }}
       />
       <Tab.Screen
@@ -57,9 +56,7 @@ function UserTabs() {
         component={JobsScreen}
         options={{
           headerTitle: 'Browse Jobs',
-          tabBarIcon: ({ color }) => (
-            <TabIcon icon="💼" color={color} />
-          ),
+          tabBarIcon: ({ color }) => <TabIcon icon="💼" color={color} />,
         }}
       />
       <Tab.Screen
@@ -67,9 +64,7 @@ function UserTabs() {
         component={ApplicationsScreen}
         options={{
           headerTitle: 'My Applications',
-          tabBarIcon: ({ color }) => (
-            <TabIcon icon="📋" color={color} />
-          ),
+          tabBarIcon: ({ color }) => <TabIcon icon="📋" color={color} />,
         }}
       />
       <Tab.Screen
@@ -77,9 +72,7 @@ function UserTabs() {
         component={ResourcesScreen}
         options={{
           headerTitle: 'Free Resources',
-          tabBarIcon: ({ color }) => (
-            <TabIcon icon="📚" color={color} />
-          ),
+          tabBarIcon: ({ color }) => <TabIcon icon="📚" color={color} />,
         }}
       />
       <Tab.Screen
@@ -87,9 +80,7 @@ function UserTabs() {
         component={ProfileScreen}
         options={{
           headerTitle: 'My Profile',
-          tabBarIcon: ({ color }) => (
-            <TabIcon icon="👤" color={color} />
-          ),
+          tabBarIcon: ({ color }) => <TabIcon icon="👤" color={color} />,
         }}
       />
     </Tab.Navigator>
@@ -99,7 +90,7 @@ function UserTabs() {
 // Simple icon component
 function TabIcon({ icon, color }: { icon: string; color: string }) {
   return (
-    <text style={{ fontSize: 24, color }}>{icon}</text>
+    <text style={StyleSheet.flatten([styles.tabIcon, { color }])}>{icon}</text>
   );
 }
 
@@ -120,7 +111,7 @@ export default function AppNavigator() {
 
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [checkAuth]);
 
   if (isLoading) {
     return <LoadingSpinner message="Loading..." />;
@@ -158,3 +149,8 @@ export default function AppNavigator() {
   );
 }
 
+const styles = StyleSheet.create({
+  tabIcon: {
+    fontSize: 24,
+  },
+});

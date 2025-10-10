@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { authApi } from '../../services/api';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -75,7 +83,7 @@ export default function ForgotPasswordScreen({ navigation }: any) {
     try {
       await authApi.resetPassword(email, newPassword, resetToken);
       Alert.alert('Success', 'Password reset successfully', [
-        { text: 'OK', onPress: () => navigation.navigate('Login') }
+        { text: 'OK', onPress: () => navigation.navigate('Login') },
       ]);
     } catch (err: any) {
       Alert.alert('Error', err.message || 'Failed to reset password');
@@ -85,7 +93,7 @@ export default function ForgotPasswordScreen({ navigation }: any) {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1"
     >
@@ -93,7 +101,9 @@ export default function ForgotPasswordScreen({ navigation }: any) {
         <View className="flex-1 px-6 pt-12">
           {/* Header */}
           <View className="mb-8">
-            <Text className="text-3xl font-bold text-gray-900 mb-2">Reset Password</Text>
+            <Text className="text-3xl font-bold text-gray-900 mb-2">
+              Reset Password
+            </Text>
             <Text className="text-gray-600 text-base">
               {step === 'email' && 'Enter your email to receive OTP'}
               {step === 'otp' && 'Enter the OTP sent to your email'}
@@ -108,7 +118,7 @@ export default function ForgotPasswordScreen({ navigation }: any) {
                 label="Email"
                 placeholder="Enter your email"
                 value={email}
-                onChangeText={(text) => {
+                onChangeText={text => {
                   setEmail(text);
                   setErrors({});
                 }}
@@ -132,7 +142,7 @@ export default function ForgotPasswordScreen({ navigation }: any) {
                 label="OTP Code"
                 placeholder="Enter 6-digit code"
                 value={otp}
-                onChangeText={(text) => {
+                onChangeText={text => {
                   setOtp(text);
                   setErrors({});
                 }}
@@ -164,9 +174,10 @@ export default function ForgotPasswordScreen({ navigation }: any) {
                 label="New Password"
                 placeholder="Enter new password"
                 value={newPassword}
-                onChangeText={(text) => {
+                onChangeText={text => {
                   setNewPassword(text);
-                  if (errors.newPassword) setErrors({ ...errors, newPassword: undefined });
+                  if (errors.newPassword)
+                    setErrors({ ...errors, newPassword: undefined });
                 }}
                 error={errors.newPassword}
                 secureTextEntry
@@ -177,9 +188,10 @@ export default function ForgotPasswordScreen({ navigation }: any) {
                 label="Confirm Password"
                 placeholder="Confirm new password"
                 value={confirmPassword}
-                onChangeText={(text) => {
+                onChangeText={text => {
                   setConfirmPassword(text);
-                  if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
+                  if (errors.confirmPassword)
+                    setErrors({ ...errors, confirmPassword: undefined });
                 }}
                 error={errors.confirmPassword}
                 secureTextEntry
@@ -197,7 +209,9 @@ export default function ForgotPasswordScreen({ navigation }: any) {
           {/* Back to Login */}
           <View className="flex-row justify-center mt-6">
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text className="text-primary-600 font-semibold">Back to Login</Text>
+              <Text className="text-primary-600 font-semibold">
+                Back to Login
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -205,4 +219,3 @@ export default function ForgotPasswordScreen({ navigation }: any) {
     </KeyboardAvoidingView>
   );
 }
-

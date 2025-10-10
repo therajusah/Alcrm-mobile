@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, RefreshControl, Linking, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  RefreshControl,
+  Linking,
+  Alert,
+} from 'react-native';
 import { useResourceStore } from '../../stores/resourceStore';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
@@ -12,7 +19,7 @@ export default function ResourcesScreen() {
 
   useEffect(() => {
     fetchResources({ page: 1, pageSize: 50 });
-  }, []);
+  }, [fetchResources]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -34,7 +41,7 @@ export default function ResourcesScreen() {
 
   const getResourceTypeBadge = (type: string | null) => {
     if (!type) return null;
-    
+
     switch (type.toUpperCase()) {
       case 'PDF':
         return <Badge text="PDF" variant="danger" />;
@@ -54,7 +61,7 @@ export default function ResourcesScreen() {
   }
 
   return (
-    <ScrollView 
+    <ScrollView
       className="flex-1 bg-gray-50"
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -74,8 +81,8 @@ export default function ResourcesScreen() {
             message="Check back later for new resources"
           />
         ) : (
-          resources.map((resource) => (
-            <Card 
+          resources.map(resource => (
+            <Card
               key={resource.resource_id}
               onPress={() => handleResourcePress(resource)}
             >
@@ -111,4 +118,3 @@ export default function ResourcesScreen() {
     </ScrollView>
   );
 }
-

@@ -12,7 +12,7 @@ export default function ApplicationsScreen() {
 
   useEffect(() => {
     fetchApplications({ page: 1, pageSize: 50 });
-  }, []);
+  }, [fetchApplications]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -48,7 +48,7 @@ export default function ApplicationsScreen() {
   }
 
   return (
-    <ScrollView 
+    <ScrollView
       className="flex-1 bg-gray-50"
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -65,14 +65,16 @@ export default function ApplicationsScreen() {
             message="Start applying for jobs to see them here"
           />
         ) : (
-          applications.map((application) => (
+          applications.map(application => (
             <Card key={application.application_id}>
               <View className="mb-3">
                 <Text className="text-lg font-bold text-gray-900 mb-1">
                   {application.job_title || 'Job Title'}
                 </Text>
                 {application.job_location && (
-                  <Text className="text-gray-600 text-sm">📍 {application.job_location}</Text>
+                  <Text className="text-gray-600 text-sm">
+                    📍 {application.job_location}
+                  </Text>
                 )}
               </View>
 
@@ -85,13 +87,16 @@ export default function ApplicationsScreen() {
               <View className="flex-row items-center justify-between">
                 {getStatusBadge(application.status)}
                 <Text className="text-gray-500 text-xs">
-                  Applied: {new Date(application.application_date).toLocaleDateString()}
+                  Applied:{' '}
+                  {new Date(application.application_date).toLocaleDateString()}
                 </Text>
               </View>
 
               {application.cover_letter && (
                 <View className="mt-3 pt-3 border-t border-gray-200">
-                  <Text className="text-gray-600 text-xs font-semibold mb-1">Cover Letter:</Text>
+                  <Text className="text-gray-600 text-xs font-semibold mb-1">
+                    Cover Letter:
+                  </Text>
                   <Text className="text-gray-700 text-sm" numberOfLines={3}>
                     {application.cover_letter}
                   </Text>
@@ -104,4 +109,3 @@ export default function ApplicationsScreen() {
     </ScrollView>
   );
 }
-

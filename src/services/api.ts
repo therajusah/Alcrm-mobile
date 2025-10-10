@@ -1,15 +1,15 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_BASE_URL } from '../config/api';
-import type { 
-  AuthResponse, 
-  UserProfile, 
-  Job, 
-  Application, 
-  FreeResource, 
-  CareerMentor, 
-  MentorshipSession, 
-  GenericList 
+import type {
+  AuthResponse,
+  UserProfile,
+  Job,
+  Application,
+  FreeResource,
+  CareerMentor,
+  MentorshipSession,
+  GenericList,
 } from '../types';
 
 const TOKEN_KEY = 'auth_token';
@@ -25,25 +25,28 @@ const api: AxiosInstance = axios.create({
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
-  async (config) => {
+  async config => {
     const token = await AsyncStorage.getItem(TOKEN_KEY);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  error => Promise.reject(error)
 );
 
 // Response interceptor for error handling
 api.interceptors.response.use(
-  (response) => response,
+  response => response,
   async (error: AxiosError) => {
     if (error.response?.status === 401) {
       // Token expired or invalid, clear storage
       await AsyncStorage.removeItem(TOKEN_KEY);
     }
-    const message = (error.response?.data as any)?.error || error.message || 'An error occurred';
+    const message =
+      (error.response?.data as any)?.error ||
+      error.message ||
+      'An error occurred';
     return Promise.reject(new Error(message));
   }
 );
@@ -60,7 +63,12 @@ export const authApi = {
     return response.data;
   },
 
-  signup: async (email: string, password: string, phone: string, preSignupToken: string): Promise<AuthResponse> => {
+  signup: async (
+    email: string,
+    password: string,
+    phone: string,
+    preSignupToken: string
+  ): Promise<AuthResponse> => {
     const response = await api.post('/auth/signup', {
       email,
       password,
@@ -102,11 +110,18 @@ export const authApi = {
   },
 
   verifyPasswordResetOtp: async (email: string, otp: string) => {
-    const response = await api.post('/auth/password/otp/verify', { email, otp });
+    const response = await api.post('/auth/password/otp/verify', {
+      email,
+      otp,
+    });
     return response.data;
   },
 
-  resetPassword: async (email: string, newPassword: string, resetToken: string) => {
+  resetPassword: async (
+    email: string,
+    newPassword: string,
+    resetToken: string
+  ) => {
     const response = await api.post('/auth/password/reset', {
       email,
       newPassword,
@@ -144,7 +159,10 @@ export const userApi = {
     return response.data;
   },
 
-  applyJob: async (id: string, data: { cover_letter?: string; resume_url?: string }) => {
+  applyJob: async (
+    id: string,
+    data: { cover_letter?: string; resume_url?: string }
+  ) => {
     const response = await api.post(`/user/jobs/${id}/apply`, data);
     return response.data;
   },
@@ -209,7 +227,11 @@ export const userApi = {
     return response.data;
   },
 
-  rateSession: async (id: string, rating: number, feedback?: string): Promise<MentorshipSession> => {
+  rateSession: async (
+    id: string,
+    rating: number,
+    feedback?: string
+  ): Promise<MentorshipSession> => {
     const response = await api.patch(`/user/mentorship-sessions/${id}/rate`, {
       rating,
       feedback,
@@ -223,7 +245,10 @@ export const userApi = {
   },
 
   uploadResume: async (fileData: string, fileName: string) => {
-    const response = await api.post('/user/uploads/resume', { fileData, fileName });
+    const response = await api.post('/user/uploads/resume', {
+      fileData,
+      fileName,
+    });
     return response.data;
   },
 
@@ -233,7 +258,10 @@ export const userApi = {
   },
 
   uploadPhoto: async (fileData: string, fileName: string) => {
-    const response = await api.post('/user/uploads/photo', { fileData, fileName });
+    const response = await api.post('/user/uploads/photo', {
+      fileData,
+      fileName,
+    });
     return response.data;
   },
 
@@ -244,4 +272,3 @@ export const userApi = {
 };
 
 export { api, TOKEN_KEY };
-

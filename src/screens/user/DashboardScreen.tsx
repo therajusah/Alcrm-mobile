@@ -1,5 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  RefreshControl,
+  TouchableOpacity,
+} from 'react-native';
 import { useAuthStore } from '../../stores/authStore';
 import { useJobStore } from '../../stores/jobStore';
 import { userApi } from '../../services/api';
@@ -14,19 +20,19 @@ export default function DashboardScreen({ navigation }: any) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       await fetchJobs({ page: 1, pageSize: 5 });
       const profileData = await userApi.getProfile();
       setProfile(profileData);
-    } catch (error) {
-      console.error('Error loading dashboard data:', error);
+    } catch {
+      // Handle error silently or show user-friendly message
     }
-  };
+  }, [fetchJobs]);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -49,14 +55,18 @@ export default function DashboardScreen({ navigation }: any) {
     }
   };
 
-  const userFirstName = profile?.first_name || user?.first_name || user?.email?.split('@')[0] || 'User';
+  const userFirstName =
+    profile?.first_name ||
+    user?.first_name ||
+    user?.email?.split('@')[0] ||
+    'User';
 
   if (isLoading && !refreshing) {
     return <LoadingSpinner message="Loading dashboard..." />;
   }
 
   return (
-    <ScrollView 
+    <ScrollView
       className="flex-1 bg-gray-50"
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -76,17 +86,21 @@ export default function DashboardScreen({ navigation }: any) {
         {/* Quick Actions */}
         <Card title="Quick Actions" className="mb-4">
           <View className="flex-row justify-between">
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => navigation.navigate('Jobs')}
               className="bg-primary-50 p-4 rounded-lg flex-1 mr-2"
             >
-              <Text className="text-primary-600 font-semibold text-center">Browse Jobs</Text>
+              <Text className="text-primary-600 font-semibold text-center">
+                Browse Jobs
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => navigation.navigate('Applications')}
               className="bg-green-50 p-4 rounded-lg flex-1 ml-2"
             >
-              <Text className="text-green-600 font-semibold text-center">My Applications</Text>
+              <Text className="text-green-600 font-semibold text-center">
+                My Applications
+              </Text>
             </TouchableOpacity>
           </View>
         </Card>
@@ -94,7 +108,9 @@ export default function DashboardScreen({ navigation }: any) {
         {/* Recent Jobs */}
         <View className="mb-4">
           <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-xl font-bold text-gray-900">Recent Job Postings</Text>
+            <Text className="text-xl font-bold text-gray-900">
+              Recent Job Postings
+            </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Jobs')}>
               <Text className="text-primary-600 font-semibold">See All</Text>
             </TouchableOpacity>
@@ -102,26 +118,36 @@ export default function DashboardScreen({ navigation }: any) {
 
           {jobs.length === 0 ? (
             <Card>
-              <Text className="text-gray-500 text-center">No jobs available</Text>
+              <Text className="text-gray-500 text-center">
+                No jobs available
+              </Text>
             </Card>
           ) : (
-            jobs.map((job) => (
-              <Card 
+            jobs.map(job => (
+              <Card
                 key={job.id}
-                onPress={() => navigation.navigate('JobDetail', { jobId: job.id })}
+                onPress={() =>
+                  navigation.navigate('JobDetail', { jobId: job.id })
+                }
               >
                 <View className="mb-3">
-                  <Text className="text-lg font-bold text-gray-900 mb-1">{job.title}</Text>
+                  <Text className="text-lg font-bold text-gray-900 mb-1">
+                    {job.title}
+                  </Text>
                   {job.company_name && (
-                    <Text className="text-gray-600 text-sm">{job.company_name}</Text>
+                    <Text className="text-gray-600 text-sm">
+                      {job.company_name}
+                    </Text>
                   )}
                 </View>
-                
+
                 <View className="flex-row items-center mb-2">
-                  <Text className="text-gray-600 text-sm mr-4">📍 {job.location}</Text>
+                  <Text className="text-gray-600 text-sm mr-4">
+                    📍 {job.location}
+                  </Text>
                   <Text className="text-gray-600 text-sm">💰 {job.salary}</Text>
                 </View>
-                
+
                 <View className="flex-row items-center justify-between">
                   {getJobTypeBadge(job.type)}
                   <Text className="text-gray-500 text-xs">
@@ -136,4 +162,3 @@ export default function DashboardScreen({ navigation }: any) {
     </ScrollView>
   );
 }
-

@@ -1,14 +1,21 @@
 {
   "name": "alcrm-mobile-app",
   "version": "1.0.0",
+  "type": "module",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "eslint .",
-    "type-check": "tsc --noEmit"
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "lint:check": "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings 0",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "type-check": "tsc --noEmit",
+    "test:check": "npm run type-check && npm run lint:check && npm run format:check",
+    "fix:all": "npm run lint:fix && npm run format"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.23.1",
@@ -23,7 +30,6 @@
     "expo-linking": "~7.0.0",
     "expo-splash-screen": "~0.29.0",
     "expo-status-bar": "~2.0.0",
-    "nativewind": "^2.0.11",
     "react": "18.3.1",
     "react-native": "0.76.9",
     "react-native-gesture-handler": "~2.20.2",
@@ -34,8 +40,19 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.0",
+    "@eslint/js": "^9.37.0",
     "@types/react": "~18.3.12",
+    "@typescript-eslint/eslint-plugin": "^8.46.0",
+    "@typescript-eslint/parser": "^8.46.0",
+    "eslint": "^9.37.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.0",
+    "eslint-plugin-react-native": "^5.0.0",
+    "nativewind": "^4.2.1",
     "postcss": "8.4.47",
+    "prettier": "^3.6.2",
     "tailwindcss": "^3.4.18",
     "typescript": "~5.3.0"
   },

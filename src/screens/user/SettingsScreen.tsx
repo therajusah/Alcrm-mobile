@@ -3,30 +3,33 @@ import { View, Text, ScrollView, Alert } from 'react-native';
 import { useAuthStore } from '../../stores/authStore';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
+import { NavigationProp } from '../../types';
 
-export default function SettingsScreen({ navigation }: any) {
+interface SettingsScreenProps {
+  navigation: NavigationProp;
+}
+
+export default function SettingsScreen({
+  navigation: _navigation,
+}: SettingsScreenProps) {
   const { logout, user } = useAuthStore();
 
   const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await logout();
-              // Navigation will be handled automatically
-            } catch (error) {
-              Alert.alert('Error', 'Failed to logout');
-            }
-          },
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await logout();
+            // Navigation will be handled automatically
+          } catch {
+            Alert.alert('Error', 'Failed to logout');
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -38,10 +41,12 @@ export default function SettingsScreen({ navigation }: any) {
             <Text className="text-gray-600 text-sm mb-1">Email</Text>
             <Text className="text-gray-900 font-semibold">{user?.email}</Text>
           </View>
-          
+
           <View className="mb-3">
             <Text className="text-gray-600 text-sm mb-1">Role</Text>
-            <Text className="text-gray-900 font-semibold capitalize">{user?.role}</Text>
+            <Text className="text-gray-900 font-semibold capitalize">
+              {user?.role}
+            </Text>
           </View>
 
           {user?.id && (
@@ -69,13 +74,8 @@ export default function SettingsScreen({ navigation }: any) {
         </Card>
 
         {/* Logout */}
-        <Button
-          title="Logout"
-          onPress={handleLogout}
-          variant="danger"
-        />
+        <Button title="Logout" onPress={handleLogout} variant="danger" />
       </View>
     </ScrollView>
   );
 }
-

@@ -12,7 +12,7 @@ interface JobState {
     page: number;
     pageSize: number;
   };
-  
+
   // Actions
   fetchJobs: (params?: {
     search?: string;
@@ -38,7 +38,7 @@ export const useJobStore = create<JobState>((set, get) => ({
     pageSize: 10,
   },
 
-  fetchJobs: async (params) => {
+  fetchJobs: async params => {
     try {
       set({ isLoading: true, error: null });
       const response: GenericList<Job> = await userApi.getJobs(params);
@@ -52,7 +52,8 @@ export const useJobStore = create<JobState>((set, get) => ({
         isLoading: false,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to fetch jobs';
+      const message =
+        error instanceof Error ? error.message : 'Failed to fetch jobs';
       set({ error: message, isLoading: false });
     }
   },
@@ -63,7 +64,8 @@ export const useJobStore = create<JobState>((set, get) => ({
       const job = await userApi.getJobDetail(id);
       set({ selectedJob: job, isLoading: false });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to fetch job details';
+      const message =
+        error instanceof Error ? error.message : 'Failed to fetch job details';
       set({ error: message, isLoading: false });
     }
   },
@@ -72,13 +74,14 @@ export const useJobStore = create<JobState>((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       await userApi.applyJob(id, { cover_letter: coverLetter });
-      
+
       // Refresh job detail to get updated application status
       await get().fetchJobDetail(id);
-      
+
       set({ isLoading: false });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to apply for job';
+      const message =
+        error instanceof Error ? error.message : 'Failed to apply for job';
       set({ error: message, isLoading: false });
       throw error;
     }
@@ -92,4 +95,3 @@ export const useJobStore = create<JobState>((set, get) => ({
     set({ error: null });
   },
 }));
-

@@ -1,4 +1,22 @@
 // Type definitions
+import { NavigationProp as RNavigationProp } from '@react-navigation/native';
+
+// Navigation types
+export type RootStackParamList = {
+  Login: undefined;
+  Signup: undefined;
+  ForgotPassword: undefined;
+  Dashboard: undefined;
+  Jobs: undefined;
+  JobDetail: { jobId: string };
+  Applications: undefined;
+  Resources: undefined;
+  Profile: undefined;
+  Settings: undefined;
+  ChangePassword: undefined;
+};
+
+export type NavigationProp = RNavigationProp<RootStackParamList>;
 
 export interface AuthUser {
   id: string;
@@ -55,14 +73,14 @@ export interface Job {
   applicationStatus?: ApplicationStatus;
 }
 
-export type ApplicationStatus = 
-  | 'APPLIED' 
-  | 'SHARED_WITH_COMPANY' 
-  | 'SHORTLISTED' 
-  | 'REJECTED' 
-  | 'INTERVIEW_SCHEDULED' 
-  | 'INTERVIEW_COMPLETED' 
-  | 'SELECTED' 
+export type ApplicationStatus =
+  | 'APPLIED'
+  | 'SHARED_WITH_COMPANY'
+  | 'SHORTLISTED'
+  | 'REJECTED'
+  | 'INTERVIEW_SCHEDULED'
+  | 'INTERVIEW_COMPLETED'
+  | 'SELECTED'
   | 'WITHDRAWN';
 
 export interface Application {
@@ -127,4 +145,3 @@ export interface ApiError {
   error: string;
   message?: string;
 }
-

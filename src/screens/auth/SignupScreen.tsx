@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { useAuthStore } from '../../stores/authStore';
 import { authApi } from '../../services/api';
 import Button from '../../components/Button';
@@ -14,7 +22,7 @@ export default function SignupScreen({ navigation }: any) {
   const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<any>({});
-  
+
   const { signup, setPreSignupToken } = useAuthStore();
 
   const validateEmail = () => {
@@ -39,21 +47,21 @@ export default function SignupScreen({ navigation }: any) {
 
   const validateDetails = () => {
     const newErrors: any = {};
-    
+
     if (!password) {
       newErrors.password = 'Password is required';
     } else if (password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    
+
     if (password !== confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
     if (!phone) {
       newErrors.phone = 'Phone number is required';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -107,7 +115,7 @@ export default function SignupScreen({ navigation }: any) {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1"
     >
@@ -115,7 +123,9 @@ export default function SignupScreen({ navigation }: any) {
         <View className="flex-1 px-6 pt-12">
           {/* Header */}
           <View className="mb-8">
-            <Text className="text-3xl font-bold text-gray-900 mb-2">Create Account</Text>
+            <Text className="text-3xl font-bold text-gray-900 mb-2">
+              Create Account
+            </Text>
             <Text className="text-gray-600 text-base">
               {step === 'email' && 'Enter your email to get started'}
               {step === 'otp' && 'Verify your email'}
@@ -130,7 +140,7 @@ export default function SignupScreen({ navigation }: any) {
                 label="Email"
                 placeholder="Enter your email"
                 value={email}
-                onChangeText={(text) => {
+                onChangeText={text => {
                   setEmail(text);
                   setErrors({});
                 }}
@@ -154,7 +164,7 @@ export default function SignupScreen({ navigation }: any) {
                 label="OTP Code"
                 placeholder="Enter 6-digit code"
                 value={otp}
-                onChangeText={(text) => {
+                onChangeText={text => {
                   setOtp(text);
                   setErrors({});
                 }}
@@ -186,7 +196,7 @@ export default function SignupScreen({ navigation }: any) {
                 label="Phone Number"
                 placeholder="Enter your phone number"
                 value={phone}
-                onChangeText={(text) => {
+                onChangeText={text => {
                   setPhone(text);
                   if (errors.phone) setErrors({ ...errors, phone: undefined });
                 }}
@@ -198,9 +208,10 @@ export default function SignupScreen({ navigation }: any) {
                 label="Password"
                 placeholder="Create a password"
                 value={password}
-                onChangeText={(text) => {
+                onChangeText={text => {
                   setPassword(text);
-                  if (errors.password) setErrors({ ...errors, password: undefined });
+                  if (errors.password)
+                    setErrors({ ...errors, password: undefined });
                 }}
                 error={errors.password}
                 secureTextEntry
@@ -211,9 +222,10 @@ export default function SignupScreen({ navigation }: any) {
                 label="Confirm Password"
                 placeholder="Confirm your password"
                 value={confirmPassword}
-                onChangeText={(text) => {
+                onChangeText={text => {
                   setConfirmPassword(text);
-                  if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
+                  if (errors.confirmPassword)
+                    setErrors({ ...errors, confirmPassword: undefined });
                 }}
                 error={errors.confirmPassword}
                 secureTextEntry
@@ -240,4 +252,3 @@ export default function SignupScreen({ navigation }: any) {
     </KeyboardAvoidingView>
   );
 }
-

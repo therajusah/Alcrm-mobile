@@ -12,7 +12,7 @@ interface ResourceState {
     page: number;
     pageSize: number;
   };
-  
+
   // Actions
   fetchResources: (params?: {
     search?: string;
@@ -25,7 +25,7 @@ interface ResourceState {
   clearError: () => void;
 }
 
-export const useResourceStore = create<ResourceState>((set) => ({
+export const useResourceStore = create<ResourceState>(set => ({
   resources: [],
   selectedResource: null,
   isLoading: false,
@@ -36,10 +36,11 @@ export const useResourceStore = create<ResourceState>((set) => ({
     pageSize: 10,
   },
 
-  fetchResources: async (params) => {
+  fetchResources: async params => {
     try {
       set({ isLoading: true, error: null });
-      const response: GenericList<FreeResource> = await userApi.getResources(params);
+      const response: GenericList<FreeResource> =
+        await userApi.getResources(params);
       set({
         resources: response.items,
         pagination: {
@@ -50,7 +51,8 @@ export const useResourceStore = create<ResourceState>((set) => ({
         isLoading: false,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to fetch resources';
+      const message =
+        error instanceof Error ? error.message : 'Failed to fetch resources';
       set({ error: message, isLoading: false });
     }
   },
@@ -61,7 +63,10 @@ export const useResourceStore = create<ResourceState>((set) => ({
       const resource = await userApi.getResourceDetail(id);
       set({ selectedResource: resource, isLoading: false });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to fetch resource details';
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to fetch resource details';
       set({ error: message, isLoading: false });
     }
   },
@@ -74,5 +79,3 @@ export const useResourceStore = create<ResourceState>((set) => ({
     set({ error: null });
   },
 }));
-
-

@@ -9,7 +9,7 @@ interface AuthState {
   isLoading: boolean;
   error: string | null;
   preSignupToken: string | null;
-  
+
   // Actions
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, phone: string) => Promise<void>;
@@ -31,11 +31,11 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
     try {
       set({ isLoading: true, error: null });
       const response = await authApi.signin(email, password);
-      
+
       if (response.token) {
         await AsyncStorage.setItem(TOKEN_KEY, response.token);
       }
-      
+
       set({
         user: response.user,
         isAuthenticated: true,
@@ -52,16 +52,16 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
     try {
       set({ isLoading: true, error: null });
       const token = get().preSignupToken;
-      
+
       if (!token) {
         throw new Error('Please verify your email first');
       }
-      
+
       await authApi.signup(email, password, phone, token);
-      
+
       // Auto login after signup
       await get().login(email, password);
-      
+
       set({ preSignupToken: null });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Signup failed';
@@ -92,19 +92,19 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
     try {
       set({ isLoading: true });
       const token = await AsyncStorage.getItem(TOKEN_KEY);
-      
+
       if (!token) {
         set({ user: null, isAuthenticated: false, isLoading: false });
         return;
       }
-      
+
       const response = await authApi.getProfile();
       set({
         user: response.user,
         isAuthenticated: true,
         isLoading: false,
       });
-    } catch (error) {
+    } catch {
       await AsyncStorage.removeItem(TOKEN_KEY);
       set({
         user: null,
@@ -131,5 +131,3 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
 });
 
 export const useAuthStore = create<AuthState>(createAuthState);
-
-

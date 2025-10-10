@@ -1,19 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, RefreshControl, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  RefreshControl,
+  TextInput,
+} from 'react-native';
 import { useJobStore } from '../../stores/jobStore';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import EmptyState from '../../components/EmptyState';
+import { NavigationProp } from '../../types';
 
-export default function JobsScreen({ navigation }: any) {
+interface JobsScreenProps {
+  navigation: NavigationProp;
+}
+
+export default function JobsScreen({ navigation }: JobsScreenProps) {
   const { jobs, fetchJobs, isLoading, pagination } = useJobStore();
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchJobs({ page: 1, pageSize: 20 });
-  }, []);
+  }, [fetchJobs]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -60,7 +71,7 @@ export default function JobsScreen({ navigation }: any) {
         />
       </View>
 
-      <ScrollView 
+      <ScrollView
         className="flex-1"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -77,27 +88,35 @@ export default function JobsScreen({ navigation }: any) {
               message="Try adjusting your search criteria"
             />
           ) : (
-            jobs.map((job) => (
-              <Card 
+            jobs.map(job => (
+              <Card
                 key={job.id}
-                onPress={() => navigation.navigate('JobDetail', { jobId: job.id })}
+                onPress={() =>
+                  navigation.navigate('JobDetail', { jobId: job.id })
+                }
               >
                 <View className="mb-3">
-                  <Text className="text-lg font-bold text-gray-900 mb-1">{job.title}</Text>
+                  <Text className="text-lg font-bold text-gray-900 mb-1">
+                    {job.title}
+                  </Text>
                   {job.company_name && (
-                    <Text className="text-gray-600 text-sm">{job.company_name}</Text>
+                    <Text className="text-gray-600 text-sm">
+                      {job.company_name}
+                    </Text>
                   )}
                 </View>
-                
+
                 <Text className="text-gray-700 text-sm mb-3" numberOfLines={2}>
                   {job.description}
                 </Text>
-                
+
                 <View className="flex-row items-center mb-3">
-                  <Text className="text-gray-600 text-sm mr-4">📍 {job.location}</Text>
+                  <Text className="text-gray-600 text-sm mr-4">
+                    📍 {job.location}
+                  </Text>
                   <Text className="text-gray-600 text-sm">💰 {job.salary}</Text>
                 </View>
-                
+
                 <View className="flex-row items-center justify-between">
                   {getJobTypeBadge(job.type)}
                   <Text className="text-gray-500 text-xs">
@@ -112,4 +131,3 @@ export default function JobsScreen({ navigation }: any) {
     </View>
   );
 }
-

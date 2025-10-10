@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 
 interface ButtonProps {
   title: string;
@@ -88,11 +88,12 @@ export default function Button({
       {loading ? (
         <ActivityIndicator color="white" />
       ) : (
-        <Text className={`${getTextStyles()} ${getTextSizeStyles()} font-semibold text-center`}>
+        <Text
+          className={`${getTextStyles()} ${getTextSizeStyles()} font-semibold text-center`}
+        >
           {title}
         </Text>
       )}
     </TouchableOpacity>
   );
 }
-

@@ -15,11 +15,11 @@ export default function JobDetailScreen({ route, navigation }: any) {
 
   useEffect(() => {
     fetchJobDetail(jobId);
-    
+
     return () => {
       // Clean up when leaving screen
     };
-  }, [jobId]);
+  }, [jobId, fetchJobDetail]);
 
   const handleApply = async () => {
     if (!coverLetter.trim()) {
@@ -31,7 +31,7 @@ export default function JobDetailScreen({ route, navigation }: any) {
     try {
       await applyForJob(jobId, coverLetter);
       Alert.alert('Success', 'Application submitted successfully!', [
-        { text: 'OK', onPress: () => navigation.goBack() }
+        { text: 'OK', onPress: () => navigation.goBack() },
       ]);
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to submit application');
@@ -56,16 +56,20 @@ export default function JobDetailScreen({ route, navigation }: any) {
   };
 
   const getStatusBadge = (status: string) => {
-    return status === 'OPEN' 
-      ? <Badge text="Open" variant="success" />
-      : <Badge text="Closed" variant="danger" />;
+    return status === 'OPEN' ? (
+      <Badge text="Open" variant="success" />
+    ) : (
+      <Badge text="Closed" variant="danger" />
+    );
   };
 
   if (isLoading || !selectedJob) {
     return <LoadingSpinner message="Loading job details..." />;
   }
 
-  const hasApplied = selectedJob.applicationStatus !== undefined && selectedJob.applicationStatus !== null;
+  const hasApplied =
+    selectedJob.applicationStatus !== undefined &&
+    selectedJob.applicationStatus !== null;
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
@@ -75,7 +79,7 @@ export default function JobDetailScreen({ route, navigation }: any) {
           <Text className="text-2xl font-bold text-gray-900 mb-2">
             {selectedJob.title}
           </Text>
-          
+
           {selectedJob.company_name && (
             <Text className="text-lg text-gray-600 mb-4">
               {selectedJob.company_name}
@@ -90,12 +94,16 @@ export default function JobDetailScreen({ route, navigation }: any) {
           <View className="border-t border-gray-200 pt-4 mt-2">
             <View className="mb-3">
               <Text className="text-gray-600 text-sm mb-1">📍 Location</Text>
-              <Text className="text-gray-900 font-semibold">{selectedJob.location}</Text>
+              <Text className="text-gray-900 font-semibold">
+                {selectedJob.location}
+              </Text>
             </View>
 
             <View className="mb-3">
               <Text className="text-gray-600 text-sm mb-1">💰 Salary</Text>
-              <Text className="text-gray-900 font-semibold">{selectedJob.salary}</Text>
+              <Text className="text-gray-900 font-semibold">
+                {selectedJob.salary}
+              </Text>
             </View>
 
             <View>
@@ -109,7 +117,9 @@ export default function JobDetailScreen({ route, navigation }: any) {
 
         {/* Job Description */}
         <Card title="Job Description">
-          <Text className="text-gray-700 leading-6">{selectedJob.description}</Text>
+          <Text className="text-gray-700 leading-6">
+            {selectedJob.description}
+          </Text>
         </Card>
 
         {/* Application Status or Apply Form */}
@@ -119,9 +129,9 @@ export default function JobDetailScreen({ route, navigation }: any) {
               <Text className="text-lg font-semibold text-gray-900 mb-2">
                 Application Status
               </Text>
-              <Badge 
-                text={selectedJob.applicationStatus || 'Applied'} 
-                variant="info" 
+              <Badge
+                text={selectedJob.applicationStatus || 'Applied'}
+                variant="info"
                 className="px-4 py-2"
               />
               <Text className="text-gray-600 mt-4 text-center">
@@ -140,9 +150,10 @@ export default function JobDetailScreen({ route, navigation }: any) {
             ) : (
               <Card title="Submit Application">
                 <Text className="text-gray-700 mb-3">
-                  Write a brief cover letter explaining why you're a good fit for this role:
+                  Write a brief cover letter explaining why you&apos;re a good
+                  fit for this role:
                 </Text>
-                
+
                 <TextInput
                   className="border border-gray-300 rounded-lg p-4 mb-4 text-gray-900 bg-white min-h-[120px]"
                   placeholder="Dear Hiring Manager,..."
@@ -179,4 +190,3 @@ export default function JobDetailScreen({ route, navigation }: any) {
     </ScrollView>
   );
 }
-

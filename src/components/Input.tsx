@@ -31,10 +31,7 @@ export default function Input({
         placeholderTextColor="#9CA3AF"
         {...props}
       />
-      {error && (
-        <Text className="text-red-500 text-sm mt-1">{error}</Text>
-      )}
+      {error && <Text className="text-red-500 text-sm mt-1">{error}</Text>}
     </View>
   );
 }
-

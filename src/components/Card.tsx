@@ -8,7 +8,12 @@ interface CardProps {
   className?: string;
 }
 
-export default function Card({ children, title, onPress, className = '' }: CardProps) {
+export default function Card({
+  children,
+  title,
+  onPress,
+  className = '',
+}: CardProps) {
   const Container = onPress ? TouchableOpacity : View;
 
   return (
@@ -23,4 +28,3 @@ export default function Card({ children, title, onPress, className = '' }: CardP
     </Container>
   );
 }
-

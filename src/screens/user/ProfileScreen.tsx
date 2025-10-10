@@ -30,7 +30,7 @@ export default function ProfileScreen({ navigation }: any) {
     try {
       const data = await userApi.getProfile();
       setProfile(data);
-      
+
       // Set form fields
       setFirstName(data.first_name || '');
       setLastName(data.last_name || '');
@@ -40,8 +40,7 @@ export default function ProfileScreen({ navigation }: any) {
       setCurrentLocation(data.current_location || '');
       setQualification(data.qualification || '');
       setWhatsappNumber(data.whatsapp_number || '');
-    } catch (error) {
-      console.error('Error loading profile:', error);
+    } catch {
       Alert.alert('Error', 'Failed to load profile');
     } finally {
       setIsLoading(false);
@@ -74,7 +73,7 @@ export default function ProfileScreen({ navigation }: any) {
 
       await userApi.updateProfile(updates);
       updateUserProfile(updates);
-      
+
       Alert.alert('Success', 'Profile updated successfully');
       setIsEditing(false);
       await loadProfile();
@@ -105,7 +104,7 @@ export default function ProfileScreen({ navigation }: any) {
   }
 
   return (
-    <ScrollView 
+    <ScrollView
       className="flex-1 bg-gray-50"
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -121,7 +120,9 @@ export default function ProfileScreen({ navigation }: any) {
               </Text>
             </View>
             <Text className="text-2xl font-bold text-gray-900">
-              {firstName && lastName ? `${firstName} ${lastName}` : 'Complete your profile'}
+              {firstName && lastName
+                ? `${firstName} ${lastName}`
+                : 'Complete your profile'}
             </Text>
             <Text className="text-gray-600 mt-1">{user?.email}</Text>
           </View>
@@ -220,11 +221,7 @@ export default function ProfileScreen({ navigation }: any) {
                 />
               </View>
               <View className="flex-1">
-                <Button
-                  title="Save"
-                  onPress={handleSave}
-                  loading={isSaving}
-                />
+                <Button title="Save" onPress={handleSave} loading={isSaving} />
               </View>
             </View>
           )}
@@ -238,7 +235,7 @@ export default function ProfileScreen({ navigation }: any) {
             variant="outline"
             className="mb-3"
           />
-          
+
           <Button
             title="Settings"
             onPress={() => navigation.navigate('Settings')}
@@ -249,4 +246,3 @@ export default function ProfileScreen({ navigation }: any) {
     </ScrollView>
   );
 }
-

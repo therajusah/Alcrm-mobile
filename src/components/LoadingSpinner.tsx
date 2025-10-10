@@ -6,14 +6,14 @@ interface LoadingSpinnerProps {
   size?: 'small' | 'large';
 }
 
-export default function LoadingSpinner({ message, size = 'large' }: LoadingSpinnerProps) {
+export default function LoadingSpinner({
+  message,
+  size = 'large',
+}: LoadingSpinnerProps) {
   return (
     <View className="flex-1 justify-center items-center bg-gray-50">
       <ActivityIndicator size={size} color="#3B82F6" />
-      {message && (
-        <Text className="text-gray-600 mt-4">{message}</Text>
-      )}
+      {message && <Text className="text-gray-600 mt-4">{message}</Text>}
     </View>
   );
 }
-

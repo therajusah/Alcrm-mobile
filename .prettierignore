@@ -1,0 +1,8 @@
+node_modules/
+.expo/
+web-build/
+dist/
+build/
+*.log
+package-lock.json
+bun.lock
