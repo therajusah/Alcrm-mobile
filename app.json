@@ -18,7 +18,8 @@
       "package": "com.alcrm.mobile"
     },
     "web": {},
-    "scheme": "alcrm"
+    "scheme": "alcrm",
+    "newArchEnabled": true
   }
 }
 

@@ -71,11 +71,14 @@ export default function SignupScreen({ navigation }: any) {
 
     setIsLoading(true);
     try {
+      console.log('SignupScreen: Requesting OTP for email:', email);
       await authApi.requestOtp(email);
       setStep('otp');
       Alert.alert('Success', 'OTP sent to your email');
       setErrors({});
+      console.log('SignupScreen: OTP request successful, moved to OTP step');
     } catch (err: any) {
+      console.log('SignupScreen: OTP request error:', err);
       Alert.alert('Error', err.message || 'Failed to send OTP');
     } finally {
       setIsLoading(false);
@@ -87,12 +90,16 @@ export default function SignupScreen({ navigation }: any) {
 
     setIsLoading(true);
     try {
+      console.log('SignupScreen: Verifying OTP for email:', email, 'OTP:', otp);
       const response = await authApi.verifyOtp(email, otp);
+      console.log('SignupScreen: OTP verification response:', response);
       setPreSignupToken(response.preSignupToken);
       setStep('details');
       Alert.alert('Success', 'Email verified successfully');
       setErrors({});
+      console.log('SignupScreen: OTP verification successful, moved to details step');
     } catch (err: any) {
+      console.log('SignupScreen: OTP verification error:', err);
       Alert.alert('Error', err.message || 'Invalid OTP');
     } finally {
       setIsLoading(false);
@@ -104,10 +111,13 @@ export default function SignupScreen({ navigation }: any) {
 
     setIsLoading(true);
     try {
+      console.log('SignupScreen: Starting signup process with:', { email, phone });
       await signup(email, password, phone);
       Alert.alert('Success', 'Account created successfully');
+      console.log('SignupScreen: Signup completed successfully');
       // Navigation will be handled automatically
     } catch (err: any) {
+      console.log('SignupScreen: Signup error:', err);
       Alert.alert('Error', err.message || 'Failed to create account');
     } finally {
       setIsLoading(false);

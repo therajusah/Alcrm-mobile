@@ -54,12 +54,16 @@ api.interceptors.response.use(
 // Auth API
 export const authApi = {
   requestOtp: async (email: string) => {
+    console.log('API: Requesting OTP for email:', email);
     const response = await api.post('/auth/otp/request', { email });
+    console.log('API: OTP request response:', response.data);
     return response.data;
   },
 
   verifyOtp: async (email: string, otp: string) => {
+    console.log('API: Verifying OTP for email:', email, 'OTP:', otp);
     const response = await api.post('/auth/otp/verify', { email, otp });
+    console.log('API: OTP verification response:', response.data);
     return response.data;
   },
 
@@ -69,17 +73,25 @@ export const authApi = {
     phone: string,
     preSignupToken: string
   ): Promise<AuthResponse> => {
+    console.log('API: Making signup request for email:', email);
     const response = await api.post('/auth/signup', {
       email,
       password,
       phone,
       preSignupToken,
     });
+    console.log('API: Signup response:', response.data);
     return response.data;
   },
 
   signin: async (email: string, password: string): Promise<AuthResponse> => {
+    console.log(
+      'API: Making signin request to:',
+      `${API_BASE_URL}/auth/signin`
+    );
+    console.log('API: Request payload:', { email, password: '***' });
     const response = await api.post('/auth/signin', { email, password });
+    console.log('API: Signin response:', response.data);
     if (response.data.token) {
       await AsyncStorage.setItem(TOKEN_KEY, response.data.token);
     }

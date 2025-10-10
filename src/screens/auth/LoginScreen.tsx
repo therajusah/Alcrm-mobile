@@ -19,7 +19,7 @@ export default function LoginScreen({ navigation }: any) {
     {}
   );
 
-  const { login, isLoading, error, clearError } = useAuthStore();
+  const { login, isLoading, clearError } = useAuthStore();
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -48,10 +48,17 @@ export default function LoginScreen({ navigation }: any) {
     }
 
     try {
+      console.log('Attempting login with:', { email, password: '***' });
       await login(email, password);
+      console.log('Login successful');
       // Navigation will be handled automatically by AppNavigator
-    } catch {
-      Alert.alert('Login Failed', error || 'An error occurred during login');
+    } catch (loginError) {
+      console.log('Login error:', loginError);
+      const errorMessage =
+        loginError instanceof Error
+          ? loginError.message
+          : 'An error occurred during login';
+      Alert.alert('Login Failed', errorMessage);
     }
   };
 

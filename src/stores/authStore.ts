@@ -29,11 +29,14 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
 
   login: async (email: string, password: string) => {
     try {
+      console.log('AuthStore: Starting login process');
       set({ isLoading: true, error: null });
       const response = await authApi.signin(email, password);
+      console.log('AuthStore: Login API response:', response);
 
       if (response.token) {
         await AsyncStorage.setItem(TOKEN_KEY, response.token);
+        console.log('AuthStore: Token stored successfully');
       }
 
       set({
@@ -41,7 +44,9 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
         isAuthenticated: true,
         isLoading: false,
       });
+      console.log('AuthStore: Login successful, user authenticated');
     } catch (error) {
+      console.log('AuthStore: Login error:', error);
       const message = error instanceof Error ? error.message : 'Login failed';
       set({ error: message, isLoading: false });
       throw error;
@@ -50,6 +55,7 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
 
   signup: async (email: string, password: string, phone: string) => {
     try {
+      console.log('AuthStore: Starting signup process for:', email);
       set({ isLoading: true, error: null });
       const token = get().preSignupToken;
 
@@ -57,13 +63,17 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
         throw new Error('Please verify your email first');
       }
 
+      console.log('AuthStore: Calling signup API with token');
       await authApi.signup(email, password, phone, token);
 
+      console.log('AuthStore: Signup successful, auto-logging in');
       // Auto login after signup
       await get().login(email, password);
 
       set({ preSignupToken: null });
+      console.log('AuthStore: Signup process completed successfully');
     } catch (error) {
+      console.log('AuthStore: Signup error:', error);
       const message = error instanceof Error ? error.message : 'Signup failed';
       set({ error: message, isLoading: false });
       throw error;
