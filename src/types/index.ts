@@ -70,7 +70,7 @@ export interface Job {
   postedDate: string;
   company_id?: string;
   company_name?: string;
-  applicationStatus?: ApplicationStatus;
+  applicationStatus?: ApplicationStatusInfo;
 }
 
 export type ApplicationStatus =
@@ -82,6 +82,11 @@ export type ApplicationStatus =
   | 'INTERVIEW_COMPLETED'
   | 'SELECTED'
   | 'WITHDRAWN';
+
+export interface ApplicationStatusInfo {
+  hasApplied: boolean;
+  status?: ApplicationStatus;
+}
 
 export interface Application {
   application_id: string;

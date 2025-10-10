@@ -69,7 +69,8 @@ export default function JobDetailScreen({ route, navigation }: any) {
 
   const hasApplied =
     selectedJob.applicationStatus !== undefined &&
-    selectedJob.applicationStatus !== null;
+    selectedJob.applicationStatus !== null &&
+    selectedJob.applicationStatus.hasApplied === true;
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
@@ -130,7 +131,7 @@ export default function JobDetailScreen({ route, navigation }: any) {
                 Application Status
               </Text>
               <Badge
-                text={selectedJob.applicationStatus || 'Applied'}
+                text="Applied"
                 variant="info"
                 className="px-4 py-2"
               />

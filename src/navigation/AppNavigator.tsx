@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { useAuthStore } from '../stores/authStore';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -90,7 +90,7 @@ function UserTabs() {
 // Simple icon component
 function TabIcon({ icon, color }: { icon: string; color: string }) {
   return (
-    <text style={StyleSheet.flatten([styles.tabIcon, { color }])}>{icon}</text>
+    <Text style={StyleSheet.flatten([styles.tabIcon, { color }])}>{icon}</Text>
   );
 }
 
