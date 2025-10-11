@@ -12,8 +12,21 @@ import { useAuthStore } from '../../stores/authStore';
 import { authApi } from '../../services/api';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
+import { NavigationProp } from '../../types';
 
-export default function SignupScreen({ navigation }: any) {
+interface SignupScreenProps {
+  navigation: NavigationProp;
+}
+
+interface SignupErrors {
+  email?: string;
+  otp?: string;
+  password?: string;
+  confirmPassword?: string;
+  phone?: string;
+}
+
+export default function SignupScreen({ navigation }: SignupScreenProps) {
   const [step, setStep] = useState<'email' | 'otp' | 'details'>('email');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -21,7 +34,7 @@ export default function SignupScreen({ navigation }: any) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<SignupErrors>({});
 
   const { signup, setPreSignupToken } = useAuthStore();
 
@@ -46,7 +59,7 @@ export default function SignupScreen({ navigation }: any) {
   };
 
   const validateDetails = () => {
-    const newErrors: any = {};
+    const newErrors: SignupErrors = {};
 
     if (!password) {
       newErrors.password = 'Password is required';
@@ -77,9 +90,11 @@ export default function SignupScreen({ navigation }: any) {
       Alert.alert('Success', 'OTP sent to your email');
       setErrors({});
       console.log('SignupScreen: OTP request successful, moved to OTP step');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.log('SignupScreen: OTP request error:', err);
-      Alert.alert('Error', err.message || 'Failed to send OTP');
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to send OTP';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -100,9 +115,10 @@ export default function SignupScreen({ navigation }: any) {
       console.log(
         'SignupScreen: OTP verification successful, moved to details step'
       );
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.log('SignupScreen: OTP verification error:', err);
-      Alert.alert('Error', err.message || 'Invalid OTP');
+      const errorMessage = err instanceof Error ? err.message : 'Invalid OTP';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -122,9 +138,11 @@ export default function SignupScreen({ navigation }: any) {
       console.log('SignupScreen: Signup completed successfully');
       // Navigate to onboarding instead of main app
       navigation.navigate('Onboarding');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.log('SignupScreen: Signup error:', err);
-      Alert.alert('Error', err.message || 'Failed to create account');
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to create account';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -193,7 +211,6 @@ export default function SignupScreen({ navigation }: any) {
                 title="Verify OTP"
                 onPress={handleVerifyOtp}
                 loading={isLoading}
-                className="mb-3"
               />
 
               <Button

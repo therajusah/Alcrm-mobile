@@ -15,7 +15,9 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import type { MentorshipSession } from '../../types';
 
 interface MentorshipSessionDetailScreenProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   route: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   navigation: any;
 }
 
@@ -43,9 +45,13 @@ export default function MentorshipSessionDetailScreen({
       if (sessionData.session_feedback) {
         setFeedback(sessionData.session_feedback);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log('Failed to load session detail:', error);
-      Alert.alert('Error', error.message || 'Failed to load session details');
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to load session details';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -72,8 +78,10 @@ export default function MentorshipSessionDetailScreen({
       await userApi.rateSession(sessionId, rating, feedback);
       Alert.alert('Success', 'Session rated successfully');
       await loadSessionDetail();
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to rate session');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to rate session';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsRating(false);
     }
@@ -93,8 +101,12 @@ export default function MentorshipSessionDetailScreen({
               await userApi.cancelSession(sessionId);
               Alert.alert('Success', 'Session cancelled successfully');
               await loadSessionDetail();
-            } catch (error: any) {
-              Alert.alert('Error', error.message || 'Failed to cancel session');
+            } catch (error: unknown) {
+              const errorMessage =
+                error instanceof Error
+                  ? error.message
+                  : 'Failed to cancel session';
+              Alert.alert('Error', errorMessage);
             }
           },
         },
@@ -136,14 +148,7 @@ export default function MentorshipSessionDetailScreen({
     return (
       <View className="flex-row mb-4">
         {[1, 2, 3, 4, 5].map(star => (
-          <Button
-            key={star}
-            title="★"
-            onPress={() => setRating(star)}
-            className={`w-12 h-12 mr-2 ${
-              star <= rating ? 'bg-yellow-400' : 'bg-gray-200'
-            }`}
-          />
+          <Button key={star} title="★" onPress={() => setRating(star)} />
         ))}
       </View>
     );
@@ -258,7 +263,6 @@ export default function MentorshipSessionDetailScreen({
               title="Cancel Session"
               onPress={handleCancelSession}
               variant="outline"
-              className="border-red-300 mb-3"
             />
           )}
 

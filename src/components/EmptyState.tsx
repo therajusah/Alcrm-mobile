@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface EmptyStateProps {
   title: string;
@@ -8,13 +9,37 @@ interface EmptyStateProps {
 }
 
 export default function EmptyState({ title, message, icon }: EmptyStateProps) {
+  const { colors } = useTheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 32,
+    },
+    iconContainer: {
+      marginBottom: 16,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 8,
+      textAlign: 'center',
+    },
+    message: {
+      color: colors.textSecondary,
+      textAlign: 'center',
+      fontSize: 16,
+    },
+  });
+
   return (
-    <View className="flex-1 justify-center items-center p-8">
-      {icon && <View className="mb-4">{icon}</View>}
-      <Text className="text-xl font-bold text-gray-900 mb-2 text-center">
-        {title}
-      </Text>
-      {message && <Text className="text-gray-600 text-center">{message}</Text>}
+    <View style={styles.container}>
+      {icon && <View style={styles.iconContainer}>{icon}</View>}
+      <Text style={styles.title}>{title}</Text>
+      {message && <Text style={styles.message}>{message}</Text>}
     </View>
   );
 }

@@ -1,37 +1,57 @@
 import React from 'react';
-import { View, TextInput, Text, TextInputProps } from 'react-native';
+import {
+  View,
+  TextInput,
+  Text,
+  TextInputProps,
+  StyleSheet,
+} from 'react-native';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
-  containerClassName?: string;
 }
 
-export default function Input({
-  label,
-  error,
-  containerClassName = '',
-  ...props
-}: InputProps) {
+export default function Input({ label, error, ...props }: InputProps) {
+  const { colors } = useTheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      marginBottom: 16,
+    },
+    label: {
+      color: colors.text,
+      fontWeight: '600',
+      marginBottom: 8,
+      fontSize: 16,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: error ? colors.error : colors.inputBorder,
+      borderRadius: 8,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      color: colors.text,
+      backgroundColor: colors.inputBackground,
+      fontSize: 16,
+    },
+    error: {
+      color: colors.error,
+      fontSize: 14,
+      marginTop: 4,
+    },
+  });
+
   return (
-    <View className={`mb-4 ${containerClassName}`.trim()}>
-      {label && (
-        <Text className="text-gray-700 font-semibold mb-2">{label}</Text>
-      )}
+    <View style={styles.container}>
+      {label && <Text style={styles.label}>{label}</Text>}
       <TextInput
-        className={`
-          border
-          ${error ? 'border-red-500' : 'border-gray-300'}
-          rounded-lg
-          px-4
-          py-3
-          text-gray-900
-          bg-white
-        `.trim()}
-        placeholderTextColor="#9CA3AF"
+        style={styles.input}
+        placeholderTextColor={colors.inputPlaceholder}
         {...props}
       />
-      {error && <Text className="text-red-500 text-sm mt-1">{error}</Text>}
+      {error && <Text style={styles.error}>{error}</Text>}
     </View>
   );
 }

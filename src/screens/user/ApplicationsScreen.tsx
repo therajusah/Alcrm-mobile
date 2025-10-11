@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, RefreshControl, StyleSheet } from 'react-native';
 import { useApplicationStore } from '../../stores/applicationStore';
+import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -8,7 +9,68 @@ import EmptyState from '../../components/EmptyState';
 
 export default function ApplicationsScreen() {
   const { applications, fetchApplications, isLoading } = useApplicationStore();
+  const { colors } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      paddingHorizontal: 24,
+      paddingVertical: 24,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 16,
+    },
+    applicationCard: {
+      marginBottom: 12,
+    },
+    applicationTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    applicationCompany: {
+      color: colors.textSecondary,
+      fontSize: 14,
+    },
+    applicationMeta: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      marginBottom: 12,
+    },
+    applicationFooter: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    applicationDate: {
+      color: colors.textTertiary,
+      fontSize: 12,
+    },
+    applicationActions: {
+      marginTop: 12,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    applicationStatus: {
+      color: colors.textSecondary,
+      fontSize: 12,
+      fontWeight: '600',
+      marginBottom: 4,
+    },
+    applicationNotes: {
+      color: colors.textSecondary,
+      fontSize: 14,
+    },
+  });
 
   useEffect(() => {
     fetchApplications({ page: 1, pageSize: 50 });
@@ -49,13 +111,13 @@ export default function ApplicationsScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-gray-50"
+      style={styles.container}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <View className="px-6 py-6">
-        <Text className="text-xl font-bold text-gray-900 mb-4">
+      <View style={styles.content}>
+        <Text style={styles.headerTitle}>
           My Applications ({applications.length})
         </Text>
 
@@ -67,37 +129,37 @@ export default function ApplicationsScreen() {
         ) : (
           applications.map(application => (
             <Card key={application.application_id}>
-              <View className="mb-3">
-                <Text className="text-lg font-bold text-gray-900 mb-1">
+              <View style={styles.applicationCard}>
+                <Text style={styles.applicationTitle}>
                   {application.job_title || 'Job Title'}
                 </Text>
                 {application.job_location && (
-                  <Text className="text-gray-600 text-sm">
+                  <Text style={styles.applicationCompany}>
                     📍 {application.job_location}
                   </Text>
                 )}
               </View>
 
               {application.job_salary && (
-                <Text className="text-gray-600 text-sm mb-3">
+                <Text style={styles.applicationMeta}>
                   💰 {application.job_salary}
                 </Text>
               )}
 
-              <View className="flex-row items-center justify-between">
+              <View style={styles.applicationFooter}>
                 {getStatusBadge(application.status)}
-                <Text className="text-gray-500 text-xs">
+                <Text style={styles.applicationDate}>
                   Applied:{' '}
                   {new Date(application.application_date).toLocaleDateString()}
                 </Text>
               </View>
 
               {application.cover_letter && (
-                <View className="mt-3 pt-3 border-t border-gray-200">
-                  <Text className="text-gray-600 text-xs font-semibold mb-1">
+                <View style={styles.applicationActions}>
+                  <Text style={styles.applicationStatus}>
                     Cover Letter:
                   </Text>
-                  <Text className="text-gray-700 text-sm" numberOfLines={3}>
+                  <Text style={styles.applicationNotes} numberOfLines={3}>
                     {application.cover_letter}
                   </Text>
                 </View>

@@ -49,7 +49,7 @@ export default function PDFViewer({
         // Download the PDF first, then share
         const filename = `ALCRM_Resource_${Date.now()}.pdf`;
         const localUri = `file:///tmp/${filename}`;
-        
+
         const downloadResult = await FileSystem.downloadAsync(pdfUrl, localUri);
         if (downloadResult.status === 200) {
           await Sharing.shareAsync(downloadResult.uri, {
@@ -81,8 +81,11 @@ export default function PDFViewer({
       const destinationUri = `${documentsDir}${filename}`;
 
       // Download directly from URL to documents directory
-      const downloadResult = await FileSystem.downloadAsync(pdfUrl, destinationUri);
-      
+      const downloadResult = await FileSystem.downloadAsync(
+        pdfUrl,
+        destinationUri
+      );
+
       if (downloadResult.status === 200) {
         Alert.alert('Download Complete', `PDF saved to: ${destinationUri}`, [
           { text: 'OK' },
@@ -139,20 +142,41 @@ export default function PDFViewer({
           {!isLoading && !error && (
             <View className="flex-1">
               <WebView
-                source={{ uri: pdfUrl }}
+                source={{
+                  uri: pdfUrl,
+                  headers: {
+                    Accept: 'application/pdf',
+                  },
+                }}
                 style={styles.webViewContainer}
-                onLoadStart={() => setIsLoading(true)}
+                onLoadStart={() => {
+                  setIsLoading(true);
+                  setError(null);
+                }}
                 onLoadEnd={() => setIsLoading(false)}
-                onError={(syntheticEvent) => {
+                onError={syntheticEvent => {
                   const { nativeEvent } = syntheticEvent;
                   console.error('WebView error:', nativeEvent);
-                  setError('Failed to load PDF');
+                  setError(
+                    'Failed to load PDF. Please try downloading instead.'
+                  );
+                  setIsLoading(false);
+                }}
+                onHttpError={syntheticEvent => {
+                  const { nativeEvent } = syntheticEvent;
+                  console.error('WebView HTTP error:', nativeEvent);
+                  setError(
+                    'Failed to load PDF. Please check your internet connection.'
+                  );
+                  setIsLoading(false);
                 }}
                 allowsInlineMediaPlayback
                 mediaPlaybackRequiresUserAction={false}
                 javaScriptEnabled={true}
                 domStorageEnabled={true}
                 startInLoadingState={true}
+                mixedContentMode="compatibility"
+                thirdPartyCookiesEnabled={false}
                 renderLoading={() => (
                   <View className="flex-1 justify-center items-center">
                     <ActivityIndicator size="large" color="#4F46E5" />
@@ -167,17 +191,11 @@ export default function PDFViewer({
         {/* Action Buttons */}
         {!isLoading && !error && (
           <View className="flex-row justify-around p-4 bg-gray-50 border-t border-gray-200">
-            <Button
-              title="Share"
-              onPress={handleShare}
-              variant="outline"
-              className="flex-1 mr-2"
-            />
+            <Button title="Share" onPress={handleShare} variant="outline" />
             <Button
               title="Download"
               onPress={handleDownload}
               variant="outline"
-              className="flex-1 ml-2"
             />
           </View>
         )}

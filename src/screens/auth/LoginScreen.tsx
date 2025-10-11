@@ -7,8 +7,10 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import { useAuthStore } from '../../stores/authStore';
+import { useTheme } from '../../contexts/ThemeContext';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 
@@ -26,6 +28,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   );
 
   const { login, isLoading, clearError } = useAuthStore();
+  const { colors } = useTheme();
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -68,23 +71,69 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: 24,
+      paddingTop: 48,
+    },
+    header: {
+      marginBottom: 32,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 8,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: colors.textSecondary,
+    },
+    form: {
+      marginBottom: 24,
+    },
+    forgotPassword: {
+      marginBottom: 24,
+      alignItems: 'flex-end',
+    },
+    forgotPasswordText: {
+      color: colors.primary,
+      fontWeight: '600',
+    },
+    signupContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginTop: 24,
+    },
+    signupText: {
+      color: colors.textSecondary,
+    },
+    signupLink: {
+      color: colors.primary,
+      fontWeight: '600',
+    },
+  });
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
+      style={styles.container}
     >
-      <ScrollView className="flex-1 bg-white">
-        <View className="flex-1 px-6 pt-12">
+      <ScrollView style={styles.container}>
+        <View style={styles.content}>
           {/* Header */}
-          <View className="mb-8">
-            <Text className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome Back!
-            </Text>
-            <Text className="text-gray-600 text-base">Sign in to continue</Text>
+          <View style={styles.header}>
+            <Text style={styles.title}>Welcome Back!</Text>
+            <Text style={styles.subtitle}>Sign in to continue</Text>
           </View>
 
           {/* Form */}
-          <View className="mb-6">
+          <View style={styles.form}>
             <Input
               label="Email"
               placeholder="Enter your email"
@@ -115,11 +164,9 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
             <TouchableOpacity
               onPress={() => navigation.navigate('ForgotPassword')}
-              className="mb-6"
+              style={styles.forgotPassword}
             >
-              <Text className="text-primary-600 text-right font-semibold">
-                Forgot Password?
-              </Text>
+              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
 
             <Button
@@ -131,10 +178,10 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
           </View>
 
           {/* Sign Up Link */}
-          <View className="flex-row justify-center mt-6">
-            <Text className="text-gray-600">Don&apos;t have an account? </Text>
+          <View style={styles.signupContainer}>
+            <Text style={styles.signupText}>Don&apos;t have an account? </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-              <Text className="text-primary-600 font-semibold">Sign Up</Text>
+              <Text style={styles.signupLink}>Sign Up</Text>
             </TouchableOpacity>
           </View>
         </View>

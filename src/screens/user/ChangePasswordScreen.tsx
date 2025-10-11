@@ -10,16 +10,29 @@ import {
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Card from '../../components/Card';
+import { NavigationProp } from '../../types';
 
-export default function ChangePasswordScreen({ navigation }: any) {
+interface ChangePasswordScreenProps {
+  navigation: NavigationProp;
+}
+
+interface PasswordErrors {
+  currentPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
+}
+
+export default function ChangePasswordScreen({
+  navigation,
+}: ChangePasswordScreenProps) {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<PasswordErrors>({});
   const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
-    const newErrors: any = {};
+    const newErrors: PasswordErrors = {};
 
     if (!currentPassword) {
       newErrors.currentPassword = 'Current password is required';
@@ -53,8 +66,10 @@ export default function ChangePasswordScreen({ navigation }: any) {
         'Password change functionality requires backend implementation. Please contact support to change your password.',
         [{ text: 'OK', onPress: () => navigation.goBack() }]
       );
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to change password');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to change password';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -112,7 +127,6 @@ export default function ChangePasswordScreen({ navigation }: any) {
               error={errors.confirmPassword}
               secureTextEntry
               autoCapitalize="none"
-              containerClassName="mb-6"
             />
 
             <Button

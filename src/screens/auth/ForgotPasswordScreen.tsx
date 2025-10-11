@@ -11,8 +11,22 @@ import {
 import { authApi } from '../../services/api';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
+import { NavigationProp } from '../../types';
 
-export default function ForgotPasswordScreen({ navigation }: any) {
+interface ForgotPasswordScreenProps {
+  navigation: NavigationProp;
+}
+
+interface PasswordErrors {
+  email?: string;
+  otp?: string;
+  newPassword?: string;
+  confirmPassword?: string;
+}
+
+export default function ForgotPasswordScreen({
+  navigation,
+}: ForgotPasswordScreenProps) {
   const [step, setStep] = useState<'email' | 'otp' | 'password'>('email');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -20,7 +34,7 @@ export default function ForgotPasswordScreen({ navigation }: any) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [resetToken, setResetToken] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<PasswordErrors>({});
 
   const handleRequestOtp = async () => {
     if (!email) {
@@ -34,8 +48,10 @@ export default function ForgotPasswordScreen({ navigation }: any) {
       setStep('otp');
       Alert.alert('Success', 'OTP sent to your email');
       setErrors({});
-    } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to send OTP');
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to send OTP';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -54,15 +70,16 @@ export default function ForgotPasswordScreen({ navigation }: any) {
       setStep('password');
       Alert.alert('Success', 'OTP verified successfully');
       setErrors({});
-    } catch (err: any) {
-      Alert.alert('Error', err.message || 'Invalid OTP');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Invalid OTP';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleResetPassword = async () => {
-    const newErrors: any = {};
+    const newErrors: PasswordErrors = {};
 
     if (!newPassword) {
       newErrors.newPassword = 'Password is required';
@@ -85,8 +102,10 @@ export default function ForgotPasswordScreen({ navigation }: any) {
       Alert.alert('Success', 'Password reset successfully', [
         { text: 'OK', onPress: () => navigation.navigate('Login') },
       ]);
-    } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to reset password');
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to reset password';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -155,7 +174,6 @@ export default function ForgotPasswordScreen({ navigation }: any) {
                 title="Verify OTP"
                 onPress={handleVerifyOtp}
                 loading={isLoading}
-                className="mb-3"
               />
 
               <Button

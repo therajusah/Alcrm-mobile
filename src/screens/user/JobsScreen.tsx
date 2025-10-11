@@ -5,8 +5,10 @@ import {
   ScrollView,
   RefreshControl,
   TextInput,
+  StyleSheet,
 } from 'react-native';
 import { useJobStore } from '../../stores/jobStore';
+import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -19,8 +21,58 @@ interface JobsScreenProps {
 
 export default function JobsScreen({ navigation }: JobsScreenProps) {
   const { jobs, fetchJobs, isLoading, pagination } = useJobStore();
+  const { colors } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    searchContainer: {
+      backgroundColor: colors.surface,
+      paddingHorizontal: 24,
+      paddingVertical: 16,
+      shadowColor: colors.text,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 1,
+    },
+    searchInput: {
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: 8,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      color: colors.text,
+      fontSize: 16,
+    },
+    content: {
+      flex: 1,
+    },
+    jobsList: {
+      paddingHorizontal: 24,
+      paddingVertical: 16,
+    },
+    emptyText: {
+      color: colors.textSecondary,
+      marginBottom: 16,
+    },
+    jobCard: {
+      marginBottom: 12,
+    },
+    jobTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    jobCompany: {
+      color: colors.textSecondary,
+      fontSize: 14,
+    },
+  });
 
   useEffect(() => {
     fetchJobs({ page: 1, pageSize: 20 });
@@ -59,26 +111,26 @@ export default function JobsScreen({ navigation }: JobsScreenProps) {
   }
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View style={styles.container}>
       {/* Search Bar */}
-      <View className="bg-white px-6 py-4 shadow-sm">
+      <View style={styles.searchContainer}>
         <TextInput
-          className="bg-gray-100 rounded-lg px-4 py-3 text-gray-900"
+          style={styles.searchInput}
           placeholder="Search jobs..."
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={colors.inputPlaceholder}
           value={searchQuery}
           onChangeText={handleSearch}
         />
       </View>
 
       <ScrollView
-        className="flex-1"
+        style={styles.content}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View className="px-6 py-4">
-          <Text className="text-gray-600 mb-4">
+        <View style={styles.jobsList}>
+          <Text style={styles.emptyText}>
             {pagination.total} job{pagination.total !== 1 ? 's' : ''} available
           </Text>
 
@@ -95,33 +147,55 @@ export default function JobsScreen({ navigation }: JobsScreenProps) {
                   navigation.navigate('JobDetail', { jobId: job.id })
                 }
               >
-                <View className="mb-3">
-                  <Text className="text-lg font-bold text-gray-900 mb-1">
+                <View style={styles.jobCard}>
+                  <Text style={styles.jobTitle}>
                     {job.title}
                   </Text>
                   {job.company_name && (
-                    <Text className="text-gray-600 text-sm">
+                    <Text style={styles.jobCompany}>
                       {job.company_name}
                     </Text>
                   )}
                 </View>
 
-                <Text className="text-gray-700 text-sm mb-3" numberOfLines={2}>
+                <Text style={{
+                  color: colors.textSecondary,
+                  fontSize: 14,
+                  marginBottom: 12,
+                }} numberOfLines={2}>
                   {job.description}
                 </Text>
 
-                <View className="flex-row items-center mb-3">
-                  <Text className="text-gray-600 text-sm mr-4">
+                <View style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginBottom: 12,
+                }}>
+                  <Text style={{
+                    color: colors.textSecondary,
+                    fontSize: 14,
+                    marginRight: 16,
+                  }}>
                     📍 {job.location}
                   </Text>
-                  <Text className="text-gray-600 text-sm">
+                  <Text style={{
+                    color: colors.textSecondary,
+                    fontSize: 14,
+                  }}>
                     💰 {job.salary ? `₹${job.salary}L` : 'Salary not specified'}
                   </Text>
                 </View>
 
-                <View className="flex-row items-center justify-between">
+                <View style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
                   {getJobTypeBadge(job.type)}
-                  <Text className="text-gray-500 text-xs">
+                  <Text style={{
+                    color: colors.textTertiary,
+                    fontSize: 12,
+                  }}>
                     {new Date(job.postedDate || '').toLocaleDateString()}
                   </Text>
                 </View>

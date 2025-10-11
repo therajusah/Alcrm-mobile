@@ -1,42 +1,86 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Alert, TextInput } from 'react-native';
+import { View, Text, ScrollView, Alert, TextInput, StyleSheet } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { useJobStore } from '../../stores/jobStore';
 import { useAuthStore } from '../../stores/authStore';
+import { useTheme } from '../../contexts/ThemeContext';
 import { userApi } from '../../services/api';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
-export default function JobDetailScreen({ route, navigation }: any) {
+interface JobDetailScreenProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  route: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  navigation: any;
+}
+
+interface ResumeFile {
+  uri: string;
+  name: string;
+  size?: number;
+  type?: string;
+}
+
+export default function JobDetailScreen({
+  route,
+  navigation,
+}: JobDetailScreenProps) {
   const { jobId } = route.params;
   const { selectedJob, fetchJobDetail, applyForJob, isLoading } = useJobStore();
   const { user } = useAuthStore();
-
-  // Check if jobId is valid
-  if (!jobId) {
-    return (
-      <View className="flex-1 justify-center items-center bg-gray-50">
-        <Text className="text-red-600 text-lg mb-4">Invalid Job ID</Text>
-        <Button title="Go Back" onPress={() => navigation.goBack()} />
-      </View>
-    );
-  }
   const [coverLetter, setCoverLetter] = useState('');
   const [showApplyForm, setShowApplyForm] = useState(false);
   const [applying, setApplying] = useState(false);
-  const [resumeFile, setResumeFile] = useState<any>(null);
+  const [resumeFile, setResumeFile] = useState<ResumeFile | null>(null);
   const [resumeFileName, setResumeFileName] = useState('');
   const [isUploadingResume, setIsUploadingResume] = useState(false);
 
+  const { colors } = useTheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.background,
+    },
+    errorText: {
+      color: colors.error,
+      fontSize: 18,
+      marginBottom: 16,
+    },
+    content: {
+      paddingHorizontal: 24,
+      paddingVertical: 24,
+    },
+  });
+
   useEffect(() => {
-    fetchJobDetail(jobId);
+    if (jobId) {
+      fetchJobDetail(jobId);
+    }
 
     return () => {
       // Clean up when leaving screen
     };
   }, [jobId, fetchJobDetail]);
+
+  // Check if jobId is valid
+  if (!jobId) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Invalid Job ID</Text>
+        <Button title="Go Back" onPress={() => navigation.goBack()} />
+      </View>
+    );
+  }
 
   const handleResumeUpload = async () => {
     try {
@@ -79,8 +123,10 @@ export default function JobDetailScreen({ route, navigation }: any) {
             resumeFileName
           );
           resumeUrl = response.resume_url;
-        } catch (error: any) {
-          Alert.alert('Error', `Failed to upload resume: ${error.message}`);
+        } catch (error: unknown) {
+          const errorMessage =
+            error instanceof Error ? error.message : 'Unknown error';
+          Alert.alert('Error', `Failed to upload resume: ${errorMessage}`);
           return;
         } finally {
           setIsUploadingResume(false);
@@ -92,8 +138,10 @@ export default function JobDetailScreen({ route, navigation }: any) {
       Alert.alert('Success', 'Application submitted successfully!', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to submit application');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to submit application';
+      Alert.alert('Error', errorMessage);
     } finally {
       setApplying(false);
     }
@@ -132,8 +180,8 @@ export default function JobDetailScreen({ route, navigation }: any) {
     selectedJob.applicationStatus.hasApplied === true;
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
-      <View className="px-6 py-6">
+    <ScrollView style={styles.container}>
+      <View style={styles.content}>
         {/* Job Header */}
         <Card>
           <Text className="text-2xl font-bold text-gray-900 mb-2">
@@ -162,7 +210,9 @@ export default function JobDetailScreen({ route, navigation }: any) {
             <View className="mb-3">
               <Text className="text-gray-600 text-sm mb-1">💰 Salary</Text>
               <Text className="text-gray-900 font-semibold">
-                {selectedJob.salary ? `₹${selectedJob.salary}L` : 'Salary not specified'}
+                {selectedJob.salary
+                  ? `₹${selectedJob.salary}L`
+                  : 'Salary not specified'}
               </Text>
             </View>
 
@@ -189,7 +239,7 @@ export default function JobDetailScreen({ route, navigation }: any) {
               <Text className="text-lg font-semibold text-gray-900 mb-2">
                 Application Status
               </Text>
-              <Badge text="Applied" variant="info" className="px-4 py-2" />
+              <Badge text="Applied" variant="info" />
               <Text className="text-gray-600 mt-4 text-center">
                 You have already applied for this job
               </Text>
@@ -262,7 +312,6 @@ export default function JobDetailScreen({ route, navigation }: any) {
                     title={resumeFile ? 'Change Resume' : 'Upload Resume'}
                     onPress={handleResumeUpload}
                     variant="outline"
-                    className="mb-2"
                   />
 
                   <Text className="text-gray-500 text-xs">

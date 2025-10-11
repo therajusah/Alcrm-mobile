@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, RefreshControl, Alert } from 'react-native';
+import { View, Text, ScrollView, RefreshControl, Alert, StyleSheet } from 'react-native';
 import { useResourceStore } from '../../stores/resourceStore';
+import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -10,11 +11,66 @@ import type { FreeResource } from '../../types';
 
 export default function ResourcesScreen() {
   const { resources, fetchResources, isLoading } = useResourceStore();
+  const { colors } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedResource, setSelectedResource] = useState<FreeResource | null>(
     null
   );
   const [showPDFViewer, setShowPDFViewer] = useState(false);
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      paddingHorizontal: 24,
+      paddingVertical: 24,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    headerSubtitle: {
+      color: colors.textSecondary,
+      marginBottom: 16,
+    },
+    resourceCard: {
+      marginBottom: 12,
+    },
+    resourceTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 8,
+    },
+    resourceDescription: {
+      color: colors.textSecondary,
+      fontSize: 14,
+    },
+    resourceFooter: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    resourceDate: {
+      color: colors.textTertiary,
+      fontSize: 12,
+    },
+    resourceActions: {
+      marginTop: 12,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    viewButton: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: '600',
+    },
+  });
 
   useEffect(() => {
     fetchResources({ page: 1, pageSize: 50 });
@@ -90,16 +146,16 @@ export default function ResourcesScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-gray-50"
+      style={styles.container}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <View className="px-6 py-6">
-        <Text className="text-xl font-bold text-gray-900 mb-1">
+      <View style={styles.content}>
+        <Text style={styles.headerTitle}>
           Free Resources
         </Text>
-        <Text className="text-gray-600 mb-4">
+        <Text style={styles.headerSubtitle}>
           Access learning materials and guides
         </Text>
 
@@ -114,27 +170,27 @@ export default function ResourcesScreen() {
               key={resource.resource_id}
               onPress={() => handleViewResource(resource)}
             >
-              <View className="mb-3">
-                <Text className="text-lg font-bold text-gray-900 mb-2">
+              <View style={styles.resourceCard}>
+                <Text style={styles.resourceTitle}>
                   {resource.title}
                 </Text>
                 {resource.description && (
-                  <Text className="text-gray-700 text-sm" numberOfLines={3}>
+                  <Text style={styles.resourceDescription} numberOfLines={3}>
                     {resource.description}
                   </Text>
                 )}
               </View>
 
-              <View className="flex-row items-center justify-between">
+              <View style={styles.resourceFooter}>
                 {getResourceTypeBadge(resource.resource_type)}
-                <Text className="text-gray-500 text-xs">
+                <Text style={styles.resourceDate}>
                   {new Date(resource.created_at || '').toLocaleDateString()}
                 </Text>
               </View>
 
               {(resource.resource_url || resource.resource_link) && (
-                <View className="mt-3 pt-3 border-t border-gray-200">
-                  <Text className="text-primary-600 text-sm font-semibold">
+                <View style={styles.resourceActions}>
+                  <Text style={styles.viewButton}>
                     Tap to open →
                   </Text>
                 </View>

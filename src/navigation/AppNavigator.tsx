@@ -1,10 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet, Text } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuthStore } from '../stores/authStore';
+import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ThemeOnboarding from '../components/ThemeOnboarding';
 
 // Auth Screens
 import LoginScreen from '../screens/auth/LoginScreen';
@@ -28,12 +31,16 @@ const Tab = createBottomTabNavigator();
 
 // Tab Navigator for authenticated users
 function UserTabs() {
+  const { colors } = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: '#3B82F6',
-        tabBarInactiveTintColor: '#9CA3AF',
+        tabBarActiveTintColor: colors.tabActive,
+        tabBarInactiveTintColor: colors.tabInactive,
         tabBarStyle: {
+          backgroundColor: colors.tabBackground,
+          borderTopColor: colors.border,
           paddingBottom: 8,
           paddingTop: 8,
           height: 60,
@@ -41,6 +48,13 @@ function UserTabs() {
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '600',
+        },
+        headerStyle: {
+          backgroundColor: colors.surface,
+        },
+        headerTintColor: colors.text,
+        headerTitleStyle: {
+          color: colors.text,
         },
       }}
     >
@@ -98,8 +112,17 @@ function TabIcon({ icon, color }: { icon: string; color: string }) {
 
 // Auth Stack
 function AuthStack() {
+  const { colors } = useTheme();
+
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        contentStyle: {
+          backgroundColor: colors.background,
+        },
+      }}
+    >
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
@@ -109,21 +132,72 @@ function AuthStack() {
 }
 
 // Main App Navigator
-export default function AppNavigator() {
+function AppNavigatorContent() {
   const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
+  const { colors } = useTheme();
+  const [showThemeOnboarding, setShowThemeOnboarding] = useState(false);
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
 
   useEffect(() => {
     checkAuth();
+    checkOnboardingStatus();
   }, [checkAuth]);
 
-  if (isLoading) {
+  const checkOnboardingStatus = async () => {
+    try {
+      const onboardingCompleted = await AsyncStorage.getItem(
+        '@onboarding_completed'
+      );
+      setShowThemeOnboarding(!onboardingCompleted);
+    } catch (error) {
+      console.error('Error checking onboarding status:', error);
+      setShowThemeOnboarding(false);
+    } finally {
+      setIsCheckingOnboarding(false);
+    }
+  };
+
+  const handleThemeOnboardingComplete = () => {
+    setShowThemeOnboarding(false);
+  };
+
+  if (isLoading || isCheckingOnboarding) {
     return <LoadingSpinner message="Loading..." />;
   }
 
+  if (showThemeOnboarding) {
+    return <ThemeOnboarding onComplete={handleThemeOnboardingComplete} />;
+  }
+
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      theme={{
+        dark: false, // We handle dark mode manually
+        colors: {
+          primary: colors.primary,
+          background: colors.background,
+          card: colors.surface,
+          text: colors.text,
+          border: colors.border,
+          notification: colors.primary,
+        },
+      }}
+    >
       {isAuthenticated ? (
-        <Stack.Navigator>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: colors.surface,
+            },
+            headerTintColor: colors.text,
+            headerTitleStyle: {
+              color: colors.text,
+            },
+            contentStyle: {
+              backgroundColor: colors.background,
+            },
+          }}
+        >
           <Stack.Screen
             name="UserTabs"
             component={UserTabs}
@@ -154,6 +228,15 @@ export default function AppNavigator() {
         <AuthStack />
       )}
     </NavigationContainer>
+  );
+}
+
+// Wrapper with ThemeProvider
+export default function AppNavigator() {
+  return (
+    <ThemeProvider>
+      <AppNavigatorContent />
+    </ThemeProvider>
   );
 }
 

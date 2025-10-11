@@ -291,9 +291,17 @@ export const userApi = {
   },
 
   uploadResume: async (fileData: string, fileName: string) => {
-    const response = await api.post('/user/uploads/resume', {
-      fileData,
-      fileName,
+    const formData = new (global as any).FormData();
+    formData.append('resume', {
+      uri: fileData,
+      type: 'application/pdf',
+      name: fileName,
+    });
+
+    const response = await api.post('/user/uploads/resume', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
     return response.data;
   },
@@ -304,9 +312,17 @@ export const userApi = {
   },
 
   uploadPhoto: async (fileData: string, fileName: string) => {
-    const response = await api.post('/user/uploads/photo', {
-      fileData,
-      fileName,
+    const formData = new (global as any).FormData();
+    formData.append('photo', {
+      uri: fileData,
+      type: 'image/jpeg',
+      name: fileName,
+    });
+
+    const response = await api.post('/user/uploads/photo', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
     return response.data;
   },

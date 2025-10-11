@@ -1,8 +1,17 @@
-import React from 'react';
-import { View, Text, ScrollView, Alert } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  Alert,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import { useAuthStore } from '../../stores/authStore';
+import { useTheme } from '../../contexts/ThemeContext';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
+import ThemeSelector from '../../components/ThemeSelector';
 import { NavigationProp } from '../../types';
 
 interface SettingsScreenProps {
@@ -13,6 +22,8 @@ export default function SettingsScreen({
   navigation: _navigation,
 }: SettingsScreenProps) {
   const { logout, user } = useAuthStore();
+  const { colors, themeMode } = useTheme();
+  const [showThemeSelector, setShowThemeSelector] = useState(false);
 
   const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
@@ -32,9 +43,60 @@ export default function SettingsScreen({
     ]);
   };
 
+  const getThemeLabel = () => {
+    switch (themeMode) {
+      case 'light':
+        return 'Light';
+      case 'dark':
+        return 'Dark';
+      case 'system':
+        return 'System Default';
+      default:
+        return 'System Default';
+    }
+  };
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      paddingHorizontal: 24,
+      paddingVertical: 24,
+    },
+    settingRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: 16,
+      paddingHorizontal: 20,
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: 12,
+      marginBottom: 8,
+    },
+    settingLabel: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: colors.text,
+    },
+    settingValue: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    chevron: {
+      fontSize: 16,
+      color: colors.textTertiary,
+    },
+    themeValueContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+  });
+
   return (
-    <ScrollView className="flex-1 bg-gray-50">
-      <View className="px-6 py-6">
+    <View style={styles.container}>
+      <ScrollView style={styles.content}>
         {/* Account Info */}
         <Card title="Account Information">
           <View className="mb-3">
@@ -59,9 +121,16 @@ export default function SettingsScreen({
 
         {/* App Settings */}
         <Card title="Preferences">
-          <Text className="text-gray-600 text-sm mb-4">
-            More settings coming soon...
-          </Text>
+          <TouchableOpacity
+            style={styles.settingRow}
+            onPress={() => setShowThemeSelector(true)}
+          >
+            <Text style={styles.settingLabel}>Theme</Text>
+            <View style={styles.themeValueContainer}>
+              <Text style={styles.settingValue}>{getThemeLabel()}</Text>
+              <Text style={styles.chevron}> ›</Text>
+            </View>
+          </TouchableOpacity>
         </Card>
 
         {/* About */}
@@ -75,7 +144,12 @@ export default function SettingsScreen({
 
         {/* Logout */}
         <Button title="Logout" onPress={handleLogout} variant="danger" />
-      </View>
-    </ScrollView>
+      </ScrollView>
+
+      <ThemeSelector
+        visible={showThemeSelector}
+        onClose={() => setShowThemeSelector(false)}
+      />
+    </View>
   );
 }

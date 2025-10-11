@@ -15,9 +15,30 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Card from '../../components/Card';
 import type { OnboardingState } from '../../types';
+import { NavigationProp } from '../../types';
 
 interface OnboardingScreenProps {
-  navigation: any;
+  navigation: NavigationProp;
+}
+
+interface ResumeFile {
+  uri: string;
+  name: string;
+  size?: number;
+  type?: string;
+}
+
+interface OnboardingErrors {
+  firstName?: string;
+  lastName?: string;
+  dateOfBirth?: string;
+  phone?: string;
+  whatsappNumber?: string;
+  bio?: string;
+  qualification?: string;
+  baseLocation?: string;
+  currentLocation?: string;
+  resume?: string;
 }
 
 export default function OnboardingScreen({
@@ -25,7 +46,7 @@ export default function OnboardingScreen({
 }: OnboardingScreenProps) {
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<OnboardingErrors>({});
   const [, setOnboardingState] = useState<OnboardingState | null>(null);
 
   // Personal Information
@@ -42,7 +63,7 @@ export default function OnboardingScreen({
   const [currentLocation, setCurrentLocation] = useState('');
 
   // Resume
-  const [resumeFile, setResumeFile] = useState<any>(null);
+  const [resumeFile, setResumeFile] = useState<ResumeFile | null>(null);
   const [resumeFileName, setResumeFileName] = useState('');
 
   const { updateUserProfile } = useAuthStore();
@@ -74,7 +95,7 @@ export default function OnboardingScreen({
   }, [loadOnboardingState]);
 
   const validateStep1 = () => {
-    const newErrors: any = {};
+    const newErrors: OnboardingErrors = {};
 
     if (!firstName.trim()) {
       newErrors.firstName = 'First name is required';
@@ -97,7 +118,7 @@ export default function OnboardingScreen({
   };
 
   const validateStep2 = () => {
-    const newErrors: any = {};
+    const newErrors: OnboardingErrors = {};
 
     if (!qualification.trim()) {
       newErrors.qualification = 'Qualification is required';
@@ -202,9 +223,13 @@ export default function OnboardingScreen({
           onPress: () => navigation.navigate('Dashboard'),
         },
       ]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log('Onboarding error:', error);
-      Alert.alert('Error', error.message || 'Failed to complete onboarding');
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to complete onboarding';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -369,7 +394,6 @@ export default function OnboardingScreen({
         title={resumeFile ? 'Change Resume' : 'Select Resume'}
         onPress={handleResumeUpload}
         variant="outline"
-        className="mb-4"
       />
 
       {errors.resume && (

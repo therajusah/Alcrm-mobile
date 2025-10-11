@@ -1,54 +1,81 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface BadgeProps {
   text: string;
   variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
-  className?: string;
 }
 
 export default function Badge({
   text,
   variant = 'default',
-  className = '',
 }: BadgeProps) {
+  const { colors } = useTheme();
+
   const getVariantStyles = () => {
     switch (variant) {
       case 'success':
-        return 'bg-green-100 border-green-200';
+        return {
+          backgroundColor: colors.success + '20',
+          borderColor: colors.success + '40',
+        };
       case 'warning':
-        return 'bg-yellow-100 border-yellow-200';
+        return {
+          backgroundColor: colors.warning + '20',
+          borderColor: colors.warning + '40',
+        };
       case 'danger':
-        return 'bg-red-100 border-red-200';
+        return {
+          backgroundColor: colors.error + '20',
+          borderColor: colors.error + '40',
+        };
       case 'info':
-        return 'bg-blue-100 border-blue-200';
+        return {
+          backgroundColor: colors.primary + '20',
+          borderColor: colors.primary + '40',
+        };
       default:
-        return 'bg-gray-100 border-gray-200';
+        return {
+          backgroundColor: colors.surfaceSecondary,
+          borderColor: colors.border,
+        };
     }
   };
 
-  const getTextStyles = () => {
+  const getTextColor = () => {
     switch (variant) {
       case 'success':
-        return 'text-green-800';
+        return colors.success;
       case 'warning':
-        return 'text-yellow-800';
+        return colors.warning;
       case 'danger':
-        return 'text-red-800';
+        return colors.error;
       case 'info':
-        return 'text-blue-800';
+        return colors.primary;
       default:
-        return 'text-gray-800';
+        return colors.textSecondary;
     }
   };
 
+  const styles = StyleSheet.create({
+    badge: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 12,
+      borderWidth: 1,
+      ...getVariantStyles(),
+    },
+    text: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: getTextColor(),
+    },
+  });
+
   return (
-    <View
-      className={`px-2 py-1 rounded-full border ${getVariantStyles()} ${className}`.trim()}
-    >
-      <Text className={`text-xs font-semibold ${getTextStyles()}`.trim()}>
-        {text}
-      </Text>
+    <View style={styles.badge}>
+      <Text style={styles.text}>{text}</Text>
     </View>
   );
 }

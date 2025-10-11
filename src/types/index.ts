@@ -1,5 +1,8 @@
 // Type definitions
-import { NavigationProp as RNavigationProp } from '@react-navigation/native';
+import {
+  NavigationProp as RNavigationProp,
+  RouteProp as RRouteProp,
+} from '@react-navigation/native';
 
 // Navigation types
 export type RootStackParamList = {
@@ -19,6 +22,10 @@ export type RootStackParamList = {
 };
 
 export type NavigationProp = RNavigationProp<RootStackParamList>;
+export type RouteProp<T extends keyof RootStackParamList> = RRouteProp<
+  RootStackParamList,
+  T
+>;
 
 // User roles - simplified for user-only app
 export type UserRole = 'USER';
