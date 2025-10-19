@@ -8,7 +8,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
-import { useJobStore } from '../../stores/jobStore';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import type { NavigationProp, RootStackParamList } from '../../types';
 import { useAuthStore } from '../../stores/authStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import { userApi } from '../../services/api';
@@ -17,12 +18,9 @@ import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import { ShimmerScreen } from '../../components/Shimmer';
 
-interface JobDetailScreenProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  route: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  navigation: any;
-}
+import { useJobStore } from '../../stores/jobStore';
+
+type JobDetailScreenRouteProp = RouteProp<RootStackParamList, 'JobDetail'>;
 
 interface ResumeFile {
   uri: string;
@@ -31,10 +29,9 @@ interface ResumeFile {
   type?: string;
 }
 
-export default function JobDetailScreen({
-  route,
-  navigation,
-}: JobDetailScreenProps) {
+export default function JobDetailScreen() {
+  const route = useRoute<JobDetailScreenRouteProp>();
+  const navigation = useNavigation<NavigationProp>();
   const { jobId } = route.params;
   const { selectedJob, fetchJobDetail, applyForJob, isLoading } = useJobStore();
   const { user } = useAuthStore();
@@ -331,14 +328,10 @@ export default function JobDetailScreen({
       <View style={styles.content}>
         {/* Job Header */}
         <Card>
-          <Text style={styles.jobTitle}>
-            {selectedJob.title}
-          </Text>
+          <Text style={styles.jobTitle}>{selectedJob.title}</Text>
 
           {selectedJob.company_name && (
-            <Text style={styles.companyName}>
-              {selectedJob.company_name}
-            </Text>
+            <Text style={styles.companyName}>{selectedJob.company_name}</Text>
           )}
 
           <View style={styles.badgesRow}>
@@ -349,9 +342,7 @@ export default function JobDetailScreen({
           <View style={styles.detailsSection}>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>📍 Location</Text>
-              <Text style={styles.detailValue}>
-                {selectedJob.location}
-              </Text>
+              <Text style={styles.detailValue}>{selectedJob.location}</Text>
             </View>
 
             <View style={styles.detailRow}>
@@ -374,18 +365,14 @@ export default function JobDetailScreen({
 
         {/* Job Description */}
         <Card title="Job Description">
-          <Text style={styles.description}>
-            {selectedJob.description}
-          </Text>
+          <Text style={styles.description}>{selectedJob.description}</Text>
         </Card>
 
         {/* Application Status or Apply Form */}
         {hasApplied ? (
           <Card>
             <View style={styles.statusContainer}>
-              <Text style={styles.statusTitle}>
-                Application Status
-              </Text>
+              <Text style={styles.statusTitle}>Application Status</Text>
               <Badge text="Applied" variant="info" />
               <Text style={styles.statusMessage}>
                 You have already applied for this job
@@ -420,9 +407,7 @@ export default function JobDetailScreen({
 
                 {/* Resume Section */}
                 <View style={styles.resumeSection}>
-                  <Text style={styles.resumeSectionTitle}>
-                    Resume
-                  </Text>
+                  <Text style={styles.resumeSectionTitle}>Resume</Text>
 
                   {user?.resume_url && !resumeFile ? (
                     <View style={styles.resumeProfileBox}>

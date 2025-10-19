@@ -326,7 +326,8 @@ export default function MentorshipScreen({
 
                 <View style={styles.mentorMeta}>
                   <Text style={styles.mentorRating}>
-                    ⭐ {mentor.rating?.toFixed(1) || '0.0'} ({mentor.total_sessions || 0} sessions)
+                    ⭐ {mentor.rating?.toFixed(1) || '0.0'} (
+                    {mentor.total_sessions || 0} sessions)
                   </Text>
                   <Text style={styles.mentorPrice}>
                     ₹{mentor.hourly_rate || 0}/hour

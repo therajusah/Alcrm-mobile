@@ -29,6 +29,10 @@ export type RootStackParamList = {
     price: number;
     duration: number;
   };
+  PDFViewer: {
+    pdfUrl: string;
+    title?: string;
+  };
   BrowseMentors: undefined;
   Profile: undefined;
   Settings: undefined;

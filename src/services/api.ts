@@ -4,12 +4,20 @@ import * as FileSystem from 'expo-file-system';
 import { API_BASE_URL } from '../config/api';
 
 // Optional: Import image manipulator only if available
-let ImageManipulator: any = null;
+let ImageManipulator: {
+  manipulateAsync: (
+    uri: string,
+    actions: Array<{ resize?: { width: number; height?: number } }>,
+    options?: { compress?: number; format?: string }
+  ) => Promise<{ uri: string }>;
+  SaveFormat: { JPEG: string; PNG: string };
+} | null = null;
 try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   ImageManipulator = require('expo-image-manipulator');
-} catch (e) {
-  console.log('expo-image-manipulator not available, skipping image compression');
+} catch {
+  console.log(
+    'expo-image-manipulator not available, skipping image compression'
+  );
 }
 import type {
   AuthResponse,
@@ -88,7 +96,7 @@ api.interceptors.response.use(
       // Token expired or invalid, clear storage
       await AsyncStorage.removeItem(TOKEN_KEY);
     }
-    
+
     // Extract error message from various possible formats
     const responseData = error.response?.data as any;
     const message =
@@ -97,7 +105,7 @@ api.interceptors.response.use(
       responseData?.details ||
       error.message ||
       'An error occurred';
-    
+
     console.error('Extracted error message:', message);
     return Promise.reject(new Error(message));
   }
@@ -315,7 +323,7 @@ export const userApi = {
   uploadResume: async (fileUri: string, fileName: string) => {
     try {
       console.log('[uploadResume] Starting upload:', { fileName, fileUri });
-      
+
       // Get file info first
       const fileInfo = await FileSystem.getInfoAsync(fileUri);
       console.log('[uploadResume] File info:', fileInfo);
@@ -343,7 +351,10 @@ export const userApi = {
 
       // Send as base64 data URL
       const dataUrl = `data:${mimeType};base64,${base64}`;
-      console.log('[uploadResume] Data URL preview:', dataUrl.substring(0, 100));
+      console.log(
+        '[uploadResume] Data URL preview:',
+        dataUrl.substring(0, 100)
+      );
       console.log('[uploadResume] Data URL total length:', dataUrl.length);
       console.log('[uploadResume] Sending to backend...');
 
@@ -351,7 +362,7 @@ export const userApi = {
         '/user/uploads/resume',
         {
           fileData: dataUrl,
-          fileName: fileName,
+          fileName,
         },
         {
           timeout: 60000, // 60 seconds for large files
@@ -360,7 +371,7 @@ export const userApi = {
           },
         }
       );
-      
+
       console.log('[uploadResume] Success:', response.data);
       return response.data;
     } catch (error) {
@@ -388,7 +399,9 @@ export const userApi = {
 
       const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
       if (fileInfo.size && fileInfo.size > MAX_FILE_SIZE) {
-        throw new Error('Image file size exceeds 5MB limit. Please choose a smaller image.');
+        throw new Error(
+          'Image file size exceeds 5MB limit. Please choose a smaller image.'
+        );
       }
 
       // Compress and resize image if ImageManipulator is available
@@ -402,7 +415,10 @@ export const userApi = {
           );
           processedUri = manipulatedImage.uri;
         } catch (manipError) {
-          console.error('Image manipulation failed, using original:', manipError);
+          console.error(
+            'Image manipulation failed, using original:',
+            manipError
+          );
           // Continue with original if manipulation fails
         }
       }
@@ -430,7 +446,7 @@ export const userApi = {
 
       const response = await api.post('/user/uploads/photo', {
         fileData: dataUrl,
-        fileName: fileName,
+        fileName,
       });
       return response.data;
     } catch (error) {

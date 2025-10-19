@@ -454,7 +454,7 @@ export default function CVReviewScreen() {
 
       if (!result.canceled && result.assets && result.assets[0]) {
         const file = result.assets[0];
-        
+
         // Validate file size (max 10MB)
         const maxSize = 10 * 1024 * 1024; // 10MB in bytes
         if (file.size && file.size > maxSize) {
@@ -757,7 +757,10 @@ export default function CVReviewScreen() {
                       <Text style={styles.fileInputLabel}>
                         Upload Resume (PDF, DOC, DOCX)
                       </Text>
-                      <TouchableOpacity style={styles.fileButton} onPress={handleSelectFile}>
+                      <TouchableOpacity
+                        style={styles.fileButton}
+                        onPress={handleSelectFile}
+                      >
                         <Text style={styles.fileButtonText}>Select File</Text>
                       </TouchableOpacity>
                       {selectedFile && (

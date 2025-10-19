@@ -13,17 +13,15 @@ import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import { ShimmerScreen } from '../../components/Shimmer';
 import EmptyState from '../../components/EmptyState';
-import SecurePDFViewer from '../../components/SecurePDFViewer';
+import PDFDialog from '../../components/PDFDialog';
 import type { FreeResource } from '../../types';
 
 export default function ResourcesScreen() {
   const { resources, fetchResources, isLoading } = useResourceStore();
   const { colors } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedResource, setSelectedResource] = useState<FreeResource | null>(
-    null
-  );
-  const [showPDFViewer, setShowPDFViewer] = useState(false);
+  const [pdfDialogVisible, setPdfDialogVisible] = useState(false);
+  const [selectedPdf, setSelectedPdf] = useState<{ url: string; title: string } | null>(null);
 
   const styles = StyleSheet.create({
     container: {
@@ -100,9 +98,9 @@ export default function ResourcesScreen() {
         url &&
         (url.toLowerCase().includes('.pdf') || resource.resource_type === 'PDF')
       ) {
-        console.log('Opening PDF viewer for:', url);
-        setSelectedResource(resource);
-        setShowPDFViewer(true);
+        console.log('Opening PDF dialog for:', url);
+        setSelectedPdf({ url, title: resource.title });
+        setPdfDialogVisible(true);
       } else {
         Alert.alert(
           'External Resource',
@@ -123,11 +121,6 @@ export default function ResourcesScreen() {
         );
       }
     }
-  };
-
-  const closePDFViewer = () => {
-    setShowPDFViewer(false);
-    setSelectedResource(null);
   };
 
   const getResourceTypeBadge = (type: string | null) => {
@@ -196,17 +189,16 @@ export default function ResourcesScreen() {
         )}
       </View>
 
-      {/* PDF Viewer Modal */}
-      {selectedResource && (
-        <SecurePDFViewer
-          visible={showPDFViewer}
-          onClose={closePDFViewer}
-          pdfUrl={
-            selectedResource.resource_url ||
-            selectedResource.resource_link ||
-            ''
-          }
-          title={selectedResource.title}
+      {/* PDF Dialog */}
+      {selectedPdf && (
+        <PDFDialog
+          visible={pdfDialogVisible}
+          pdfUrl={selectedPdf.url}
+          title={selectedPdf.title}
+          onClose={() => {
+            setPdfDialogVisible(false);
+            setSelectedPdf(null);
+          }}
         />
       )}
     </ScrollView>

@@ -136,10 +136,10 @@ export default function SecurePDFViewer({
   // Hide security notice after 3 seconds
   React.useEffect(() => {
     if (visible && showSecurityNotice) {
-      const timer = setTimeout(() => {
+      const timer = global.setTimeout(() => {
         setShowSecurityNotice(false);
       }, 3000);
-      return () => clearTimeout(timer);
+      return () => global.clearTimeout(timer);
     }
     return undefined;
   }, [visible, showSecurityNotice]);
@@ -156,7 +156,11 @@ export default function SecurePDFViewer({
     // Block any attempts to access external URLs or download
     const message = event.nativeEvent.data;
     if (message && typeof message === 'string') {
-      if (message.includes('download') || message.includes('share') || message.includes('external')) {
+      if (
+        message.includes('download') ||
+        message.includes('share') ||
+        message.includes('external')
+      ) {
         console.log('Blocked external access attempt:', message);
         return;
       }
@@ -166,7 +170,11 @@ export default function SecurePDFViewer({
   const handleShouldStartLoadWithRequest = (request: any) => {
     // Block navigation to external URLs
     const url = request.url;
-    if (url && !url.includes(pdfUrl) && !url.includes('docs.google.com/viewer')) {
+    if (
+      url &&
+      !url.includes(pdfUrl) &&
+      !url.includes('docs.google.com/viewer')
+    ) {
       console.log('Blocked external navigation:', url);
       return false;
     }
@@ -282,7 +290,7 @@ export default function SecurePDFViewer({
   const getPDFSource = () => {
     if (pdfUrl.includes('http')) {
       return {
-        uri: `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true&chrome=false&widget=false&toolbar=false&navpanes=false&scrollbar=false&statusbar=false&messages=false&scrollbar=false&print=false&download=false`
+        uri: `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true&chrome=false&widget=false&toolbar=false&navpanes=false&scrollbar=false&statusbar=false&messages=false&print=false&download=false`,
       };
     }
     return { uri: pdfUrl };
@@ -353,9 +361,12 @@ export default function SecurePDFViewer({
               showsVerticalScrollIndicator={true}
               injectedJavaScript={injectedJavaScript}
               injectedJavaScriptBeforeContentLoaded={injectedJavaScript}
-              onNavigationStateChange={(navState) => {
+              onNavigationStateChange={navState => {
                 // Block any navigation attempts
-                if (navState.url !== pdfUrl && !navState.url.includes('docs.google.com/viewer')) {
+                if (
+                  navState.url !== pdfUrl &&
+                  !navState.url.includes('docs.google.com/viewer')
+                ) {
                   console.log('Blocked navigation to:', navState.url);
                   return false;
                 }
@@ -364,7 +375,9 @@ export default function SecurePDFViewer({
               renderLoading={() => (
                 <View style={styles.loadingContainer}>
                   <ActivityIndicator size="large" color="#4F46E5" />
-                  <Text style={styles.loadingText}>Loading PDF securely...</Text>
+                  <Text style={styles.loadingText}>
+                    Loading PDF securely...
+                  </Text>
                   <Text style={styles.loadingSubtext}>
                     Download and sharing features are disabled for security
                   </Text>

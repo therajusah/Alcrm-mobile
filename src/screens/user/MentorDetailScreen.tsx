@@ -11,7 +11,8 @@ import {
   TextInput,
   Platform,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import type { NavigationProp, RootStackParamList } from '../../types';
 import { useMentorshipStore } from '../../stores/mentorshipStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -19,18 +20,16 @@ import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import { ShimmerScreen } from '../../components/Shimmer';
 import Button from '../../components/Button';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-interface MentorDetailScreenProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  route: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  navigation: any;
-}
+type MentorDetailScreenRouteProp = RouteProp<
+  RootStackParamList,
+  'MentorDetail'
+>;
 
-export default function MentorDetailScreen({
-  route,
-  navigation,
-}: MentorDetailScreenProps) {
+export default function MentorDetailScreen() {
+  const route = useRoute<MentorDetailScreenRouteProp>();
+  const navigation = useNavigation<NavigationProp>();
   const { mentorId } = route.params;
   const { selectedMentor, fetchMentorDetail, bookSession, isLoading } =
     useMentorshipStore();
@@ -62,13 +61,13 @@ export default function MentorDetailScreen({
     });
   };
 
-  const handleDateChange = (_event: any, selectedDate?: Date) => {
+  const handleDateChange = (_event: unknown, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {
       setSelectedDate(selectedDate);
-      setBookingData({ 
-        ...bookingData, 
-        scheduled_at: selectedDate.toISOString() 
+      setBookingData({
+        ...bookingData,
+        scheduled_at: selectedDate.toISOString(),
       });
     }
   };
@@ -461,10 +460,9 @@ export default function MentorDetailScreen({
               onPress={() => setShowDatePicker(true)}
             >
               <Text style={styles.dateButtonText}>
-                {bookingData.scheduled_at 
+                {bookingData.scheduled_at
                   ? `${formatDate(selectedDate)} at ${formatTime(selectedDate)}`
-                  : 'Select date and time'
-                }
+                  : 'Select date and time'}
               </Text>
               <Text style={styles.dateButtonIcon}>📅</Text>
             </TouchableOpacity>

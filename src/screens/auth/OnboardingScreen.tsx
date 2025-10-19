@@ -179,7 +179,7 @@ export default function OnboardingScreen({
 
       if (!result.canceled && result.assets && result.assets[0]) {
         const file = result.assets[0];
-        
+
         // Check file size (max 10MB)
         const maxSize = 10 * 1024 * 1024; // 10MB in bytes
         if (file.size && file.size > maxSize) {
@@ -189,7 +189,7 @@ export default function OnboardingScreen({
           );
           return;
         }
-        
+
         setResumeFile(file);
         setResumeFileName(file.name);
         setErrors({ ...errors, resume: undefined });
@@ -216,7 +216,10 @@ export default function OnboardingScreen({
 
     // Check if future date
     if (selectedDateOnly > today) {
-      setErrors({ ...errors, dateOfBirth: 'Date of birth cannot be in the future' });
+      setErrors({
+        ...errors,
+        dateOfBirth: 'Date of birth cannot be in the future',
+      });
       return;
     }
 
@@ -224,17 +227,24 @@ export default function OnboardingScreen({
     const age = today.getFullYear() - date.getFullYear();
     const monthDiff = today.getMonth() - date.getMonth();
     const dayDiff = today.getDate() - date.getDate();
-    const actualAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
+    const actualAge =
+      monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
 
     // Check minimum age (13)
     if (actualAge < 13) {
-      setErrors({ ...errors, dateOfBirth: 'You must be at least 13 years old' });
+      setErrors({
+        ...errors,
+        dateOfBirth: 'You must be at least 13 years old',
+      });
       return;
     }
 
     // Check maximum age (120)
     if (actualAge > 120) {
-      setErrors({ ...errors, dateOfBirth: 'Please enter a valid date of birth' });
+      setErrors({
+        ...errors,
+        dateOfBirth: 'Please enter a valid date of birth',
+      });
       return;
     }
 
@@ -326,7 +336,9 @@ export default function OnboardingScreen({
           <Text
             style={[
               styles.stepText,
-              stepNumber <= step ? styles.stepTextActive : styles.stepTextInactive,
+              stepNumber <= step
+                ? styles.stepTextActive
+                : styles.stepTextInactive,
             ]}
           >
             {stepNumber}
@@ -466,9 +478,7 @@ export default function OnboardingScreen({
 
       {resumeFile ? (
         <View style={styles.resumeUploadedContainer}>
-          <Text style={styles.resumeUploadedTitle}>
-            ✓ Resume Uploaded
-          </Text>
+          <Text style={styles.resumeUploadedTitle}>✓ Resume Uploaded</Text>
           <Text style={styles.resumeUploadedText}>{resumeFileName}</Text>
         </View>
       ) : (
@@ -486,9 +496,7 @@ export default function OnboardingScreen({
         variant="outline"
       />
 
-      {errors.resume && (
-        <Text style={styles.errorText}>{errors.resume}</Text>
-      )}
+      {errors.resume && <Text style={styles.errorText}>{errors.resume}</Text>}
 
       <Text style={styles.supportedFormats}>
         Supported formats: PDF, DOC, DOCX (Max 10MB)
@@ -505,9 +513,7 @@ export default function OnboardingScreen({
         <View style={styles.content}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>
-              Complete Your Profile
-            </Text>
+            <Text style={styles.title}>Complete Your Profile</Text>
             <Text style={styles.subtitle}>
               Step {step} of 3:{' '}
               {step === 1
@@ -577,7 +583,9 @@ export default function OnboardingScreen({
         <View style={datePickerStyles.modalOverlay}>
           <View style={datePickerStyles.modalContent}>
             <View style={datePickerStyles.modalHeader}>
-              <Text style={datePickerStyles.modalTitle}>Select Date of Birth</Text>
+              <Text style={datePickerStyles.modalTitle}>
+                Select Date of Birth
+              </Text>
               <TouchableOpacity
                 onPress={() => setShowDatePicker(false)}
                 style={datePickerStyles.closeButton}
@@ -589,15 +597,25 @@ export default function OnboardingScreen({
             <View style={datePickerStyles.pickerContainer}>
               <View style={datePickerStyles.pickerColumn}>
                 <Text style={datePickerStyles.pickerLabel}>Year</Text>
-                <ScrollView style={datePickerStyles.picker} showsVerticalScrollIndicator={false}>
-                  {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                <ScrollView
+                  style={datePickerStyles.picker}
+                  showsVerticalScrollIndicator={false}
+                >
+                  {Array.from(
+                    { length: 100 },
+                    (_, i) => new Date().getFullYear() - i
+                  ).map(year => (
                     <TouchableOpacity
                       key={year}
                       onPress={() => {
                         const newDate = new Date(selectedDate);
                         newDate.setFullYear(year);
                         // Clamp day to valid range for new year/month combination
-                        const maxDay = new Date(year, selectedDate.getMonth() + 1, 0).getDate();
+                        const maxDay = new Date(
+                          year,
+                          selectedDate.getMonth() + 1,
+                          0
+                        ).getDate();
                         if (newDate.getDate() > maxDay) {
                           newDate.setDate(maxDay);
                         }
@@ -605,13 +623,15 @@ export default function OnboardingScreen({
                       }}
                       style={[
                         datePickerStyles.pickerItem,
-                        selectedDate.getFullYear() === year && datePickerStyles.pickerItemSelected,
+                        selectedDate.getFullYear() === year &&
+                          datePickerStyles.pickerItemSelected,
                       ]}
                     >
                       <Text
                         style={[
                           datePickerStyles.pickerItemText,
-                          selectedDate.getFullYear() === year && datePickerStyles.pickerItemTextSelected,
+                          selectedDate.getFullYear() === year &&
+                            datePickerStyles.pickerItemTextSelected,
                         ]}
                       >
                         {year}
@@ -623,15 +643,35 @@ export default function OnboardingScreen({
 
               <View style={datePickerStyles.pickerColumn}>
                 <Text style={datePickerStyles.pickerLabel}>Month</Text>
-                <ScrollView style={datePickerStyles.picker} showsVerticalScrollIndicator={false}>
-                  {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, index) => (
+                <ScrollView
+                  style={datePickerStyles.picker}
+                  showsVerticalScrollIndicator={false}
+                >
+                  {[
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec',
+                  ].map((month, index) => (
                     <TouchableOpacity
                       key={month}
                       onPress={() => {
                         const newDate = new Date(selectedDate);
                         newDate.setMonth(index);
                         // Clamp day to valid range for new month
-                        const maxDay = new Date(newDate.getFullYear(), index + 1, 0).getDate();
+                        const maxDay = new Date(
+                          newDate.getFullYear(),
+                          index + 1,
+                          0
+                        ).getDate();
                         if (newDate.getDate() > maxDay) {
                           newDate.setDate(maxDay);
                         }
@@ -639,13 +679,15 @@ export default function OnboardingScreen({
                       }}
                       style={[
                         datePickerStyles.pickerItem,
-                        selectedDate.getMonth() === index && datePickerStyles.pickerItemSelected,
+                        selectedDate.getMonth() === index &&
+                          datePickerStyles.pickerItemSelected,
                       ]}
                     >
                       <Text
                         style={[
                           datePickerStyles.pickerItemText,
-                          selectedDate.getMonth() === index && datePickerStyles.pickerItemTextSelected,
+                          selectedDate.getMonth() === index &&
+                            datePickerStyles.pickerItemTextSelected,
                         ]}
                       >
                         {month}
@@ -657,32 +699,43 @@ export default function OnboardingScreen({
 
               <View style={datePickerStyles.pickerColumn}>
                 <Text style={datePickerStyles.pickerLabel}>Day</Text>
-                <ScrollView style={datePickerStyles.picker} showsVerticalScrollIndicator={false}>
+                <ScrollView
+                  style={datePickerStyles.picker}
+                  showsVerticalScrollIndicator={false}
+                >
                   {(() => {
-                    const maxDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
-                    return Array.from({ length: maxDay }, (_, i) => i + 1).map(day => (
-                      <TouchableOpacity
-                        key={day}
-                        onPress={() => {
-                          const newDate = new Date(selectedDate);
-                          newDate.setDate(day);
-                          setSelectedDate(newDate);
-                        }}
-                        style={[
-                          datePickerStyles.pickerItem,
-                          selectedDate.getDate() === day && datePickerStyles.pickerItemSelected,
-                        ]}
-                      >
-                        <Text
+                    const maxDay = new Date(
+                      selectedDate.getFullYear(),
+                      selectedDate.getMonth() + 1,
+                      0
+                    ).getDate();
+                    return Array.from({ length: maxDay }, (_, i) => i + 1).map(
+                      day => (
+                        <TouchableOpacity
+                          key={day}
+                          onPress={() => {
+                            const newDate = new Date(selectedDate);
+                            newDate.setDate(day);
+                            setSelectedDate(newDate);
+                          }}
                           style={[
-                            datePickerStyles.pickerItemText,
-                            selectedDate.getDate() === day && datePickerStyles.pickerItemTextSelected,
+                            datePickerStyles.pickerItem,
+                            selectedDate.getDate() === day &&
+                              datePickerStyles.pickerItemSelected,
                           ]}
                         >
-                          {day}
-                        </Text>
-                      </TouchableOpacity>
-                    ));
+                          <Text
+                            style={[
+                              datePickerStyles.pickerItemText,
+                              selectedDate.getDate() === day &&
+                                datePickerStyles.pickerItemTextSelected,
+                            ]}
+                          >
+                            {day}
+                          </Text>
+                        </TouchableOpacity>
+                      )
+                    );
                   })()}
                 </ScrollView>
               </View>
@@ -691,7 +744,10 @@ export default function OnboardingScreen({
             <View style={datePickerStyles.modalActions}>
               <TouchableOpacity
                 onPress={() => setShowDatePicker(false)}
-                style={[datePickerStyles.actionButton, datePickerStyles.cancelButton]}
+                style={[
+                  datePickerStyles.actionButton,
+                  datePickerStyles.cancelButton,
+                ]}
               >
                 <Text style={datePickerStyles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
@@ -700,7 +756,10 @@ export default function OnboardingScreen({
                   handleDateSelect(selectedDate);
                   setShowDatePicker(false);
                 }}
-                style={[datePickerStyles.actionButton, datePickerStyles.confirmButton]}
+                style={[
+                  datePickerStyles.actionButton,
+                  datePickerStyles.confirmButton,
+                ]}
               >
                 <Text style={datePickerStyles.confirmButtonText}>Confirm</Text>
               </TouchableOpacity>

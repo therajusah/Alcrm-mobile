@@ -9,9 +9,9 @@ import {
   StyleSheet,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import Button from './Button';
+import { useTheme } from '../contexts/ThemeContext';
 
-interface PDFViewerProps {
+interface PDFDialogProps {
   visible: boolean;
   onClose: () => void;
   pdfUrl: string;
@@ -20,107 +20,108 @@ interface PDFViewerProps {
 
 const { width, height } = Dimensions.get('window');
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    backgroundColor: '#F3F4F6',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
-    flex: 1,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  closeButton: {
-    marginLeft: 8,
-    padding: 8,
-    backgroundColor: '#E5E7EB',
-    borderRadius: 9999,
-  },
-  closeButtonText: {
-    color: '#4B5563',
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-  content: {
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  loadingText: {
-    color: '#4B5563',
-    marginTop: 16,
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  loadingSubtext: {
-    color: '#6B7280',
-    marginTop: 8,
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  errorContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  errorText: {
-    color: '#DC2626',
-    textAlign: 'center',
-    marginBottom: 24,
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  errorActions: {
-    gap: 12,
-    width: '100%',
-    maxWidth: 300,
-  },
-  webViewContainer: {
-    flex: 1,
-    width,
-    height: height - 80, // Account for header only
-  },
-});
-
-export default function PDFViewer({
+export default function PDFDialog({
   visible,
   onClose,
   pdfUrl,
   title = 'PDF Document',
-}: PDFViewerProps) {
+}: PDFDialogProps) {
+  const { colors } = useTheme();
   const [error, setError] = useState<string | null>(null);
 
-  console.log('PDFViewer props:', { visible, pdfUrl, title });
+  console.log('PDFDialog props:', { visible, pdfUrl, title });
 
   // Try multiple PDF viewing approaches
   const getPDFSource = () => {
     // First try Google Docs Viewer
     if (pdfUrl.includes('http')) {
       return {
-        uri: `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`,
+        uri: `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`
       };
     }
     return { uri: pdfUrl };
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: 16,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    headerText: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+      flex: 1,
+    },
+    headerActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    closeButton: {
+      marginLeft: 8,
+      padding: 8,
+      backgroundColor: colors.surface,
+      borderRadius: 9999,
+    },
+    closeButtonText: {
+      color: colors.textSecondary,
+      fontWeight: 'bold',
+      fontSize: 18,
+    },
+    content: {
+      flex: 1,
+    },
+    loadingContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 24,
+    },
+    loadingText: {
+      color: colors.textSecondary,
+      marginTop: 16,
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    loadingSubtext: {
+      color: colors.textTertiary,
+      marginTop: 8,
+      fontSize: 14,
+      textAlign: 'center',
+    },
+    errorContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 24,
+    },
+    errorText: {
+      color: colors.error,
+      textAlign: 'center',
+      marginBottom: 24,
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    errorActions: {
+      gap: 12,
+      width: '100%',
+      maxWidth: 300,
+    },
+    webViewContainer: {
+      flex: 1,
+      width,
+      height: height - 80, // Account for header only
+    },
+  });
 
   return (
     <Modal
@@ -148,7 +149,20 @@ export default function PDFViewer({
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>{error}</Text>
               <View style={styles.errorActions}>
-                <Button title="Close" onPress={onClose} />
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: colors.primary,
+                    paddingHorizontal: 24,
+                    paddingVertical: 12,
+                    borderRadius: 8,
+                    alignItems: 'center',
+                  }}
+                  onPress={onClose}
+                >
+                  <Text style={{ color: colors.textInverse, fontWeight: '600' }}>
+                    Close
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
           ) : (
@@ -165,7 +179,9 @@ export default function PDFViewer({
               onError={syntheticEvent => {
                 const { nativeEvent } = syntheticEvent;
                 console.error('WebView error:', nativeEvent);
-                setError('Failed to load PDF. You can download it instead.');
+                setError(
+                  'Failed to load PDF. You can download it instead.'
+                );
               }}
               onHttpError={syntheticEvent => {
                 const { nativeEvent } = syntheticEvent;
@@ -183,7 +199,7 @@ export default function PDFViewer({
               mediaPlaybackRequiresUserAction={false}
               renderLoading={() => (
                 <View style={styles.loadingContainer}>
-                  <ActivityIndicator size="large" color="#4F46E5" />
+                  <ActivityIndicator size="large" color={colors.primary} />
                   <Text style={styles.loadingText}>Loading PDF...</Text>
                   <Text style={styles.loadingSubtext}>
                     If this takes too long, try downloading instead

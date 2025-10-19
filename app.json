@@ -9,7 +9,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.alcrm.mobile"
@@ -28,8 +30,8 @@
     "scheme": "alcrm",
     "newArchEnabled": true,
     "plugins": [
-      "expo-document-picker"
+      "expo-document-picker",
+      "expo-asset"
     ]
   }
 }
-

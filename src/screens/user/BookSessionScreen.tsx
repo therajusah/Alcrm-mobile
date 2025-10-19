@@ -196,16 +196,12 @@ export default function BookSessionScreen() {
 
   const handleBookSession = async () => {
     if (date <= new Date()) {
-      showAlert(
-        'Invalid Date',
-        'Please select a future date and time',
-        [
-          {
-            text: 'OK',
-            onPress: () => {},
-          },
-        ]
-      );
+      showAlert('Invalid Date', 'Please select a future date and time', [
+        {
+          text: 'OK',
+          onPress: () => {},
+        },
+      ]);
       return;
     }
 
@@ -287,9 +283,7 @@ export default function BookSessionScreen() {
       </View>
 
       <ScrollView style={styles.form}>
-        <Text style={styles.label}>
-          Select Mentor (Optional)
-        </Text>
+        <Text style={styles.label}>Select Mentor (Optional)</Text>
         <Text style={styles.helpText}>
           Choose a specific mentor or let our system auto-assign the best match
         </Text>
@@ -330,10 +324,9 @@ export default function BookSessionScreen() {
               </View>
               <View style={styles.mentorInfo}>
                 <Text style={styles.mentorName}>
-                  {mentor.user?.first_name && mentor.user?.last_name 
+                  {mentor.user?.first_name && mentor.user?.last_name
                     ? `${mentor.user.first_name} ${mentor.user.last_name}`
-                    : 'Unknown Mentor'
-                  }
+                    : 'Unknown Mentor'}
                 </Text>
                 <Text style={styles.mentorDomain}>
                   {mentor.domain} • {mentor.experience_years}+ years
@@ -410,15 +403,14 @@ export default function BookSessionScreen() {
         />
 
         <TouchableOpacity
-          style={[
-            styles.bookButton,
-            submitting && styles.bookButtonDisabled,
-          ]}
+          style={[styles.bookButton, submitting && styles.bookButtonDisabled]}
           onPress={handleBookSession}
           disabled={submitting}
         >
           <Text style={styles.bookButtonText}>
-            {submitting ? 'Booking...' : `Book Session - ₹${price.toLocaleString()}`}
+            {submitting
+              ? 'Booking...'
+              : `Book Session - ₹${price.toLocaleString()}`}
           </Text>
         </TouchableOpacity>
 
@@ -439,4 +431,3 @@ export default function BookSessionScreen() {
     </View>
   );
 }
-

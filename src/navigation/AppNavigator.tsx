@@ -34,6 +34,7 @@ import SettingsScreen from '../screens/user/SettingsScreen';
 import ChangePasswordScreen from '../screens/user/ChangePasswordScreen';
 import MentorshipSessionDetailScreen from '../screens/user/MentorshipSessionDetailScreen';
 import MentorshipHomeScreen from '../screens/user/MentorshipHomeScreen';
+import PDFViewerScreen from '../screens/user/PDFViewerScreen';
 import BookSessionScreen from '../screens/user/BookSessionScreen';
 
 const Stack = createNativeStackNavigator();
@@ -308,6 +309,11 @@ function AppNavigatorContent() {
             name="MentorshipSessionDetail"
             component={MentorshipSessionDetailScreen}
             options={{ headerTitle: 'Session Details' }}
+          />
+          <Stack.Screen
+            name="PDFViewer"
+            component={PDFViewerScreen}
+            options={{ headerShown: false }}
           />
         </Stack.Navigator>
       ) : (

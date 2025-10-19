@@ -358,11 +358,12 @@ export default function MySessionsScreen({
             sessions.map(session => {
               // Get mentor information from the session
               const mentorInfo = (session as any).career_mentors;
-              const mentorName = mentorInfo?.users?.first_name && mentorInfo?.users?.last_name
-                ? `${mentorInfo.users.first_name} ${mentorInfo.users.last_name}`
-                : 'Mentor';
+              const mentorName =
+                mentorInfo?.users?.first_name && mentorInfo?.users?.last_name
+                  ? `${mentorInfo.users.first_name} ${mentorInfo.users.last_name}`
+                  : 'Mentor';
               const mentorInitial = mentorName.charAt(0).toUpperCase();
-              
+
               // Format date nicely
               const formatDate = (dateString: string | null | undefined) => {
                 if (!dateString) return 'Not scheduled yet';
@@ -372,15 +373,17 @@ export default function MySessionsScreen({
                   month: 'short',
                   day: 'numeric',
                   hour: '2-digit',
-                  minute: '2-digit'
+                  minute: '2-digit',
                 });
               };
-              
+
               return (
                 <Card key={session.session_id}>
                   <View style={styles.sessionHeader}>
                     <View style={styles.sessionAvatar}>
-                      <Text style={styles.sessionAvatarText}>{mentorInitial}</Text>
+                      <Text style={styles.sessionAvatarText}>
+                        {mentorInitial}
+                      </Text>
                     </View>
                     <View style={styles.sessionInfo}>
                       <Text style={styles.sessionMentor}>{mentorName}</Text>
@@ -405,7 +408,7 @@ export default function MySessionsScreen({
                         {formatDate(session.scheduled_at)}
                       </Text>
                     </View>
-                    
+
                     {session.session_duration_minutes && (
                       <View style={styles.detailRow}>
                         <Text style={styles.detailLabel}>⏱ Duration</Text>
@@ -414,7 +417,7 @@ export default function MySessionsScreen({
                         </Text>
                       </View>
                     )}
-                    
+
                     {session.completed_at && (
                       <View style={styles.detailRow}>
                         <Text style={styles.detailLabel}>✅ Completed</Text>
@@ -423,7 +426,7 @@ export default function MySessionsScreen({
                         </Text>
                       </View>
                     )}
-                    
+
                     {session.session_rating && (
                       <View style={styles.detailRow}>
                         <Text style={styles.detailLabel}>★ Your Rating</Text>
@@ -442,7 +445,7 @@ export default function MySessionsScreen({
                       </Text>
                     </View>
                   )}
-                  
+
                   {session.session_feedback && (
                     <View style={styles.notesContainer}>
                       <Text style={styles.notesLabel}>Your Feedback:</Text>
@@ -457,9 +460,11 @@ export default function MySessionsScreen({
                       style={[styles.actionButton, styles.viewButton]}
                       onPress={() => handleViewSession(session)}
                     >
-                      <Text style={styles.viewButtonText}>View Full Details</Text>
+                      <Text style={styles.viewButtonText}>
+                        View Full Details
+                      </Text>
                     </TouchableOpacity>
-                    
+
                     {(session.status === 'SCHEDULED' ||
                       session.status === 'PENDING') && (
                       <TouchableOpacity
@@ -471,14 +476,16 @@ export default function MySessionsScreen({
                         </Text>
                       </TouchableOpacity>
                     )}
-                    
+
                     {session.status === 'COMPLETED' &&
                       !session.session_rating && (
                         <TouchableOpacity
                           style={[styles.actionButton, styles.rateButton]}
                           onPress={() => handleRateSession(session)}
                         >
-                          <Text style={styles.rateButtonText}>★ Rate Session</Text>
+                          <Text style={styles.rateButtonText}>
+                            ★ Rate Session
+                          </Text>
                         </TouchableOpacity>
                       )}
                   </View>

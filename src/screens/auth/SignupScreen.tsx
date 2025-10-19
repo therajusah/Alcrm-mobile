@@ -266,7 +266,7 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
@@ -290,15 +290,34 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
 
         {/* Step Indicator */}
         <View style={styles.stepIndicator}>
-          <View style={[styles.stepDot, step === 'email' ? styles.stepActive : styles.stepCompleted]}>
+          <View
+            style={[
+              styles.stepDot,
+              step === 'email' ? styles.stepActive : styles.stepCompleted,
+            ]}
+          >
             <Text style={styles.stepNumber}>1</Text>
           </View>
           <View style={styles.stepLine} />
-          <View style={[styles.stepDot, step === 'otp' ? styles.stepActive : step === 'details' ? styles.stepCompleted : styles.stepInactive]}>
+          <View
+            style={[
+              styles.stepDot,
+              step === 'otp'
+                ? styles.stepActive
+                : step === 'details'
+                  ? styles.stepCompleted
+                  : styles.stepInactive,
+            ]}
+          >
             <Text style={styles.stepNumber}>2</Text>
           </View>
           <View style={styles.stepLine} />
-          <View style={[styles.stepDot, step === 'details' ? styles.stepActive : styles.stepInactive]}>
+          <View
+            style={[
+              styles.stepDot,
+              step === 'details' ? styles.stepActive : styles.stepInactive,
+            ]}
+          >
             <Text style={styles.stepNumber}>3</Text>
           </View>
         </View>

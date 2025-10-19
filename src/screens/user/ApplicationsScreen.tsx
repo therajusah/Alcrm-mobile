@@ -124,7 +124,8 @@ export default function ApplicationsScreen() {
     >
       <View style={styles.content}>
         <Text style={styles.headerTitle}>
-          {applications.length} Application{applications.length !== 1 ? 's' : ''}
+          {applications.length} Application
+          {applications.length !== 1 ? 's' : ''}
         </Text>
 
         {applications.length === 0 ? (

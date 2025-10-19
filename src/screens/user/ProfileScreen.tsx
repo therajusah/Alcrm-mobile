@@ -198,7 +198,7 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 
       if (!result.canceled && result.assets && result.assets[0]) {
         const file = result.assets[0];
-        
+
         // Check file size (max 10MB)
         const maxSize = 10 * 1024 * 1024; // 10MB in bytes
         if (file.size && file.size > maxSize) {
@@ -208,7 +208,7 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
           );
           return;
         }
-        
+
         setIsUploadingResume(true);
 
         try {

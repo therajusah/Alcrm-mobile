@@ -224,7 +224,7 @@ export default function ForgotPasswordScreen({
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
@@ -248,22 +248,40 @@ export default function ForgotPasswordScreen({
 
         {/* Step Indicator */}
         <View style={styles.stepIndicator}>
-          <View style={[styles.stepDot, step === 'email' ? styles.stepActive : styles.stepCompleted]}>
+          <View
+            style={[
+              styles.stepDot,
+              step === 'email' ? styles.stepActive : styles.stepCompleted,
+            ]}
+          >
             <Text style={styles.stepNumber}>1</Text>
           </View>
           <View style={styles.stepLine} />
-          <View style={[styles.stepDot, step === 'otp' ? styles.stepActive : step === 'password' ? styles.stepCompleted : styles.stepInactive]}>
+          <View
+            style={[
+              styles.stepDot,
+              step === 'otp'
+                ? styles.stepActive
+                : step === 'password'
+                  ? styles.stepCompleted
+                  : styles.stepInactive,
+            ]}
+          >
             <Text style={styles.stepNumber}>2</Text>
           </View>
           <View style={styles.stepLine} />
-          <View style={[styles.stepDot, step === 'password' ? styles.stepActive : styles.stepInactive]}>
+          <View
+            style={[
+              styles.stepDot,
+              step === 'password' ? styles.stepActive : styles.stepInactive,
+            ]}
+          >
             <Text style={styles.stepNumber}>3</Text>
           </View>
         </View>
 
         {/* Form Card */}
         <View style={styles.formCard}>
-
           {/* Step 1: Email */}
           {step === 'email' && (
             <View>
@@ -357,15 +375,12 @@ export default function ForgotPasswordScreen({
               />
             </View>
           )}
-
         </View>
 
         {/* Back to Login */}
         <View style={styles.backButton}>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.backButtonText}>
-              Back to Login
-            </Text>
+            <Text style={styles.backButtonText}>Back to Login</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

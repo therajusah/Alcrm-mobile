@@ -69,21 +69,17 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         loginError instanceof Error
           ? loginError.message
           : 'An error occurred during login';
-      showAlert(
-        'Login Failed', 
-        errorMessage,
-        [
-          {
-            text: 'Try Again',
-            onPress: () => {},
-            style: 'default',
-          },
-          {
-            text: 'Create Account',
-            onPress: () => navigation.navigate('Signup'),
-          }
-        ]
-      );
+      showAlert('Login Failed', errorMessage, [
+        {
+          text: 'Try Again',
+          onPress: () => {},
+          style: 'default',
+        },
+        {
+          text: 'Create Account',
+          onPress: () => navigation.navigate('Signup'),
+        },
+      ]);
     }
   };
 
@@ -183,7 +179,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
@@ -198,7 +194,9 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Welcome Back</Text>
-          <Text style={styles.subtitle}>Sign in to continue to your account</Text>
+          <Text style={styles.subtitle}>
+            Sign in to continue to your account
+          </Text>
         </View>
 
         {/* Form Card */}

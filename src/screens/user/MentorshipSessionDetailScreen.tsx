@@ -8,20 +8,20 @@ import {
   TextInput,
   StyleSheet,
 } from 'react-native';
-import { userApi } from '../../services/api';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import type { NavigationProp, RootStackParamList } from '../../types';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useTheme } from '../../contexts/ThemeContext';
+import { userApi } from '../../services/api';
 import type { MentorshipSession } from '../../types';
 
-interface MentorshipSessionDetailScreenProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  route: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  navigation: any;
-}
+type MentorshipSessionDetailScreenRouteProp = RouteProp<
+  RootStackParamList,
+  'MentorshipSessionDetail'
+>;
 
 // Static styles (layout and sizing only, no colors)
 const staticStyles = StyleSheet.create({
@@ -113,10 +113,9 @@ const staticStyles = StyleSheet.create({
   },
 });
 
-export default function MentorshipSessionDetailScreen({
-  route,
-  navigation,
-}: MentorshipSessionDetailScreenProps) {
+export default function MentorshipSessionDetailScreen() {
+  const route = useRoute<MentorshipSessionDetailScreenRouteProp>();
+  const navigation = useNavigation<NavigationProp>();
   const { sessionId } = route.params;
   const { colors } = useTheme();
   const [session, setSession] = useState<MentorshipSession | null>(null);
@@ -189,8 +188,8 @@ export default function MentorshipSessionDetailScreen({
       },
       ratedBox: {
         ...staticStyles.ratedBox,
-        backgroundColor: colors.success + '20',
-        borderColor: colors.success + '40',
+        backgroundColor: `${colors.success}20`,
+        borderColor: `${colors.success}40`,
       },
       ratedTitle: {
         ...staticStyles.ratedTitle,
@@ -333,9 +332,7 @@ export default function MentorshipSessionDetailScreen({
   if (!session) {
     return (
       <View style={styles.notFoundContainer}>
-        <Text style={styles.notFoundTitle}>
-          Session Not Found
-        </Text>
+        <Text style={styles.notFoundTitle}>Session Not Found</Text>
         <Text style={styles.notFoundText}>
           The session you&apos;re looking for doesn&apos;t exist or you
           don&apos;t have access to it.
@@ -356,9 +353,7 @@ export default function MentorshipSessionDetailScreen({
         {/* Session Header */}
         <Card>
           <View style={styles.headerRow}>
-            <Text style={styles.headerTitle}>
-              Session Details
-            </Text>
+            <Text style={styles.headerTitle}>Session Details</Text>
             {getStatusBadge(session.status)}
           </View>
 
@@ -373,9 +368,7 @@ export default function MentorshipSessionDetailScreen({
 
           <View style={styles.detailsSection}>
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>
-                📅 Scheduled Date
-              </Text>
+              <Text style={styles.detailLabel}>📅 Scheduled Date</Text>
               <Text style={styles.detailValue}>
                 {session.scheduled_at
                   ? new Date(session.scheduled_at).toLocaleString()
@@ -413,18 +406,14 @@ export default function MentorshipSessionDetailScreen({
         {/* Mentor Notes */}
         {session.mentor_notes && (
           <Card title="Mentor Notes">
-            <Text style={styles.notesText}>
-              {session.mentor_notes}
-            </Text>
+            <Text style={styles.notesText}>{session.mentor_notes}</Text>
           </Card>
         )}
 
         {/* Session Feedback */}
         {session.session_feedback && (
           <Card title="Your Feedback">
-            <Text style={styles.notesText}>
-              {session.session_feedback}
-            </Text>
+            <Text style={styles.notesText}>{session.session_feedback}</Text>
           </Card>
         )}
 
@@ -441,9 +430,7 @@ export default function MentorshipSessionDetailScreen({
           {session.status.toLowerCase() === 'completed' &&
             !session.session_rating && (
               <View>
-                <Text style={styles.ratingLabel}>
-                  Rate Your Session
-                </Text>
+                <Text style={styles.ratingLabel}>Rate Your Session</Text>
 
                 {renderRatingStars()}
 
@@ -473,9 +460,7 @@ export default function MentorshipSessionDetailScreen({
           {session.status.toLowerCase() === 'completed' &&
             session.session_rating && (
               <View style={styles.ratedBox}>
-                <Text style={styles.ratedTitle}>
-                  ✓ Session Rated
-                </Text>
+                <Text style={styles.ratedTitle}>✓ Session Rated</Text>
                 <Text style={styles.ratedText}>
                   Thank you for your feedback!
                 </Text>

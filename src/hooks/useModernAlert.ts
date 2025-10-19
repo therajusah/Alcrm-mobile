@@ -49,7 +49,9 @@ export const useModernAlert = () => {
 };
 
 // Convenience functions for common alert patterns
-export const createAlertHelpers = (showAlert: (title: string, message: string, buttons: AlertButton[]) => void) => ({
+export const createAlertHelpers = (
+  showAlert: (title: string, message: string, buttons: AlertButton[]) => void
+) => ({
   // Simple OK alert
   alert: (title: string, message: string, onPress?: () => void) => {
     showAlert(title, message, [

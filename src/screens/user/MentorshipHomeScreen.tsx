@@ -64,7 +64,9 @@ export default function MentorshipHomeScreen() {
   const navigation = useNavigation<NavigationProp>();
   const { colors } = useTheme();
   const { mentors, fetchMentors, isLoading, pagination } = useMentorshipStore();
-  const [activeTab, setActiveTab] = useState<'services' | 'sessions'>('services');
+  const [activeTab, setActiveTab] = useState<'services' | 'sessions'>(
+    'services'
+  );
   const [refreshing, setRefreshing] = useState(false);
 
   const styles = StyleSheet.create({
@@ -117,7 +119,6 @@ export default function MentorshipHomeScreen() {
       flex: 1,
     },
     servicesContent: {
-
       padding: 16,
     },
     sectionTitle: {
@@ -207,7 +208,7 @@ export default function MentorshipHomeScreen() {
     setRefreshing(false);
   };
 
-  const handleServicePress = (service: typeof services[0]) => {
+  const handleServicePress = (service: (typeof services)[0]) => {
     navigation.navigate('BookSession', {
       serviceType: service.id,
       serviceTitle: service.title,
@@ -356,4 +357,3 @@ export default function MentorshipHomeScreen() {
     </View>
   );
 }
-
