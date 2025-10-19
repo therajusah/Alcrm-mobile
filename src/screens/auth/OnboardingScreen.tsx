@@ -7,6 +7,8 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
+  Modal,
 } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { useAuthStore } from '../../stores/authStore';
@@ -66,6 +68,10 @@ export default function OnboardingScreen({
   const [resumeFile, setResumeFile] = useState<ResumeFile | null>(null);
   const [resumeFileName, setResumeFileName] = useState('');
 
+  // Date picker state
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date(2000, 0, 1));
+
   const { updateUserProfile } = useAuthStore();
 
   const loadOnboardingState = useCallback(async () => {
@@ -73,9 +79,9 @@ export default function OnboardingScreen({
       const state = await userApi.getOnboardingState();
       setOnboardingState(state);
 
-      // If user has completed onboarding, redirect to dashboard
+      // If user has completed onboarding, redirect to main app
       if (state.is_completed) {
-        navigation.navigate('Dashboard');
+        navigation.navigate('UserTabs' as never);
         return;
       }
 
@@ -173,6 +179,17 @@ export default function OnboardingScreen({
 
       if (!result.canceled && result.assets && result.assets[0]) {
         const file = result.assets[0];
+        
+        // Check file size (max 10MB)
+        const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+        if (file.size && file.size > maxSize) {
+          Alert.alert(
+            'File Too Large',
+            'Please select a resume file smaller than 10MB'
+          );
+          return;
+        }
+        
         setResumeFile(file);
         setResumeFileName(file.name);
         setErrors({ ...errors, resume: undefined });
@@ -183,6 +200,63 @@ export default function OnboardingScreen({
     }
   };
 
+  const formatLocalDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleDateSelect = (date: Date) => {
+    // Validate date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedDateOnly = new Date(date);
+    selectedDateOnly.setHours(0, 0, 0, 0);
+
+    // Check if future date
+    if (selectedDateOnly > today) {
+      setErrors({ ...errors, dateOfBirth: 'Date of birth cannot be in the future' });
+      return;
+    }
+
+    // Calculate age
+    const age = today.getFullYear() - date.getFullYear();
+    const monthDiff = today.getMonth() - date.getMonth();
+    const dayDiff = today.getDate() - date.getDate();
+    const actualAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
+
+    // Check minimum age (13)
+    if (actualAge < 13) {
+      setErrors({ ...errors, dateOfBirth: 'You must be at least 13 years old' });
+      return;
+    }
+
+    // Check maximum age (120)
+    if (actualAge > 120) {
+      setErrors({ ...errors, dateOfBirth: 'Please enter a valid date of birth' });
+      return;
+    }
+
+    setSelectedDate(date);
+    const formattedDate = formatLocalDate(date);
+    setDateOfBirth(formattedDate);
+    if (errors.dateOfBirth) {
+      setErrors({ ...errors, dateOfBirth: undefined });
+    }
+  };
+
+  const formatDisplayDate = (dateString: string) => {
+    if (!dateString) return 'Select your date of birth';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Select your date of birth';
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   const handleCompleteOnboarding = async () => {
     if (!resumeFile) {
       setErrors({ resume: 'Please upload your resume' });
@@ -191,11 +265,13 @@ export default function OnboardingScreen({
 
     setIsLoading(true);
     try {
+      console.log('Uploading resume:', resumeFileName);
       // Upload resume first
       const resumeResponse = await userApi.uploadResume(
         resumeFile.uri,
         resumeFileName
       );
+      console.log('Resume uploaded successfully:', resumeResponse);
 
       // Update user profile with all information
       const profileData = {
@@ -211,24 +287,26 @@ export default function OnboardingScreen({
         resume_url: resumeResponse.resume_url,
       };
 
+      console.log('Updating profile with data');
       await userApi.updateProfile(profileData);
       updateUserProfile(profileData);
 
       // Mark onboarding as completed
+      console.log('Marking onboarding as completed');
       await userApi.completeOnboarding();
 
       Alert.alert('Welcome!', 'Your profile has been completed successfully.', [
         {
           text: 'Get Started',
-          onPress: () => navigation.navigate('Dashboard'),
+          onPress: () => navigation.navigate('UserTabs' as never),
         },
       ]);
     } catch (error: unknown) {
-      console.log('Onboarding error:', error);
+      console.error('Onboarding error:', error);
       const errorMessage =
         error instanceof Error
           ? error.message
-          : 'Failed to complete onboarding';
+          : 'Failed to complete onboarding. Please try again.';
       Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
@@ -236,18 +314,20 @@ export default function OnboardingScreen({
   };
 
   const renderStepIndicator = () => (
-    <View className="flex-row justify-center mb-6">
+    <View style={styles.stepIndicatorContainer}>
       {[1, 2, 3].map(stepNumber => (
         <View
           key={stepNumber}
-          className={`w-8 h-8 rounded-full mx-1 flex items-center justify-center ${
-            stepNumber <= step ? 'bg-primary-600' : 'bg-gray-300'
-          }`}
+          style={[
+            styles.stepCircle,
+            stepNumber <= step ? styles.stepActive : styles.stepInactive,
+          ]}
         >
           <Text
-            className={`text-sm font-semibold ${
-              stepNumber <= step ? 'text-white' : 'text-gray-600'
-            }`}
+            style={[
+              styles.stepText,
+              stepNumber <= step ? styles.stepTextActive : styles.stepTextInactive,
+            ]}
           >
             {stepNumber}
           </Text>
@@ -280,17 +360,29 @@ export default function OnboardingScreen({
         error={errors.lastName}
       />
 
-      <Input
-        label="Date of Birth *"
-        placeholder="YYYY-MM-DD"
-        value={dateOfBirth}
-        onChangeText={text => {
-          setDateOfBirth(text);
-          if (errors.dateOfBirth)
-            setErrors({ ...errors, dateOfBirth: undefined });
-        }}
-        error={errors.dateOfBirth}
-      />
+      <View style={{ marginBottom: 16 }}>
+        <Text style={datePickerStyles.label}>Date of Birth *</Text>
+        <TouchableOpacity
+          onPress={() => setShowDatePicker(true)}
+          style={[
+            datePickerStyles.dateButton,
+            errors.dateOfBirth && datePickerStyles.dateButtonError,
+          ]}
+        >
+          <Text
+            style={[
+              datePickerStyles.dateButtonText,
+              !dateOfBirth && datePickerStyles.dateButtonPlaceholder,
+            ]}
+          >
+            {formatDisplayDate(dateOfBirth)}
+          </Text>
+          <Text style={datePickerStyles.dateIcon}>📅</Text>
+        </TouchableOpacity>
+        {errors.dateOfBirth && (
+          <Text style={datePickerStyles.errorText}>{errors.dateOfBirth}</Text>
+        )}
+      </View>
 
       <Input
         label="Phone Number *"
@@ -367,25 +459,23 @@ export default function OnboardingScreen({
 
   const renderStep3 = () => (
     <Card title="Upload Resume">
-      <Text className="text-gray-700 mb-4">
+      <Text style={styles.resumeDescription}>
         Upload your resume to complete your profile. This will be used for job
         applications.
       </Text>
 
       {resumeFile ? (
-        <View className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-          <Text className="text-green-800 font-semibold mb-1">
+        <View style={styles.resumeUploadedContainer}>
+          <Text style={styles.resumeUploadedTitle}>
             ✓ Resume Uploaded
           </Text>
-          <Text className="text-green-700 text-sm">{resumeFileName}</Text>
+          <Text style={styles.resumeUploadedText}>{resumeFileName}</Text>
         </View>
       ) : (
-        <View className="border-2 border-dashed border-gray-300 rounded-lg p-6 mb-4">
-          <Text className="text-gray-500 text-center mb-2">
-            📄 No resume selected
-          </Text>
-          <Text className="text-gray-400 text-sm text-center">
-            Tap the button below to select your resume
+        <View style={styles.resumeEmptyContainer}>
+          <Text style={styles.resumeEmptyIcon}>📄</Text>
+          <Text style={styles.resumeEmptyText}>
+            No resume selected. Tap the button below to upload your resume.
           </Text>
         </View>
       )}
@@ -397,10 +487,10 @@ export default function OnboardingScreen({
       />
 
       {errors.resume && (
-        <Text className="text-red-500 text-sm mb-4">{errors.resume}</Text>
+        <Text style={styles.errorText}>{errors.resume}</Text>
       )}
 
-      <Text className="text-gray-500 text-xs">
+      <Text style={styles.supportedFormats}>
         Supported formats: PDF, DOC, DOCX (Max 10MB)
       </Text>
     </Card>
@@ -409,16 +499,16 @@ export default function OnboardingScreen({
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
+      style={styles.container}
     >
-      <ScrollView className="flex-1 bg-gray-50">
-        <View className="px-6 pt-12">
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.content}>
           {/* Header */}
-          <View className="mb-6">
-            <Text className="text-3xl font-bold text-gray-900 mb-2">
+          <View style={styles.header}>
+            <Text style={styles.title}>
               Complete Your Profile
             </Text>
-            <Text className="text-gray-600 text-base">
+            <Text style={styles.subtitle}>
               Step {step} of 3:{' '}
               {step === 1
                 ? 'Personal Info'
@@ -436,9 +526,9 @@ export default function OnboardingScreen({
           {step === 3 && renderStep3()}
 
           {/* Navigation Buttons */}
-          <View className="flex-row gap-3 mt-6">
+          <View style={styles.navigationButtons}>
             {step > 1 && (
-              <View className="flex-1">
+              <View style={styles.buttonFlex}>
                 <Button
                   title="Previous"
                   onPress={handlePrevious}
@@ -448,7 +538,7 @@ export default function OnboardingScreen({
               </View>
             )}
 
-            <View className={step > 1 ? 'flex-1' : 'flex-1'}>
+            <View style={styles.buttonFlex}>
               {step < 3 ? (
                 <Button
                   title="Next"
@@ -467,15 +557,438 @@ export default function OnboardingScreen({
 
           {/* Skip Option */}
           <TouchableOpacity
-            onPress={() => navigation.navigate('Dashboard')}
-            className="mt-4"
+            onPress={() => navigation.navigate('UserTabs' as never)}
+            style={styles.skipButton}
           >
-            <Text className="text-center text-gray-500 text-sm">
-              Skip for now
+            <Text style={styles.skipText}>
+              Skip for now (Complete later in Profile)
             </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Date Picker Modal */}
+      <Modal
+        visible={showDatePicker}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowDatePicker(false)}
+      >
+        <View style={datePickerStyles.modalOverlay}>
+          <View style={datePickerStyles.modalContent}>
+            <View style={datePickerStyles.modalHeader}>
+              <Text style={datePickerStyles.modalTitle}>Select Date of Birth</Text>
+              <TouchableOpacity
+                onPress={() => setShowDatePicker(false)}
+                style={datePickerStyles.closeButton}
+              >
+                <Text style={datePickerStyles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={datePickerStyles.pickerContainer}>
+              <View style={datePickerStyles.pickerColumn}>
+                <Text style={datePickerStyles.pickerLabel}>Year</Text>
+                <ScrollView style={datePickerStyles.picker} showsVerticalScrollIndicator={false}>
+                  {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                    <TouchableOpacity
+                      key={year}
+                      onPress={() => {
+                        const newDate = new Date(selectedDate);
+                        newDate.setFullYear(year);
+                        // Clamp day to valid range for new year/month combination
+                        const maxDay = new Date(year, selectedDate.getMonth() + 1, 0).getDate();
+                        if (newDate.getDate() > maxDay) {
+                          newDate.setDate(maxDay);
+                        }
+                        setSelectedDate(newDate);
+                      }}
+                      style={[
+                        datePickerStyles.pickerItem,
+                        selectedDate.getFullYear() === year && datePickerStyles.pickerItemSelected,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          datePickerStyles.pickerItemText,
+                          selectedDate.getFullYear() === year && datePickerStyles.pickerItemTextSelected,
+                        ]}
+                      >
+                        {year}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              <View style={datePickerStyles.pickerColumn}>
+                <Text style={datePickerStyles.pickerLabel}>Month</Text>
+                <ScrollView style={datePickerStyles.picker} showsVerticalScrollIndicator={false}>
+                  {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, index) => (
+                    <TouchableOpacity
+                      key={month}
+                      onPress={() => {
+                        const newDate = new Date(selectedDate);
+                        newDate.setMonth(index);
+                        // Clamp day to valid range for new month
+                        const maxDay = new Date(newDate.getFullYear(), index + 1, 0).getDate();
+                        if (newDate.getDate() > maxDay) {
+                          newDate.setDate(maxDay);
+                        }
+                        setSelectedDate(newDate);
+                      }}
+                      style={[
+                        datePickerStyles.pickerItem,
+                        selectedDate.getMonth() === index && datePickerStyles.pickerItemSelected,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          datePickerStyles.pickerItemText,
+                          selectedDate.getMonth() === index && datePickerStyles.pickerItemTextSelected,
+                        ]}
+                      >
+                        {month}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              <View style={datePickerStyles.pickerColumn}>
+                <Text style={datePickerStyles.pickerLabel}>Day</Text>
+                <ScrollView style={datePickerStyles.picker} showsVerticalScrollIndicator={false}>
+                  {(() => {
+                    const maxDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
+                    return Array.from({ length: maxDay }, (_, i) => i + 1).map(day => (
+                      <TouchableOpacity
+                        key={day}
+                        onPress={() => {
+                          const newDate = new Date(selectedDate);
+                          newDate.setDate(day);
+                          setSelectedDate(newDate);
+                        }}
+                        style={[
+                          datePickerStyles.pickerItem,
+                          selectedDate.getDate() === day && datePickerStyles.pickerItemSelected,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            datePickerStyles.pickerItemText,
+                            selectedDate.getDate() === day && datePickerStyles.pickerItemTextSelected,
+                          ]}
+                        >
+                          {day}
+                        </Text>
+                      </TouchableOpacity>
+                    ));
+                  })()}
+                </ScrollView>
+              </View>
+            </View>
+
+            <View style={datePickerStyles.modalActions}>
+              <TouchableOpacity
+                onPress={() => setShowDatePicker(false)}
+                style={[datePickerStyles.actionButton, datePickerStyles.cancelButton]}
+              >
+                <Text style={datePickerStyles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  handleDateSelect(selectedDate);
+                  setShowDatePicker(false);
+                }}
+                style={[datePickerStyles.actionButton, datePickerStyles.confirmButton]}
+              >
+                <Text style={datePickerStyles.confirmButtonText}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  content: {
+    paddingHorizontal: 24,
+    paddingTop: 48,
+    paddingBottom: 40,
+  },
+  header: {
+    marginBottom: 32,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#111827',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    color: '#6B7280',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  stepIndicatorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 32,
+    gap: 8,
+  },
+  stepCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  stepActive: {
+    backgroundColor: '#2563EB',
+  },
+  stepInactive: {
+    backgroundColor: '#E5E7EB',
+  },
+  stepText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  stepTextActive: {
+    color: '#FFFFFF',
+  },
+  stepTextInactive: {
+    color: '#9CA3AF',
+  },
+  resumeDescription: {
+    color: '#6B7280',
+    marginBottom: 20,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  resumeUploadedContainer: {
+    backgroundColor: '#ECFDF5',
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 16,
+  },
+  resumeUploadedTitle: {
+    color: '#065F46',
+    fontWeight: '600',
+    marginBottom: 4,
+    fontSize: 16,
+  },
+  resumeUploadedText: {
+    color: '#047857',
+    fontSize: 14,
+  },
+  resumeEmptyContainer: {
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: '#D1D5DB',
+    borderRadius: 12,
+    padding: 32,
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  resumeEmptyIcon: {
+    fontSize: 48,
+    marginBottom: 12,
+  },
+  resumeEmptyText: {
+    color: '#9CA3AF',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  errorText: {
+    color: '#EF4444',
+    fontSize: 14,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  supportedFormats: {
+    color: '#9CA3AF',
+    fontSize: 12,
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  navigationButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 32,
+  },
+  buttonFlex: {
+    flex: 1,
+  },
+  skipButton: {
+    marginTop: 24,
+    paddingVertical: 12,
+  },
+  skipText: {
+    textAlign: 'center',
+    color: '#2563EB',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+});
+
+const datePickerStyles = StyleSheet.create({
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  dateButton: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  dateButtonError: {
+    borderColor: '#EF4444',
+  },
+  dateButtonText: {
+    fontSize: 16,
+    color: '#111827',
+  },
+  dateButtonPlaceholder: {
+    color: '#9CA3AF',
+  },
+  dateIcon: {
+    fontSize: 20,
+  },
+  errorText: {
+    color: '#EF4444',
+    fontSize: 14,
+    marginTop: 4,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 20,
+    paddingBottom: 40,
+    paddingHorizontal: 24,
+    maxHeight: '70%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#111827',
+  },
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeButtonText: {
+    fontSize: 20,
+    color: '#6B7280',
+  },
+  pickerContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 24,
+  },
+  pickerColumn: {
+    flex: 1,
+  },
+  pickerLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  picker: {
+    height: 200,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+  },
+  pickerItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+  },
+  pickerItemSelected: {
+    backgroundColor: '#2563EB',
+    borderRadius: 8,
+    marginHorizontal: 4,
+  },
+  pickerItemText: {
+    fontSize: 16,
+    color: '#374151',
+  },
+  pickerItemTextSelected: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  actionButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#F3F4F6',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+  confirmButton: {
+    backgroundColor: '#2563EB',
+  },
+  confirmButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+});

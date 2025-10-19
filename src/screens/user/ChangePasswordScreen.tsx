@@ -6,6 +6,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -78,12 +79,12 @@ export default function ChangePasswordScreen({
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
+      style={styles.container}
     >
-      <ScrollView className="flex-1 bg-gray-50">
-        <View className="px-6 py-6">
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.content}>
           <Card>
-            <Text className="text-gray-600 mb-6">
+            <Text style={styles.infoText}>
               Enter your current password and choose a new password
             </Text>
 
@@ -140,3 +141,21 @@ export default function ChangePasswordScreen({
     </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  content: {
+    paddingHorizontal: 24,
+    paddingVertical: 24,
+  },
+  infoText: {
+    color: '#4B5563',
+    marginBottom: 24,
+  },
+});

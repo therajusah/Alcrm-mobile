@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,14 @@ import {
   Alert,
   RefreshControl,
   TextInput,
+  StyleSheet,
 } from 'react-native';
 import { userApi } from '../../services/api';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { useTheme } from '../../contexts/ThemeContext';
 import type { MentorshipSession } from '../../types';
 
 interface MentorshipSessionDetailScreenProps {
@@ -21,17 +23,186 @@ interface MentorshipSessionDetailScreenProps {
   navigation: any;
 }
 
+// Static styles (layout and sizing only, no colors)
+const staticStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: 24,
+    paddingVertical: 24,
+  },
+  notFoundContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  notFoundTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  notFoundText: {
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  typeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
+  detailsSection: {
+    borderTopWidth: 1,
+    paddingTop: 16,
+  },
+  detailRow: {
+    marginBottom: 12,
+  },
+  detailLabel: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  detailValue: {
+    fontWeight: '600',
+  },
+  notesText: {
+    lineHeight: 24,
+  },
+  ratingStarsRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  ratingLabel: {
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  feedbackLabel: {
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  feedbackInput: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    minHeight: 100,
+  },
+  ratedBox: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 16,
+  },
+  ratedTitle: {
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  ratedText: {
+    fontSize: 14,
+  },
+});
+
 export default function MentorshipSessionDetailScreen({
   route,
   navigation,
 }: MentorshipSessionDetailScreenProps) {
   const { sessionId } = route.params;
+  const { colors } = useTheme();
   const [session, setSession] = useState<MentorshipSession | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isRating, setIsRating] = useState(false);
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState('');
+
+  // Theme-dependent styles
+  const styles = useMemo(
+    () => ({
+      container: {
+        ...staticStyles.container,
+        backgroundColor: colors.backgroundSecondary,
+      },
+      content: staticStyles.content,
+      notFoundContainer: {
+        ...staticStyles.notFoundContainer,
+        backgroundColor: colors.backgroundSecondary,
+      },
+      notFoundTitle: {
+        ...staticStyles.notFoundTitle,
+        color: colors.text,
+      },
+      notFoundText: {
+        ...staticStyles.notFoundText,
+        color: colors.textSecondary,
+      },
+      headerRow: staticStyles.headerRow,
+      headerTitle: {
+        ...staticStyles.headerTitle,
+        color: colors.text,
+      },
+      typeRow: staticStyles.typeRow,
+      durationText: {
+        color: colors.textSecondary,
+      },
+      detailsSection: {
+        ...staticStyles.detailsSection,
+        borderTopColor: colors.border,
+      },
+      detailRow: staticStyles.detailRow,
+      detailLabel: {
+        ...staticStyles.detailLabel,
+        color: colors.textSecondary,
+      },
+      detailValue: {
+        ...staticStyles.detailValue,
+        color: colors.text,
+      },
+      notesText: {
+        ...staticStyles.notesText,
+        color: colors.text,
+      },
+      ratingStarsRow: staticStyles.ratingStarsRow,
+      ratingLabel: {
+        ...staticStyles.ratingLabel,
+        color: colors.text,
+      },
+      feedbackLabel: {
+        ...staticStyles.feedbackLabel,
+        color: colors.text,
+      },
+      feedbackInput: {
+        ...staticStyles.feedbackInput,
+        borderColor: colors.inputBorder,
+        color: colors.text,
+        backgroundColor: colors.inputBackground,
+      },
+      ratedBox: {
+        ...staticStyles.ratedBox,
+        backgroundColor: colors.success + '20',
+        borderColor: colors.success + '40',
+      },
+      ratedTitle: {
+        ...staticStyles.ratedTitle,
+        color: colors.success,
+      },
+      ratedText: {
+        ...staticStyles.ratedText,
+        color: colors.success,
+      },
+    }),
+    [colors]
+  );
 
   const loadSessionDetail = useCallback(async () => {
     try {
@@ -146,7 +317,7 @@ export default function MentorshipSessionDetailScreen({
 
   const renderRatingStars = () => {
     return (
-      <View className="flex-row mb-4">
+      <View style={styles.ratingStarsRow}>
         {[1, 2, 3, 4, 5].map(star => (
           <Button key={star} title="★" onPress={() => setRating(star)} />
         ))}
@@ -160,11 +331,11 @@ export default function MentorshipSessionDetailScreen({
 
   if (!session) {
     return (
-      <View className="flex-1 bg-gray-50 items-center justify-center px-6">
-        <Text className="text-xl font-semibold text-gray-900 mb-2">
+      <View style={styles.notFoundContainer}>
+        <Text style={styles.notFoundTitle}>
           Session Not Found
         </Text>
-        <Text className="text-gray-600 text-center mb-6">
+        <Text style={styles.notFoundText}>
           The session you&apos;re looking for doesn&apos;t exist or you
           don&apos;t have access to it.
         </Text>
@@ -175,36 +346,36 @@ export default function MentorshipSessionDetailScreen({
 
   return (
     <ScrollView
-      className="flex-1 bg-gray-50"
+      style={styles.container}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <View className="px-6 py-6">
+      <View style={styles.content}>
         {/* Session Header */}
         <Card>
-          <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-2xl font-bold text-gray-900">
+          <View style={styles.headerRow}>
+            <Text style={styles.headerTitle}>
               Session Details
             </Text>
             {getStatusBadge(session.status)}
           </View>
 
-          <View className="flex-row items-center gap-2 mb-4">
+          <View style={styles.typeRow}>
             {getSessionTypeBadge(session.session_type)}
-            <Text className="text-gray-600">
+            <Text style={styles.durationText}>
               {session.session_duration_minutes
                 ? `${session.session_duration_minutes} min`
                 : 'Duration TBD'}
             </Text>
           </View>
 
-          <View className="border-t border-gray-200 pt-4">
-            <View className="mb-3">
-              <Text className="text-gray-600 text-sm mb-1">
+          <View style={styles.detailsSection}>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>
                 📅 Scheduled Date
               </Text>
-              <Text className="text-gray-900 font-semibold">
+              <Text style={styles.detailValue}>
                 {session.scheduled_at
                   ? new Date(session.scheduled_at).toLocaleString()
                   : 'TBD'}
@@ -212,18 +383,18 @@ export default function MentorshipSessionDetailScreen({
             </View>
 
             {session.completed_at && (
-              <View className="mb-3">
-                <Text className="text-gray-600 text-sm mb-1">✅ Completed</Text>
-                <Text className="text-gray-900 font-semibold">
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>✅ Completed</Text>
+                <Text style={styles.detailValue}>
                   {new Date(session.completed_at).toLocaleString()}
                 </Text>
               </View>
             )}
 
             {session.session_rating && (
-              <View className="mb-3">
-                <Text className="text-gray-600 text-sm mb-1">⭐ Rating</Text>
-                <Text className="text-gray-900 font-semibold">
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>⭐ Rating</Text>
+                <Text style={styles.detailValue}>
                   {session.session_rating}/5 stars
                 </Text>
               </View>
@@ -234,14 +405,14 @@ export default function MentorshipSessionDetailScreen({
         {/* Session Notes */}
         {session.notes && (
           <Card title="Session Notes">
-            <Text className="text-gray-700 leading-6">{session.notes}</Text>
+            <Text style={styles.notesText}>{session.notes}</Text>
           </Card>
         )}
 
         {/* Mentor Notes */}
         {session.mentor_notes && (
           <Card title="Mentor Notes">
-            <Text className="text-gray-700 leading-6">
+            <Text style={styles.notesText}>
               {session.mentor_notes}
             </Text>
           </Card>
@@ -250,7 +421,7 @@ export default function MentorshipSessionDetailScreen({
         {/* Session Feedback */}
         {session.session_feedback && (
           <Card title="Your Feedback">
-            <Text className="text-gray-700 leading-6">
+            <Text style={styles.notesText}>
               {session.session_feedback}
             </Text>
           </Card>
@@ -269,19 +440,19 @@ export default function MentorshipSessionDetailScreen({
           {session.status.toLowerCase() === 'completed' &&
             !session.session_rating && (
               <View>
-                <Text className="text-gray-700 font-semibold mb-3">
+                <Text style={styles.ratingLabel}>
                   Rate Your Session
                 </Text>
 
                 {renderRatingStars()}
 
-                <Text className="text-gray-700 font-semibold mb-2">
+                <Text style={styles.feedbackLabel}>
                   Additional Feedback (Optional)
                 </Text>
                 <TextInput
-                  className="border border-gray-300 rounded-lg p-4 mb-4 text-gray-900 bg-white min-h-[100px]"
+                  style={styles.feedbackInput}
                   placeholder="Share your experience..."
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={colors.inputPlaceholder}
                   multiline
                   numberOfLines={4}
                   textAlignVertical="top"
@@ -300,11 +471,11 @@ export default function MentorshipSessionDetailScreen({
 
           {session.status.toLowerCase() === 'completed' &&
             session.session_rating && (
-              <View className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <Text className="text-green-800 font-semibold mb-1">
+              <View style={styles.ratedBox}>
+                <Text style={styles.ratedTitle}>
                   ✓ Session Rated
                 </Text>
-                <Text className="text-green-700 text-sm">
+                <Text style={styles.ratedText}>
                   Thank you for your feedback!
                 </Text>
               </View>

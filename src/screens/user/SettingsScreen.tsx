@@ -92,6 +92,37 @@ export default function SettingsScreen({
       flexDirection: 'row',
       alignItems: 'center',
     },
+    accountInfoRow: {
+      marginBottom: 12,
+    },
+    label: {
+      color: '#4B5563',
+      fontSize: 14,
+      marginBottom: 4,
+    },
+    value: {
+      color: '#111827',
+      fontWeight: '600',
+    },
+    userIdValue: {
+      color: '#111827',
+      fontFamily: 'monospace',
+      fontSize: 12,
+    },
+    aboutText: {
+      color: '#4B5563',
+      fontSize: 14,
+      marginBottom: 8,
+    },
+    aboutVersion: {
+      color: '#4B5563',
+      fontSize: 14,
+      marginBottom: 16,
+    },
+    copyright: {
+      color: '#6B7280',
+      fontSize: 12,
+    },
   });
 
   return (
@@ -99,22 +130,22 @@ export default function SettingsScreen({
       <ScrollView style={styles.content}>
         {/* Account Info */}
         <Card title="Account Information">
-          <View className="mb-3">
-            <Text className="text-gray-600 text-sm mb-1">Email</Text>
-            <Text className="text-gray-900 font-semibold">{user?.email}</Text>
+          <View style={styles.accountInfoRow}>
+            <Text style={styles.label}>Email</Text>
+            <Text style={styles.value}>{user?.email}</Text>
           </View>
 
-          <View className="mb-3">
-            <Text className="text-gray-600 text-sm mb-1">Role</Text>
-            <Text className="text-gray-900 font-semibold capitalize">
+          <View style={styles.accountInfoRow}>
+            <Text style={styles.label}>Role</Text>
+            <Text style={[styles.value, { textTransform: 'capitalize' }]}>
               {user?.role}
             </Text>
           </View>
 
           {user?.id && (
             <View>
-              <Text className="text-gray-600 text-sm mb-1">User ID</Text>
-              <Text className="text-gray-900 font-mono text-xs">{user.id}</Text>
+              <Text style={styles.label}>User ID</Text>
+              <Text style={styles.userIdValue}>{user.id}</Text>
             </View>
           )}
         </Card>
@@ -135,9 +166,9 @@ export default function SettingsScreen({
 
         {/* About */}
         <Card title="About">
-          <Text className="text-gray-600 text-sm mb-2">ALCRM Mobile</Text>
-          <Text className="text-gray-600 text-sm mb-4">Version 1.0.0</Text>
-          <Text className="text-gray-500 text-xs">
+          <Text style={styles.aboutText}>ALCRM Mobile</Text>
+          <Text style={styles.aboutVersion}>Version 1.0.0</Text>
+          <Text style={styles.copyright}>
             © 2025 ALCRM. All rights reserved.
           </Text>
         </Card>

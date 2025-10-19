@@ -7,6 +7,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from 'react-native';
 import { useAuthStore } from '../../stores/authStore';
 import { authApi } from '../../services/api';
@@ -151,22 +152,47 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
+      style={styles.container}
     >
-      <ScrollView className="flex-1 bg-white">
-        <View className="flex-1 px-6 pt-12">
-          {/* Header */}
-          <View className="mb-8">
-            <Text className="text-3xl font-bold text-gray-900 mb-2">
-              Create Account
-            </Text>
-            <Text className="text-gray-600 text-base">
-              {step === 'email' && 'Enter your email to get started'}
-              {step === 'otp' && 'Verify your email'}
-              {step === 'details' && 'Complete your profile'}
-            </Text>
-          </View>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Logo */}
+        <View style={styles.logoContainer}>
+          <Text style={styles.logoText}>ALCRM</Text>
+          <Text style={styles.logoSubtext}>MOBILE</Text>
+        </View>
 
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>
+            {step === 'email' && 'Enter your email to get started'}
+            {step === 'otp' && 'Verify your email with OTP'}
+            {step === 'details' && 'Complete your profile to continue'}
+          </Text>
+        </View>
+
+        {/* Step Indicator */}
+        <View style={styles.stepIndicator}>
+          <View style={[styles.stepDot, step === 'email' ? styles.stepActive : styles.stepCompleted]}>
+            <Text style={styles.stepNumber}>1</Text>
+          </View>
+          <View style={styles.stepLine} />
+          <View style={[styles.stepDot, step === 'otp' ? styles.stepActive : step === 'details' ? styles.stepCompleted : styles.stepInactive]}>
+            <Text style={styles.stepNumber}>2</Text>
+          </View>
+          <View style={styles.stepLine} />
+          <View style={[styles.stepDot, step === 'details' ? styles.stepActive : styles.stepInactive]}>
+            <Text style={styles.stepNumber}>3</Text>
+          </View>
+        </View>
+
+        {/* Form Card */}
+        <View style={styles.formCard}>
           {/* Step 1: Email */}
           {step === 'email' && (
             <View>
@@ -272,16 +298,126 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
               />
             </View>
           )}
+        </View>
 
-          {/* Sign In Link */}
-          <View className="flex-row justify-center mt-6">
-            <Text className="text-gray-600">Already have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text className="text-primary-600 font-semibold">Sign In</Text>
-            </TouchableOpacity>
-          </View>
+        {/* Sign In Link */}
+        <View style={styles.signInLink}>
+          <Text style={styles.signInText}>Already have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.signInButton}>Sign In</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 40,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  logoText: {
+    fontSize: 42,
+    fontWeight: 'bold',
+    color: '#2563EB',
+    letterSpacing: -1,
+  },
+  logoSubtext: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 4,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+  },
+  header: {
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#111827',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    color: '#6B7280',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  stepIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 32,
+  },
+  stepDot: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepActive: {
+    backgroundColor: '#2563EB',
+  },
+  stepCompleted: {
+    backgroundColor: '#10B981',
+  },
+  stepInactive: {
+    backgroundColor: '#D1D5DB',
+  },
+  stepNumber: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  stepLine: {
+    width: 40,
+    height: 2,
+    backgroundColor: '#D1D5DB',
+  },
+  formCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  signInLink: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  signInText: {
+    color: '#6B7280',
+    fontSize: 15,
+  },
+  signInButton: {
+    color: '#2563EB',
+    fontWeight: '600',
+    fontSize: 15,
+  },
+});

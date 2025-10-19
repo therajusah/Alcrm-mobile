@@ -1,6 +1,16 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system';
 import { API_BASE_URL } from '../config/api';
+
+// Optional: Import image manipulator only if available
+let ImageManipulator: any = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  ImageManipulator = require('expo-image-manipulator');
+} catch (e) {
+  console.log('expo-image-manipulator not available, skipping image compression');
+}
 import type {
   AuthResponse,
   UserProfile,
@@ -62,7 +72,7 @@ api.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
-    console.log('API Response Error:', {
+    console.error('API Response Error:', {
       message: error.message,
       code: error.code,
       status: error.response?.status,
@@ -71,16 +81,24 @@ api.interceptors.response.use(
         ? `${error.config.baseURL}${error.config.url}`
         : 'unknown',
       data: error.response?.data,
+      headers: error.response?.headers,
     });
 
     if (error.response?.status === 401) {
       // Token expired or invalid, clear storage
       await AsyncStorage.removeItem(TOKEN_KEY);
     }
+    
+    // Extract error message from various possible formats
+    const responseData = error.response?.data as any;
     const message =
-      (error.response?.data as { error?: string })?.error ||
+      responseData?.error ||
+      responseData?.message ||
+      responseData?.details ||
       error.message ||
       'An error occurred';
+    
+    console.error('Extracted error message:', message);
     return Promise.reject(new Error(message));
   }
 );
@@ -290,20 +308,65 @@ export const userApi = {
     return response.data;
   },
 
-  uploadResume: async (fileData: string, fileName: string) => {
-    const formData = new (global as any).FormData();
-    formData.append('resume', {
-      uri: fileData,
-      type: 'application/pdf',
-      name: fileName,
-    });
+  uploadResume: async (fileUri: string, fileName: string) => {
+    try {
+      console.log('[uploadResume] Starting upload:', { fileName, fileUri });
+      
+      // Get file info first
+      const fileInfo = await FileSystem.getInfoAsync(fileUri);
+      console.log('[uploadResume] File info:', fileInfo);
 
-    const response = await api.post('/user/uploads/resume', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
+      if (!fileInfo.exists) {
+        throw new Error('File does not exist');
+      }
+
+      // Read the file as base64
+      console.log('[uploadResume] Reading file as base64...');
+      const base64 = await FileSystem.readAsStringAsync(fileUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      console.log('[uploadResume] Base64 length:', base64.length);
+
+      // Determine the file type
+      const fileExtension = fileName.split('.').pop()?.toLowerCase();
+      let mimeType = 'application/pdf';
+      if (fileExtension === 'doc') {
+        mimeType = 'application/msword';
+      } else if (fileExtension === 'docx') {
+        mimeType =
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      }
+
+      // Send as base64 data URL
+      const dataUrl = `data:${mimeType};base64,${base64}`;
+      console.log('[uploadResume] Data URL preview:', dataUrl.substring(0, 100));
+      console.log('[uploadResume] Data URL total length:', dataUrl.length);
+      console.log('[uploadResume] Sending to backend...');
+
+      const response = await api.post(
+        '/user/uploads/resume',
+        {
+          fileData: dataUrl,
+          fileName: fileName,
+        },
+        {
+          timeout: 60000, // 60 seconds for large files
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      console.log('[uploadResume] Success:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('[uploadResume] Error uploading resume:', error);
+      if (error instanceof Error) {
+        console.error('[uploadResume] Error message:', error.message);
+        console.error('[uploadResume] Error stack:', error.stack);
+      }
+      throw error;
+    }
   },
 
   deleteResume: async () => {
@@ -311,20 +374,65 @@ export const userApi = {
     return response.data;
   },
 
-  uploadPhoto: async (fileData: string, fileName: string) => {
-    const formData = new (global as any).FormData();
-    formData.append('photo', {
-      uri: fileData,
-      type: 'image/jpeg',
-      name: fileName,
-    });
+  uploadPhoto: async (fileUri: string, fileName: string) => {
+    try {
+      // Check file size before processing
+      const fileInfo = await FileSystem.getInfoAsync(fileUri);
+      if (!fileInfo.exists) {
+        throw new Error('File does not exist');
+      }
 
-    const response = await api.post('/user/uploads/photo', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
+      const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+      if (fileInfo.size && fileInfo.size > MAX_FILE_SIZE) {
+        throw new Error('Image file size exceeds 5MB limit. Please choose a smaller image.');
+      }
+
+      // Compress and resize image if ImageManipulator is available
+      let processedUri = fileUri;
+      if (ImageManipulator?.manipulateAsync) {
+        try {
+          const manipulatedImage = await ImageManipulator.manipulateAsync(
+            fileUri,
+            [{ resize: { width: 1024 } }], // Resize to max width of 1024px
+            { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+          );
+          processedUri = manipulatedImage.uri;
+        } catch (manipError) {
+          console.error('Image manipulation failed, using original:', manipError);
+          // Continue with original if manipulation fails
+        }
+      }
+
+      // Read the file as base64
+      const base64 = await FileSystem.readAsStringAsync(processedUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // Determine the file type
+      const fileExtension = fileName.split('.').pop()?.toLowerCase();
+      let mimeType = 'image/jpeg';
+      if (fileExtension === 'png') {
+        mimeType = 'image/png';
+      } else if (fileExtension === 'jpg' || fileExtension === 'jpeg') {
+        mimeType = 'image/jpeg';
+      } else if (fileExtension === 'gif') {
+        mimeType = 'image/gif';
+      } else if (fileExtension === 'webp') {
+        mimeType = 'image/webp';
+      }
+
+      // Send as base64 data URL
+      const dataUrl = `data:${mimeType};base64,${base64}`;
+
+      const response = await api.post('/user/uploads/photo', {
+        fileData: dataUrl,
+        fileName: fileName,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      throw error;
+    }
   },
 
   deletePhoto: async () => {

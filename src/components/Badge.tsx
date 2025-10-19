@@ -7,33 +7,30 @@ interface BadgeProps {
   variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
 }
 
-export default function Badge({
-  text,
-  variant = 'default',
-}: BadgeProps) {
+export default function Badge({ text, variant = 'default' }: BadgeProps) {
   const { colors } = useTheme();
 
   const getVariantStyles = () => {
     switch (variant) {
       case 'success':
         return {
-          backgroundColor: colors.success + '20',
-          borderColor: colors.success + '40',
+          backgroundColor: `${colors.success}20`,
+          borderColor: `${colors.success}40`,
         };
       case 'warning':
         return {
-          backgroundColor: colors.warning + '20',
-          borderColor: colors.warning + '40',
+          backgroundColor: `${colors.warning}20`,
+          borderColor: `${colors.warning}40`,
         };
       case 'danger':
         return {
-          backgroundColor: colors.error + '20',
-          borderColor: colors.error + '40',
+          backgroundColor: `${colors.error}20`,
+          borderColor: `${colors.error}40`,
         };
       case 'info':
         return {
-          backgroundColor: colors.primary + '20',
-          borderColor: colors.primary + '40',
+          backgroundColor: `${colors.primary}20`,
+          borderColor: `${colors.primary}40`,
         };
       default:
         return {

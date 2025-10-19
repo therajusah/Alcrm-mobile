@@ -76,46 +76,89 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       flex: 1,
       backgroundColor: colors.background,
     },
-    content: {
+    scrollView: {
       flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      justifyContent: 'center',
       paddingHorizontal: 24,
-      paddingTop: 48,
+      paddingVertical: 40,
+    },
+    logoContainer: {
+      alignItems: 'center',
+      marginBottom: 48,
+    },
+    logoText: {
+      fontSize: 42,
+      fontWeight: 'bold',
+      color: colors.primary,
+      letterSpacing: -1,
+    },
+    logoSubtext: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginTop: 4,
+      letterSpacing: 2,
+      textTransform: 'uppercase',
     },
     header: {
-      marginBottom: 32,
+      marginBottom: 40,
+      alignItems: 'center',
     },
     title: {
-      fontSize: 28,
+      fontSize: 32,
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 8,
+      textAlign: 'center',
     },
     subtitle: {
       fontSize: 16,
       color: colors.textSecondary,
+      textAlign: 'center',
+    },
+    formCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      padding: 24,
+      marginBottom: 24,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3,
     },
     form: {
-      marginBottom: 24,
+      marginBottom: 20,
     },
     forgotPassword: {
+      marginTop: 8,
       marginBottom: 24,
       alignItems: 'flex-end',
     },
     forgotPasswordText: {
       color: colors.primary,
       fontWeight: '600',
+      fontSize: 14,
     },
     signupContainer: {
       flexDirection: 'row',
       justifyContent: 'center',
+      alignItems: 'center',
       marginTop: 24,
     },
     signupText: {
       color: colors.textSecondary,
+      fontSize: 15,
     },
     signupLink: {
       color: colors.primary,
       fontWeight: '600',
+      fontSize: 15,
     },
   });
 
@@ -124,15 +167,26 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView style={styles.container}>
-        <View style={styles.content}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.title}>Welcome Back!</Text>
-            <Text style={styles.subtitle}>Sign in to continue</Text>
-          </View>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Logo */}
+        <View style={styles.logoContainer}>
+          <Text style={styles.logoText}>ALCRM</Text>
+          <Text style={styles.logoSubtext}>MOBILE</Text>
+        </View>
 
-          {/* Form */}
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.subtitle}>Sign in to continue to your account</Text>
+        </View>
+
+        {/* Form Card */}
+        <View style={styles.formCard}>
           <View style={styles.form}>
             <Input
               label="Email"
@@ -176,14 +230,14 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
               disabled={isLoading}
             />
           </View>
+        </View>
 
-          {/* Sign Up Link */}
-          <View style={styles.signupContainer}>
-            <Text style={styles.signupText}>Don&apos;t have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-              <Text style={styles.signupLink}>Sign Up</Text>
-            </TouchableOpacity>
-          </View>
+        {/* Sign Up Link */}
+        <View style={styles.signupContainer}>
+          <Text style={styles.signupText}>Don&apos;t have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+            <Text style={styles.signupLink}>Sign Up</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

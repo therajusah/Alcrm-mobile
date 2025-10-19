@@ -88,7 +88,7 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
     avatar: {
       width: 96,
       height: 96,
-      backgroundColor: colors.primary + '20',
+      backgroundColor: `${colors.primary}20`,
       borderRadius: 48,
       alignItems: 'center',
       justifyContent: 'center',
@@ -107,24 +107,6 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
     emailText: {
       color: colors.textSecondary,
       marginTop: 4,
-    },
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: colors.text,
-      marginBottom: 16,
-    },
-    resumeInfo: {
-      marginBottom: 12,
-    },
-    resumeLabel: {
-      color: colors.textSecondary,
-      fontSize: 14,
-      marginBottom: 4,
-    },
-    resumeText: {
-      color: colors.text,
-      fontWeight: '600',
     },
   });
 
@@ -216,9 +198,21 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 
       if (!result.canceled && result.assets && result.assets[0]) {
         const file = result.assets[0];
+        
+        // Check file size (max 10MB)
+        const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+        if (file.size && file.size > maxSize) {
+          Alert.alert(
+            'File Too Large',
+            'Please select a resume file smaller than 10MB'
+          );
+          return;
+        }
+        
         setIsUploadingResume(true);
 
         try {
+          console.log('Uploading resume from profile:', file.name);
           const response = await userApi.uploadResume(file.uri, file.name);
 
           // Update profile with new resume URL
@@ -229,6 +223,7 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
           Alert.alert('Success', 'Resume uploaded successfully');
           await loadProfile();
         } catch (error: unknown) {
+          console.error('Resume upload error:', error);
           const errorMessage =
             error instanceof Error ? error.message : 'Failed to upload resume';
           Alert.alert('Error', errorMessage);
@@ -370,7 +365,9 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
           />
 
           <View style={{ marginBottom: 16 }}>
-            <Text style={{ color: colors.text, fontWeight: '600', marginBottom: 8 }}>
+            <Text
+              style={{ color: colors.text, fontWeight: '600', marginBottom: 8 }}
+            >
               Bio
             </Text>
             <Input
@@ -428,25 +425,31 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
         <Card title="Resume">
           {profile?.resume_url ? (
             <View>
-              <View style={{
-                backgroundColor: colors.success + '20',
-                borderWidth: 1,
-                borderColor: colors.success + '40',
-                borderRadius: 8,
-                padding: 16,
-                marginBottom: 16,
-              }}>
-                <Text style={{
-                  color: colors.success,
-                  fontWeight: '600',
-                  marginBottom: 4,
-                }}>
+              <View
+                style={{
+                  backgroundColor: `${colors.success}20`,
+                  borderWidth: 1,
+                  borderColor: `${colors.success}40`,
+                  borderRadius: 8,
+                  padding: 16,
+                  marginBottom: 16,
+                }}
+              >
+                <Text
+                  style={{
+                    color: colors.success,
+                    fontWeight: '600',
+                    marginBottom: 4,
+                  }}
+                >
                   ✓ Resume Uploaded
                 </Text>
-                <Text style={{
-                  color: colors.success,
-                  fontSize: 14,
-                }}>
+                <Text
+                  style={{
+                    color: colors.success,
+                    fontSize: 14,
+                  }}
+                >
                   Your resume is ready for job applications
                 </Text>
               </View>
@@ -472,26 +475,32 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
             </View>
           ) : (
             <View>
-              <View style={{
-                borderWidth: 2,
-                borderStyle: 'dashed',
-                borderColor: colors.border,
-                borderRadius: 8,
-                padding: 24,
-                marginBottom: 16,
-              }}>
-                <Text style={{
-                  color: colors.textSecondary,
-                  textAlign: 'center',
-                  marginBottom: 8,
-                }}>
+              <View
+                style={{
+                  borderWidth: 2,
+                  borderStyle: 'dashed',
+                  borderColor: colors.border,
+                  borderRadius: 8,
+                  padding: 24,
+                  marginBottom: 16,
+                }}
+              >
+                <Text
+                  style={{
+                    color: colors.textSecondary,
+                    textAlign: 'center',
+                    marginBottom: 8,
+                  }}
+                >
                   📄 No resume uploaded
                 </Text>
-                <Text style={{
-                  color: colors.textTertiary,
-                  fontSize: 14,
-                  textAlign: 'center',
-                }}>
+                <Text
+                  style={{
+                    color: colors.textTertiary,
+                    fontSize: 14,
+                    textAlign: 'center',
+                  }}
+                >
                   Upload your resume to apply for jobs
                 </Text>
               </View>
@@ -505,11 +514,13 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
             </View>
           )}
 
-          <Text style={{
-            color: colors.textSecondary,
-            fontSize: 12,
-            marginTop: 12,
-          }}>
+          <Text
+            style={{
+              color: colors.textSecondary,
+              fontSize: 12,
+              marginTop: 12,
+            }}
+          >
             Supported formats: PDF, DOC, DOCX (Max 10MB)
           </Text>
         </Card>

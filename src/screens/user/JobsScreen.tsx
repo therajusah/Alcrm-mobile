@@ -148,54 +148,63 @@ export default function JobsScreen({ navigation }: JobsScreenProps) {
                 }
               >
                 <View style={styles.jobCard}>
-                  <Text style={styles.jobTitle}>
-                    {job.title}
-                  </Text>
+                  <Text style={styles.jobTitle}>{job.title}</Text>
                   {job.company_name && (
-                    <Text style={styles.jobCompany}>
-                      {job.company_name}
-                    </Text>
+                    <Text style={styles.jobCompany}>{job.company_name}</Text>
                   )}
                 </View>
 
-                <Text style={{
-                  color: colors.textSecondary,
-                  fontSize: 14,
-                  marginBottom: 12,
-                }} numberOfLines={2}>
+                <Text
+                  style={{
+                    color: colors.textSecondary,
+                    fontSize: 14,
+                    marginBottom: 12,
+                  }}
+                  numberOfLines={2}
+                >
                   {job.description}
                 </Text>
 
-                <View style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginBottom: 12,
-                }}>
-                  <Text style={{
-                    color: colors.textSecondary,
-                    fontSize: 14,
-                    marginRight: 16,
-                  }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: 12,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: colors.textSecondary,
+                      fontSize: 14,
+                      marginRight: 16,
+                    }}
+                  >
                     📍 {job.location}
                   </Text>
-                  <Text style={{
-                    color: colors.textSecondary,
-                    fontSize: 14,
-                  }}>
+                  <Text
+                    style={{
+                      color: colors.textSecondary,
+                      fontSize: 14,
+                    }}
+                  >
                     💰 {job.salary ? `₹${job.salary}L` : 'Salary not specified'}
                   </Text>
                 </View>
 
-                <View style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
                   {getJobTypeBadge(job.type)}
-                  <Text style={{
-                    color: colors.textTertiary,
-                    fontSize: 12,
-                  }}>
+                  <Text
+                    style={{
+                      color: colors.textTertiary,
+                      fontSize: 12,
+                    }}
+                  >
                     {new Date(job.postedDate || '').toLocaleDateString()}
                   </Text>
                 </View>

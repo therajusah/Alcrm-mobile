@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Alert, TextInput, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  Alert,
+  TextInput,
+  StyleSheet,
+} from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { useJobStore } from '../../stores/jobStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -59,6 +66,146 @@ export default function JobDetailScreen({
     content: {
       paddingHorizontal: 24,
       paddingVertical: 24,
+    },
+    jobTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 8,
+    },
+    companyName: {
+      fontSize: 18,
+      color: colors.textSecondary,
+      marginBottom: 16,
+    },
+    badgesRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 16,
+    },
+    detailsSection: {
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      paddingTop: 16,
+      marginTop: 8,
+    },
+    detailRow: {
+      marginBottom: 12,
+    },
+    detailLabel: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      marginBottom: 4,
+    },
+    detailValue: {
+      color: colors.text,
+      fontWeight: '600',
+    },
+    description: {
+      color: colors.textSecondary,
+      lineHeight: 24,
+    },
+    statusContainer: {
+      alignItems: 'center',
+      paddingVertical: 16,
+    },
+    statusTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 8,
+    },
+    statusMessage: {
+      color: colors.textSecondary,
+      marginTop: 16,
+      textAlign: 'center',
+    },
+    coverLetterLabel: {
+      color: colors.textSecondary,
+      marginBottom: 12,
+    },
+    coverLetterInput: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 8,
+      padding: 16,
+      marginBottom: 16,
+      color: colors.text,
+      backgroundColor: colors.surface,
+      minHeight: 120,
+    },
+    resumeSection: {
+      marginBottom: 16,
+    },
+    resumeSectionTitle: {
+      color: colors.textSecondary,
+      fontWeight: '600',
+      marginBottom: 8,
+    },
+    resumeProfileBox: {
+      backgroundColor: '#EFF6FF',
+      borderWidth: 1,
+      borderColor: '#BFDBFE',
+      borderRadius: 8,
+      padding: 12,
+      marginBottom: 12,
+    },
+    resumeProfileTitle: {
+      color: '#1E40AF',
+      fontWeight: '600',
+      marginBottom: 4,
+    },
+    resumeProfileText: {
+      color: '#1E3A8A',
+      fontSize: 14,
+    },
+    resumeUploadedBox: {
+      backgroundColor: '#ECFDF5',
+      borderWidth: 1,
+      borderColor: '#A7F3D0',
+      borderRadius: 8,
+      padding: 12,
+      marginBottom: 12,
+    },
+    resumeUploadedTitle: {
+      color: '#065F46',
+      fontWeight: '600',
+      marginBottom: 4,
+    },
+    resumeUploadedText: {
+      color: '#047857',
+      fontSize: 14,
+    },
+    resumeEmptyBox: {
+      borderWidth: 2,
+      borderStyle: 'dashed',
+      borderColor: colors.border,
+      borderRadius: 8,
+      padding: 16,
+      marginBottom: 12,
+    },
+    resumeEmptyIcon: {
+      color: colors.textTertiary,
+      textAlign: 'center',
+      marginBottom: 8,
+    },
+    resumeEmptyText: {
+      color: colors.textTertiary,
+      fontSize: 14,
+      textAlign: 'center',
+    },
+    supportedFormats: {
+      color: colors.textTertiary,
+      fontSize: 12,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      gap: 12,
+    },
+    buttonFlex: {
+      flex: 1,
     },
   });
 
@@ -184,32 +331,32 @@ export default function JobDetailScreen({
       <View style={styles.content}>
         {/* Job Header */}
         <Card>
-          <Text className="text-2xl font-bold text-gray-900 mb-2">
+          <Text style={styles.jobTitle}>
             {selectedJob.title}
           </Text>
 
           {selectedJob.company_name && (
-            <Text className="text-lg text-gray-600 mb-4">
+            <Text style={styles.companyName}>
               {selectedJob.company_name}
             </Text>
           )}
 
-          <View className="flex-row flex-wrap items-center gap-2 mb-4">
+          <View style={styles.badgesRow}>
             {getJobTypeBadge(selectedJob.type)}
             {getStatusBadge(selectedJob.status)}
           </View>
 
-          <View className="border-t border-gray-200 pt-4 mt-2">
-            <View className="mb-3">
-              <Text className="text-gray-600 text-sm mb-1">📍 Location</Text>
-              <Text className="text-gray-900 font-semibold">
+          <View style={styles.detailsSection}>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>📍 Location</Text>
+              <Text style={styles.detailValue}>
                 {selectedJob.location}
               </Text>
             </View>
 
-            <View className="mb-3">
-              <Text className="text-gray-600 text-sm mb-1">💰 Salary</Text>
-              <Text className="text-gray-900 font-semibold">
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>💰 Salary</Text>
+              <Text style={styles.detailValue}>
                 {selectedJob.salary
                   ? `₹${selectedJob.salary}L`
                   : 'Salary not specified'}
@@ -217,8 +364,8 @@ export default function JobDetailScreen({
             </View>
 
             <View>
-              <Text className="text-gray-600 text-sm mb-1">📅 Posted</Text>
-              <Text className="text-gray-900 font-semibold">
+              <Text style={styles.detailLabel}>📅 Posted</Text>
+              <Text style={styles.detailValue}>
                 {new Date(selectedJob.postedDate || '').toLocaleDateString()}
               </Text>
             </View>
@@ -227,7 +374,7 @@ export default function JobDetailScreen({
 
         {/* Job Description */}
         <Card title="Job Description">
-          <Text className="text-gray-700 leading-6">
+          <Text style={styles.description}>
             {selectedJob.description}
           </Text>
         </Card>
@@ -235,12 +382,12 @@ export default function JobDetailScreen({
         {/* Application Status or Apply Form */}
         {hasApplied ? (
           <Card>
-            <View className="items-center py-4">
-              <Text className="text-lg font-semibold text-gray-900 mb-2">
+            <View style={styles.statusContainer}>
+              <Text style={styles.statusTitle}>
                 Application Status
               </Text>
               <Badge text="Applied" variant="info" />
-              <Text className="text-gray-600 mt-4 text-center">
+              <Text style={styles.statusMessage}>
                 You have already applied for this job
               </Text>
             </View>
@@ -255,13 +402,13 @@ export default function JobDetailScreen({
               />
             ) : (
               <Card title="Submit Application">
-                <Text className="text-gray-700 mb-3">
+                <Text style={styles.coverLetterLabel}>
                   Write a brief cover letter explaining why you&apos;re a good
                   fit for this role:
                 </Text>
 
                 <TextInput
-                  className="border border-gray-300 rounded-lg p-4 mb-4 text-gray-900 bg-white min-h-[120px]"
+                  style={styles.coverLetterInput}
                   placeholder="Dear Hiring Manager,..."
                   placeholderTextColor="#9CA3AF"
                   multiline
@@ -272,35 +419,35 @@ export default function JobDetailScreen({
                 />
 
                 {/* Resume Section */}
-                <View className="mb-4">
-                  <Text className="text-gray-700 font-semibold mb-2">
+                <View style={styles.resumeSection}>
+                  <Text style={styles.resumeSectionTitle}>
                     Resume
                   </Text>
 
                   {user?.resume_url && !resumeFile ? (
-                    <View className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-                      <Text className="text-blue-800 font-semibold mb-1">
+                    <View style={styles.resumeProfileBox}>
+                      <Text style={styles.resumeProfileTitle}>
                         ✓ Using Profile Resume
                       </Text>
-                      <Text className="text-blue-700 text-sm">
+                      <Text style={styles.resumeProfileText}>
                         Your profile resume will be used for this application
                       </Text>
                     </View>
                   ) : resumeFile ? (
-                    <View className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
-                      <Text className="text-green-800 font-semibold mb-1">
+                    <View style={styles.resumeUploadedBox}>
+                      <Text style={styles.resumeUploadedTitle}>
                         ✓ New Resume Selected
                       </Text>
-                      <Text className="text-green-700 text-sm">
+                      <Text style={styles.resumeUploadedText}>
                         {resumeFileName}
                       </Text>
                     </View>
                   ) : (
-                    <View className="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-3">
-                      <Text className="text-gray-500 text-center mb-2">
+                    <View style={styles.resumeEmptyBox}>
+                      <Text style={styles.resumeEmptyIcon}>
                         📄 No resume selected
                       </Text>
-                      <Text className="text-gray-400 text-sm text-center">
+                      <Text style={styles.resumeEmptyText}>
                         {user?.resume_url
                           ? 'Using profile resume or upload a new one'
                           : 'Upload your resume to apply'}
@@ -314,13 +461,13 @@ export default function JobDetailScreen({
                     variant="outline"
                   />
 
-                  <Text className="text-gray-500 text-xs">
+                  <Text style={styles.supportedFormats}>
                     Supported formats: PDF, DOC, DOCX (Max 10MB)
                   </Text>
                 </View>
 
-                <View className="flex-row gap-3">
-                  <View className="flex-1">
+                <View style={styles.buttonRow}>
+                  <View style={styles.buttonFlex}>
                     <Button
                       title="Cancel"
                       onPress={() => setShowApplyForm(false)}
@@ -328,7 +475,7 @@ export default function JobDetailScreen({
                       disabled={applying}
                     />
                   </View>
-                  <View className="flex-1">
+                  <View style={styles.buttonFlex}>
                     <Button
                       title="Submit"
                       onPress={handleApply}

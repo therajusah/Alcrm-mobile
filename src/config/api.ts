@@ -18,6 +18,11 @@ export const API_BASE_URL = __DEV__
   ? getLocalhostUrl()
   : 'https://alcrm-backend.vercel.app/api/'; // For production
 
+// Dashboard URL for web features
+export const DASHBOARD_BASE_URL = __DEV__
+  ? 'http://localhost:3000' // Development web dashboard
+  : 'https://alcrm-backend.vercel.app/api'; // Production web dashboard
+
 export const API_ENDPOINTS = {
   // Auth endpoints
   AUTH: {

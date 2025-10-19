@@ -24,10 +24,71 @@ interface PDFViewerProps {
 const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    backgroundColor: '#F3F4F6',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+    flex: 1,
+  },
+  closeButton: {
+    marginLeft: 16,
+    padding: 8,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 9999,
+  },
+  closeButtonText: {
+    color: '#4B5563',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  content: {
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    color: '#4B5563',
+    marginTop: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  errorText: {
+    color: '#DC2626',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
   webViewContainer: {
     flex: 1,
     width,
     height: height - 120, // Account for header and buttons
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 16,
+    backgroundColor: '#F9FAFB',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
   },
 });
 
@@ -106,41 +167,35 @@ export default function PDFViewer({
       presentationStyle="fullScreen"
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-white">
+      <View style={styles.container}>
         {/* Header */}
-        <View className="flex-row items-center justify-between p-4 bg-gray-100 border-b border-gray-200">
-          <Text
-            className="text-lg font-semibold text-gray-900 flex-1"
-            numberOfLines={1}
-          >
+        <View style={styles.header}>
+          <Text style={styles.headerText} numberOfLines={1}>
             {title}
           </Text>
-          <TouchableOpacity
-            onPress={onClose}
-            className="ml-4 p-2 bg-gray-200 rounded-full"
-          >
-            <Text className="text-gray-600 font-bold text-lg">✕</Text>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>✕</Text>
           </TouchableOpacity>
         </View>
 
         {/* Content */}
-        <View className="flex-1">
+        <View style={styles.content}>
           {isLoading && (
-            <View className="flex-1 items-center justify-center">
+            <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#3B82F6" />
-              <Text className="text-gray-600 mt-4">Loading PDF...</Text>
+              <Text style={styles.loadingText}>Loading PDF...</Text>
             </View>
           )}
 
           {error && (
-            <View className="flex-1 items-center justify-center p-6">
-              <Text className="text-red-600 text-center mb-4">{error}</Text>
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
               <Button title="Close" onPress={onClose} />
             </View>
           )}
 
           {!isLoading && !error && (
-            <View className="flex-1">
+            <View style={styles.content}>
               <WebView
                 source={{
                   uri: pdfUrl,
@@ -178,9 +233,9 @@ export default function PDFViewer({
                 mixedContentMode="compatibility"
                 thirdPartyCookiesEnabled={false}
                 renderLoading={() => (
-                  <View className="flex-1 justify-center items-center">
+                  <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#4F46E5" />
-                    <Text className="mt-4 text-gray-600">Loading PDF...</Text>
+                    <Text style={styles.loadingText}>Loading PDF...</Text>
                   </View>
                 )}
               />
@@ -190,7 +245,7 @@ export default function PDFViewer({
 
         {/* Action Buttons */}
         {!isLoading && !error && (
-          <View className="flex-row justify-around p-4 bg-gray-50 border-t border-gray-200">
+          <View style={styles.actionButtons}>
             <Button title="Share" onPress={handleShare} variant="outline" />
             <Button
               title="Download"

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, RefreshControl, Alert, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  RefreshControl,
+  Alert,
+  StyleSheet,
+} from 'react-native';
 import { useResourceStore } from '../../stores/resourceStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
@@ -152,9 +159,7 @@ export default function ResourcesScreen() {
       }
     >
       <View style={styles.content}>
-        <Text style={styles.headerTitle}>
-          Free Resources
-        </Text>
+        <Text style={styles.headerTitle}>Free Resources</Text>
         <Text style={styles.headerSubtitle}>
           Access learning materials and guides
         </Text>
@@ -171,9 +176,7 @@ export default function ResourcesScreen() {
               onPress={() => handleViewResource(resource)}
             >
               <View style={styles.resourceCard}>
-                <Text style={styles.resourceTitle}>
-                  {resource.title}
-                </Text>
+                <Text style={styles.resourceTitle}>{resource.title}</Text>
                 {resource.description && (
                   <Text style={styles.resourceDescription} numberOfLines={3}>
                     {resource.description}
@@ -190,9 +193,7 @@ export default function ResourcesScreen() {
 
               {(resource.resource_url || resource.resource_link) && (
                 <View style={styles.resourceActions}>
-                  <Text style={styles.viewButton}>
-                    Tap to open →
-                  </Text>
+                  <Text style={styles.viewButton}>Tap to open →</Text>
                 </View>
               )}
             </Card>

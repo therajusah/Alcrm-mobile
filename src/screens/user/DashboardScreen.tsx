@@ -49,29 +49,51 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
       marginBottom: 8,
     },
     headerSubtitle: {
-      color: colors.textInverse + 'CC',
+      color: `${colors.textInverse}CC`,
       fontSize: 16,
     },
     content: {
       paddingHorizontal: 24,
       marginTop: 24,
     },
-    quickActions: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+    quickActionsContainer: {
       marginBottom: 24,
     },
+    quickActionsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      marginHorizontal: -6,
+      marginTop: 16,
+    },
     quickActionCard: {
-      backgroundColor: colors.primary + '10',
-      padding: 16,
-      borderRadius: 8,
-      flex: 1,
-      marginHorizontal: 4,
+      width: '47%',
+      marginHorizontal: '1.5%',
+      marginBottom: 12,
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.08,
+      shadowRadius: 8,
+      elevation: 3,
+      minHeight: 120,
+    },
+    quickActionIcon: {
+      fontSize: 36,
+      marginBottom: 12,
     },
     quickActionText: {
-      color: colors.primary,
+      fontSize: 14,
       fontWeight: '600',
       textAlign: 'center',
+      color: colors.text,
+      lineHeight: 20,
     },
     sectionHeader: {
       flexDirection: 'row',
@@ -181,9 +203,7 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
     >
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>
-          Welcome back, {userFirstName}!
-        </Text>
+        <Text style={styles.headerTitle}>Welcome back, {userFirstName}!</Text>
         <Text style={styles.headerSubtitle}>
           Checkout the latest job openings
         </Text>
@@ -191,35 +211,51 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
 
       <View style={styles.content}>
         {/* Quick Actions */}
-        <Card title="Quick Actions">
-          <View style={styles.quickActions}>
+        <View style={styles.quickActionsContainer}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <View style={styles.quickActionsGrid}>
             <TouchableOpacity
-              key="browse-jobs"
               onPress={() => navigation.navigate('Jobs')}
               style={styles.quickActionCard}
+              activeOpacity={0.7}
             >
-              <Text style={styles.quickActionText}>
-                Browse Jobs
-              </Text>
+              <Text style={styles.quickActionIcon}>💼</Text>
+              <Text style={styles.quickActionText}>Browse Jobs</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
-              key="my-applications"
-              onPress={() => navigation.navigate('Applications')}
-              style={[styles.quickActionCard, { backgroundColor: colors.success + '10' }]}
+              onPress={() => navigation.navigate('Mentorship')}
+              style={styles.quickActionCard}
+              activeOpacity={0.7}
             >
-              <Text style={[styles.quickActionText, { color: colors.success }]}>
-                My Applications
-              </Text>
+              <Text style={styles.quickActionIcon}>👨‍🏫</Text>
+              <Text style={styles.quickActionText}>Find Mentors</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('CareerGuidance')}
+              style={styles.quickActionCard}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.quickActionIcon}>🎯</Text>
+              <Text style={styles.quickActionText}>Career Guidance</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Applications')}
+              style={styles.quickActionCard}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.quickActionIcon}>📋</Text>
+              <Text style={styles.quickActionText}>My Applications</Text>
             </TouchableOpacity>
           </View>
-        </Card>
+        </View>
 
         {/* Recent Jobs */}
         <View style={{ marginBottom: 16 }}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>
-              Recent Job Postings
-            </Text>
+            <Text style={styles.sectionTitle}>Recent Job Postings</Text>
             <TouchableOpacity onPress={() => navigation.navigate('Jobs')}>
               <Text style={styles.seeAllText}>See All</Text>
             </TouchableOpacity>
@@ -227,9 +263,7 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
 
           {jobs.length === 0 ? (
             <Card>
-              <Text style={styles.emptyText}>
-                No jobs available
-              </Text>
+              <Text style={styles.emptyText}>No jobs available</Text>
             </Card>
           ) : (
             jobs.map(job => (
@@ -248,20 +282,14 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
                 }}
               >
                 <View style={styles.jobCard}>
-                  <Text style={styles.jobTitle}>
-                    {job.title}
-                  </Text>
+                  <Text style={styles.jobTitle}>{job.title}</Text>
                   {job.company_name && (
-                    <Text style={styles.jobCompany}>
-                      {job.company_name}
-                    </Text>
+                    <Text style={styles.jobCompany}>{job.company_name}</Text>
                   )}
                 </View>
 
                 <View style={styles.jobMeta}>
-                  <Text style={styles.jobMetaText}>
-                    📍 {job.location}
-                  </Text>
+                  <Text style={styles.jobMetaText}>📍 {job.location}</Text>
                   <Text style={styles.jobMetaText}>
                     💰 {job.salary ? `₹${job.salary}L` : 'Salary not specified'}
                   </Text>

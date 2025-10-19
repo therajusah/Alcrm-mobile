@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuthStore } from '../stores/authStore';
+import { userApi } from '../services/api';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ThemeOnboarding from '../components/ThemeOnboarding';
@@ -21,6 +22,13 @@ import JobsScreen from '../screens/user/JobsScreen';
 import JobDetailScreen from '../screens/user/JobDetailScreen';
 import ApplicationsScreen from '../screens/user/ApplicationsScreen';
 import ResourcesScreen from '../screens/user/ResourcesScreen';
+import MentorshipScreen from '../screens/user/MentorshipScreen';
+import MentorDetailScreen from '../screens/user/MentorDetailScreen';
+import MySessionsScreen from '../screens/user/MySessionsScreen';
+import CareerGuidanceScreen from '../screens/user/CareerGuidanceScreen';
+import CVReviewScreen from '../screens/user/CVReviewScreen';
+import InterviewPrepScreen from '../screens/user/InterviewPrepScreen';
+import PersonalReferencesScreen from '../screens/user/PersonalReferencesScreen';
 import ProfileScreen from '../screens/user/ProfileScreen';
 import SettingsScreen from '../screens/user/SettingsScreen';
 import ChangePasswordScreen from '../screens/user/ChangePasswordScreen';
@@ -92,6 +100,14 @@ function UserTabs() {
         }}
       />
       <Tab.Screen
+        name="Mentorship"
+        component={MentorshipScreen}
+        options={{
+          headerTitle: 'Find Mentors',
+          tabBarIcon: ({ color }) => <TabIcon icon="🎯" color={color} />,
+        }}
+      />
+      <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
@@ -137,11 +153,18 @@ function AppNavigatorContent() {
   const { colors } = useTheme();
   const [showThemeOnboarding, setShowThemeOnboarding] = useState(false);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
+  const [needsProfileOnboarding, setNeedsProfileOnboarding] = useState(false);
 
   useEffect(() => {
     checkAuth();
     checkOnboardingStatus();
   }, [checkAuth]);
+
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      checkProfileOnboarding();
+    }
+  }, [isAuthenticated, isLoading]);
 
   const checkOnboardingStatus = async () => {
     try {
@@ -154,6 +177,16 @@ function AppNavigatorContent() {
       setShowThemeOnboarding(false);
     } finally {
       setIsCheckingOnboarding(false);
+    }
+  };
+
+  const checkProfileOnboarding = async () => {
+    try {
+      const onboardingState = await userApi.getOnboardingState();
+      setNeedsProfileOnboarding(!onboardingState.is_completed);
+    } catch (error) {
+      console.log('Error checking profile onboarding:', error);
+      setNeedsProfileOnboarding(false);
     }
   };
 
@@ -185,6 +218,7 @@ function AppNavigatorContent() {
     >
       {isAuthenticated ? (
         <Stack.Navigator
+          initialRouteName={needsProfileOnboarding ? 'Onboarding' : 'UserTabs'}
           screenOptions={{
             headerStyle: {
               backgroundColor: colors.surface,
@@ -199,14 +233,54 @@ function AppNavigatorContent() {
           }}
         >
           <Stack.Screen
+            name="Onboarding"
+            component={OnboardingScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
             name="UserTabs"
             component={UserTabs}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Dashboard"
+            component={DashboardScreen}
             options={{ headerShown: false }}
           />
           <Stack.Screen
             name="JobDetail"
             component={JobDetailScreen}
             options={{ headerTitle: 'Job Details' }}
+          />
+          <Stack.Screen
+            name="MentorDetail"
+            component={MentorDetailScreen}
+            options={{ headerTitle: 'Mentor Profile' }}
+          />
+          <Stack.Screen
+            name="MySessions"
+            component={MySessionsScreen}
+            options={{ headerTitle: 'My Sessions' }}
+          />
+          <Stack.Screen
+            name="CareerGuidance"
+            component={CareerGuidanceScreen}
+            options={{ headerTitle: 'Career Guidance' }}
+          />
+          <Stack.Screen
+            name="CVReview"
+            component={CVReviewScreen}
+            options={{ headerTitle: 'CV Review' }}
+          />
+          <Stack.Screen
+            name="InterviewPrep"
+            component={InterviewPrepScreen}
+            options={{ headerTitle: 'Interview Prep' }}
+          />
+          <Stack.Screen
+            name="PersonalReferences"
+            component={PersonalReferencesScreen}
+            options={{ headerTitle: 'Personal References' }}
           />
           <Stack.Screen
             name="Settings"

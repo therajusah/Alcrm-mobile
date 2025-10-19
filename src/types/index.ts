@@ -15,10 +15,17 @@ export type RootStackParamList = {
   JobDetail: { jobId: string };
   Applications: undefined;
   Resources: undefined;
+  CareerGuidance: undefined;
+  CVReview: undefined;
+  InterviewPrep: undefined;
+  PersonalReferences: undefined;
+  Mentorship: undefined;
+  MentorDetail: { mentorId: string };
+  MySessions: undefined;
+  MentorshipSessionDetail: { sessionId: string };
   Profile: undefined;
   Settings: undefined;
   ChangePassword: undefined;
-  MentorshipSessionDetail: { sessionId: string };
 };
 
 export type NavigationProp = RNavigationProp<RootStackParamList>;
@@ -153,6 +160,9 @@ export interface CareerMentor {
   bio?: string;
   created_at?: string;
   is_deleted?: boolean;
+  rating?: number;
+  total_sessions?: number;
+  hourly_rate?: number;
   user?: {
     first_name?: string;
     last_name?: string;

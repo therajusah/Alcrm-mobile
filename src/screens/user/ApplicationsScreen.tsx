@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, RefreshControl, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  RefreshControl,
+  StyleSheet,
+} from 'react-native';
 import { useApplicationStore } from '../../stores/applicationStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
@@ -156,9 +162,7 @@ export default function ApplicationsScreen() {
 
               {application.cover_letter && (
                 <View style={styles.applicationActions}>
-                  <Text style={styles.applicationStatus}>
-                    Cover Letter:
-                  </Text>
+                  <Text style={styles.applicationStatus}>Cover Letter:</Text>
                   <Text style={styles.applicationNotes} numberOfLines={3}>
                     {application.cover_letter}
                   </Text>
