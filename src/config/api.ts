@@ -1,27 +1,9 @@
 // API Configuration
-import { Platform } from 'react-native';
-
-// Get the correct localhost URL based on platform
-const getLocalhostUrl = () => {
-  if (Platform.OS === 'android') {
-    // Android emulator uses 10.0.2.2 to access host machine's localhost
-    return 'http://10.0.2.2:4000/api';
-  } else if (Platform.OS === 'ios') {
-    // iOS simulator can use localhost directly
-    return 'http://localhost:4000/api';
-  }
-  // Fallback for web or other platforms
-  return 'http://localhost:4000/api';
-};
-
-export const API_BASE_URL = __DEV__
-  ? getLocalhostUrl()
-  : 'https://alcrm-backend.vercel.app/api/'; // For production
+// Using production API
+export const API_BASE_URL = 'https://alcrm-backend.vercel.app/api';
 
 // Dashboard URL for web features
-export const DASHBOARD_BASE_URL = __DEV__
-  ? 'http://localhost:3000' // Development web dashboard
-  : 'https://alcrm-backend.vercel.app/api'; // Production web dashboard
+export const DASHBOARD_BASE_URL = 'https://alcrm-backend.vercel.app';
 
 export const API_ENDPOINTS = {
   // Auth endpoints

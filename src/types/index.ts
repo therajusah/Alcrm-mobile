@@ -23,6 +23,13 @@ export type RootStackParamList = {
   MentorDetail: { mentorId: string };
   MySessions: undefined;
   MentorshipSessionDetail: { sessionId: string };
+  BookSession: {
+    serviceType: string;
+    serviceTitle: string;
+    price: number;
+    duration: number;
+  };
+  BrowseMentors: undefined;
   Profile: undefined;
   Settings: undefined;
   ChangePassword: undefined;

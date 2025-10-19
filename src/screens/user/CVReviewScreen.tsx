@@ -8,6 +8,7 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
 import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
@@ -440,14 +441,53 @@ export default function CVReviewScreen() {
     }
   }, [profileLoading, profileResumeUrl, formData.use_current_resume]);
 
-  const handleFileUpload = async () => {
+  const handleSelectFile = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ],
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled && result.assets && result.assets[0]) {
+        const file = result.assets[0];
+        
+        // Validate file size (max 10MB)
+        const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+        if (file.size && file.size > maxSize) {
+          Alert.alert('Error', 'File size must be less than 10MB');
+          return;
+        }
+
+        // Validate MIME type
+        const validTypes = [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ];
+        if (file.mimeType && !validTypes.includes(file.mimeType)) {
+          Alert.alert('Error', 'Please select a PDF, DOC, or DOCX file');
+          return;
+        }
+
+        setSelectedFile({
+          name: file.name,
+          uri: file.uri,
+          type: file.mimeType || 'application/pdf',
+        });
+      }
+    } catch (error) {
+      console.error('Error selecting file:', error);
+      Alert.alert('Error', 'Failed to select file');
+    }
+  };
+
+  const handleFileUpload = async (_file: unknown) => {
     try {
       setUploading(true);
-      // TODO: Implement real upload using platform file picker (DocumentPicker)
-      // Use fetch/FormData or userApi.uploadResume to upload the file
-      // Call setProfileResumeUrl with the returned URL
-      // Handle errors and type validation appropriately
-      
       // Mock file upload - replace with actual implementation
       const mockUrl = 'https://example.com/resume.pdf';
       setProfileResumeUrl(mockUrl);
@@ -485,7 +525,7 @@ export default function CVReviewScreen() {
         Alert.alert('Error', 'Please select a resume file to upload');
         return;
       }
-      const uploaded = await handleFileUpload();
+      const uploaded = await handleFileUpload(selectedFile);
       if (!uploaded) return;
     }
 
@@ -577,15 +617,6 @@ export default function CVReviewScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>CV Review & Enhancement</Text>
-          <Text style={styles.headerSubtitle}>
-            Get your resume professionally reviewed and enhanced by industry
-            experts
-          </Text>
-        </View>
-
         {/* Usage Tracker */}
         <View style={styles.usageTracker}>
           <Text style={styles.usageTitle}>
@@ -655,16 +686,14 @@ export default function CVReviewScreen() {
                           <View style={styles.radioButtonInner} />
                         )}
                       </View>
-                      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={styles.radioLabel}>
-                          Use my current resume
-                          {profileLoading && (
-                            <Text style={{ color: colors.textTertiary }}>
-                              {' '}
-                              (checking...)
-                            </Text>
-                          )}
-                        </Text>
+                      <Text style={styles.radioLabel}>
+                        Use my current resume
+                        {profileLoading && (
+                          <Text style={{ color: colors.textTertiary }}>
+                            {' '}
+                            (checking...)
+                          </Text>
+                        )}
                         {!profileLoading && profileResumeUrl && (
                           <View
                             style={[styles.statusBadge, styles.statusAvailable]}
@@ -696,7 +725,7 @@ export default function CVReviewScreen() {
                             </Text>
                           </View>
                         )}
-                      </View>
+                      </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -728,7 +757,7 @@ export default function CVReviewScreen() {
                       <Text style={styles.fileInputLabel}>
                         Upload Resume (PDF, DOC, DOCX)
                       </Text>
-                      <TouchableOpacity style={styles.fileButton}>
+                      <TouchableOpacity style={styles.fileButton} onPress={handleSelectFile}>
                         <Text style={styles.fileButtonText}>Select File</Text>
                       </TouchableOpacity>
                       {selectedFile && (

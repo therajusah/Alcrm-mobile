@@ -12,6 +12,7 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Card from '../../components/Card';
 import { NavigationProp } from '../../types';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface ChangePasswordScreenProps {
   navigation: NavigationProp;
@@ -26,6 +27,7 @@ interface PasswordErrors {
 export default function ChangePasswordScreen({
   navigation,
 }: ChangePasswordScreenProps) {
+  const { colors } = useTheme();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -75,6 +77,24 @@ export default function ChangePasswordScreen({
       setIsLoading(false);
     }
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    scrollView: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      paddingHorizontal: 24,
+      paddingVertical: 24,
+    },
+    infoText: {
+      color: colors.textSecondary,
+      marginBottom: 24,
+    },
+  });
 
   return (
     <KeyboardAvoidingView
@@ -141,21 +161,3 @@ export default function ChangePasswordScreen({
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
-  content: {
-    paddingHorizontal: 24,
-    paddingVertical: 24,
-  },
-  infoText: {
-    color: '#4B5563',
-    marginBottom: 24,
-  },
-});

@@ -572,15 +572,6 @@ export default function PersonalReferencesScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Personal Job References</Text>
-          <Text style={styles.headerSubtitle}>
-            Get direct referrals to top organizations through our professional
-            network
-          </Text>
-        </View>
-
         {/* Usage Tracker */}
         <View style={styles.usageTracker}>
           <Text style={styles.usageTitle}>

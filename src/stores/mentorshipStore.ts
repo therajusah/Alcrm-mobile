@@ -39,13 +39,13 @@ interface MentorshipActions {
     pageSize?: number;
     session_type?: string;
   }) => Promise<void>;
+  fetchSessionDetail: (id: string) => Promise<void>;
   bookSession: (data: {
-    mentor_id: string;
-    user_id: string;
+    mentor_id?: string;
     session_type: string;
-    scheduled_at: string;
+    scheduled_at?: string;
     notes?: string;
-  }) => Promise<void>;
+  }) => Promise<MentorshipSession>;
   rateSession: (id: string, rating: number, feedback?: string) => Promise<void>;
   cancelSession: (id: string) => Promise<void>;
   setSelectedMentor: (mentor: CareerMentor | null) => void;
@@ -162,17 +162,33 @@ export const useMentorshipStore = create<MentorshipStore>((set, get) => ({
     }
   },
 
+  fetchSessionDetail: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const session = await userApi.getSessionDetail(id);
+      set({ selectedSession: session, isLoading: false });
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to fetch session details';
+      set({ error: errorMessage, isLoading: false });
+    }
+  },
+
   bookSession: async data => {
     set({ isLoading: true, error: null });
     try {
-      await userApi.bookSession(data);
+      const session = await userApi.bookSession(data);
       // Refresh sessions after booking
       await get().fetchSessions();
       set({ isLoading: false });
+      return session; // Return the created session
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'Failed to book session';
       set({ error: errorMessage, isLoading: false });
+      throw error; // Re-throw to let the UI handle it
     }
   },
 

@@ -35,7 +35,7 @@ export default function InterviewPrepScreen() {
   const [interviewSessions, setInterviewSessions] = useState<
     InterviewSession[]
   >([]);
-  const [activeTab, setActiveTab] = useState('MOCK_INTERVIEW');
+  const [activeTab, setActiveTab] = useState('mock-interview');
   const [formData, setFormData] = useState({
     session_type: 'MOCK_INTERVIEW',
     domain: '',
@@ -409,15 +409,6 @@ export default function InterviewPrepScreen() {
     'Partner',
   ];
 
-  // Helper function to check if a session type has a pending or scheduled session
-  const hasPendingOrScheduledSession = (sessionTypeId: string): boolean => {
-    return interviewSessions.some(
-      s =>
-        s.session_type === sessionTypeId &&
-        ['PENDING', 'SCHEDULED'].includes(s.status)
-    );
-  };
-
   const loadInterviewSessions = useCallback(async () => {
     try {
       // Mock data for now - replace with actual API call
@@ -471,7 +462,12 @@ export default function InterviewPrepScreen() {
       return;
     }
 
-    if (hasPendingOrScheduledSession(formData.session_type)) {
+    const duplicate = interviewSessions.some(
+      s =>
+        s.session_type === formData.session_type &&
+        ['PENDING', 'SCHEDULED'].includes(s.status)
+    );
+    if (duplicate) {
       Alert.alert(
         'Duplicate',
         'You already have a pending session of this type in progress'
@@ -571,15 +567,6 @@ export default function InterviewPrepScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Domain-Specific Interview Prep</Text>
-          <Text style={styles.headerSubtitle}>
-            Professional interview preparation tailored to your industry and
-            role
-          </Text>
-        </View>
-
         {/* Usage Tracker */}
         <View style={styles.usageTracker}>
           <Text style={styles.usageTitle}>
@@ -598,18 +585,18 @@ export default function InterviewPrepScreen() {
               key={type.id}
               style={[
                 styles.tabButton,
-                activeTab === type.id &&
+                activeTab === type.id.toLowerCase().replace('_', '-') &&
                   styles.tabButtonActive,
               ]}
               onPress={() => {
-                setActiveTab(type.id);
+                setActiveTab(type.id.toLowerCase().replace('_', '-'));
                 setFormData(prev => ({ ...prev, session_type: type.id }));
               }}
             >
               <Text
                 style={[
                   styles.tabButtonText,
-                  activeTab === type.id &&
+                  activeTab === type.id.toLowerCase().replace('_', '-') &&
                     styles.tabButtonTextActive,
                 ]}
               >
@@ -622,7 +609,7 @@ export default function InterviewPrepScreen() {
         {/* Session Details */}
         {sessionTypes.map(
           sessionType =>
-            activeTab === sessionType.id && (
+            activeTab === sessionType.id.toLowerCase().replace('_', '-') && (
               <Card key={sessionType.id}>
                 <View style={styles.sessionHeader}>
                   <View style={styles.sessionInfo}>
@@ -846,13 +833,21 @@ export default function InterviewPrepScreen() {
                       disabled={
                         isLoading ||
                         requestsRemaining <= 0 ||
-                        hasPendingOrScheduledSession(sessionType.id)
+                        interviewSessions.some(
+                          s =>
+                            s.session_type === sessionType.id &&
+                            ['PENDING', 'SCHEDULED'].includes(s.status)
+                        )
                       }
                     >
                       <Text style={styles.submitButtonText}>
                         {isLoading
                           ? 'Booking...'
-                          : hasPendingOrScheduledSession(sessionType.id)
+                          : interviewSessions.some(
+                                s =>
+                                  s.session_type === sessionType.id &&
+                                  ['PENDING', 'SCHEDULED'].includes(s.status)
+                              )
                             ? 'Session In Progress'
                             : `Book ${sessionType.title} - ${sessionType.price}`}
                       </Text>

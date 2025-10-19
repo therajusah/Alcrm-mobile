@@ -14,6 +14,7 @@ import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import EmptyState from '../../components/EmptyState';
+import RateSessionModal from '../../components/RateSessionModal';
 import type { MentorshipSession } from '../../types';
 import { NavigationProp } from '../../types';
 
@@ -29,6 +30,9 @@ export default function MySessionsScreen({
   const { colors } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string>('');
+  const [ratingModalVisible, setRatingModalVisible] = useState(false);
+  const [selectedSessionForRating, setSelectedSessionForRating] =
+    useState<MentorshipSession | null>(null);
 
   const styles = StyleSheet.create({
     container: {
@@ -79,10 +83,13 @@ export default function MySessionsScreen({
       color: colors.textSecondary,
       marginBottom: 16,
     },
+    sessionCard: {
+      marginBottom: 16,
+    },
     sessionHeader: {
       flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 12,
+      alignItems: 'flex-start',
+      marginBottom: 16,
     },
     sessionAvatar: {
       width: 50,
@@ -91,7 +98,6 @@ export default function MySessionsScreen({
       borderRadius: 25,
       alignItems: 'center',
       justifyContent: 'center',
-      marginRight: 12,
     },
     sessionAvatarText: {
       fontSize: 18,
@@ -100,64 +106,113 @@ export default function MySessionsScreen({
     },
     sessionInfo: {
       flex: 1,
+      marginLeft: 12,
     },
     sessionMentor: {
-      fontSize: 16,
+      fontSize: 17,
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 2,
     },
+    mentorDomain: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      marginBottom: 4,
+    },
     sessionType: {
-      color: colors.textSecondary,
-      fontSize: 14,
-    },
-    sessionMeta: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 8,
-    },
-    sessionDate: {
-      color: colors.textSecondary,
-      fontSize: 14,
-      marginRight: 16,
-    },
-    sessionPrice: {
-      color: colors.primary,
       fontSize: 14,
       fontWeight: '600',
+      color: colors.primary,
+      textTransform: 'capitalize',
     },
-    sessionNotes: {
-      color: colors.textSecondary,
-      fontSize: 14,
+    sessionDivider: {
+      height: 1,
+      backgroundColor: colors.border,
+      marginVertical: 16,
+    },
+    sessionDetails: {
       marginBottom: 12,
     },
-    sessionActions: {
+    detailRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
+      marginBottom: 10,
     },
-    actionButton: {
-      paddingHorizontal: 16,
-      paddingVertical: 8,
-      borderRadius: 6,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    actionButtonText: {
+    detailLabel: {
+      fontSize: 14,
       color: colors.textSecondary,
-      fontSize: 12,
       fontWeight: '500',
     },
+    detailValue: {
+      fontSize: 14,
+      color: colors.text,
+      fontWeight: '600',
+      textAlign: 'right',
+      flex: 1,
+      marginLeft: 12,
+    },
+    notesContainer: {
+      backgroundColor: `${colors.primary}10`,
+      padding: 12,
+      borderRadius: 8,
+      marginBottom: 12,
+    },
+    notesLabel: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      marginBottom: 4,
+    },
+    sessionNotes: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    sessionActions: {
+      flexDirection: 'column',
+      gap: 8,
+      marginTop: 16,
+    },
+    actionButton: {
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderRadius: 10,
+      alignItems: 'center',
+      borderWidth: 1,
+    },
+    viewButton: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    viewButtonText: {
+      color: colors.textInverse,
+      fontSize: 15,
+      fontWeight: '600',
+    },
     cancelButton: {
+      backgroundColor: 'transparent',
       borderColor: colors.error,
     },
     cancelButtonText: {
       color: colors.error,
+      fontSize: 15,
+      fontWeight: '600',
+    },
+    rateButton: {
+      backgroundColor: '#FBBF24',
+      borderColor: '#FBBF24',
+    },
+    rateButtonText: {
+      color: '#1F2937',
+      fontSize: 15,
+      fontWeight: '600',
     },
   });
 
   const statusFilters = [
     { key: '', label: 'All' },
+    { key: 'PENDING', label: 'Pending' },
     { key: 'SCHEDULED', label: 'Scheduled' },
     { key: 'COMPLETED', label: 'Completed' },
     { key: 'CANCELLED', label: 'Cancelled' },
@@ -191,6 +246,17 @@ export default function MySessionsScreen({
     });
   };
 
+  const handleRateSession = (session: MentorshipSession) => {
+    setSelectedSessionForRating(session);
+    setRatingModalVisible(true);
+  };
+
+  const handleRatingSuccess = async () => {
+    setRatingModalVisible(false);
+    setSelectedSessionForRating(null);
+    await loadSessions();
+  };
+
   const handleCancelSession = async (session: MentorshipSession) => {
     Alert.alert(
       'Cancel Session',
@@ -222,6 +288,8 @@ export default function MySessionsScreen({
 
   const getStatusBadge = (status: string) => {
     switch (status.toUpperCase()) {
+      case 'PENDING':
+        return <Badge text="Pending" variant="warning" />;
       case 'SCHEDULED':
         return <Badge text="Scheduled" variant="info" />;
       case 'COMPLETED':
@@ -287,65 +355,153 @@ export default function MySessionsScreen({
               message="You haven't booked any mentorship sessions yet."
             />
           ) : (
-            sessions.map(session => (
-              <Card key={session.session_id}>
-                <View style={styles.sessionHeader}>
-                  <View style={styles.sessionAvatar}>
-                    <Text style={styles.sessionAvatarText}>{'M'}</Text>
+            sessions.map(session => {
+              // Get mentor information from the session
+              const mentorInfo = (session as any).career_mentors;
+              const mentorName = mentorInfo?.users?.first_name && mentorInfo?.users?.last_name
+                ? `${mentorInfo.users.first_name} ${mentorInfo.users.last_name}`
+                : 'Mentor';
+              const mentorInitial = mentorName.charAt(0).toUpperCase();
+              
+              // Format date nicely
+              const formatDate = (dateString: string | null | undefined) => {
+                if (!dateString) return 'Not scheduled yet';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                });
+              };
+              
+              return (
+                <Card key={session.session_id}>
+                  <View style={styles.sessionHeader}>
+                    <View style={styles.sessionAvatar}>
+                      <Text style={styles.sessionAvatarText}>{mentorInitial}</Text>
+                    </View>
+                    <View style={styles.sessionInfo}>
+                      <Text style={styles.sessionMentor}>{mentorName}</Text>
+                      {mentorInfo?.domain && (
+                        <Text style={styles.mentorDomain}>
+                          {mentorInfo.domain}
+                        </Text>
+                      )}
+                      <Text style={styles.sessionType}>
+                        {session.session_type?.replace('_', ' ') || 'Session'}
+                      </Text>
+                    </View>
+                    {getStatusBadge(session.status)}
                   </View>
-                  <View style={styles.sessionInfo}>
-                    <Text style={styles.sessionMentor}>{'Mentor Name'}</Text>
-                    <Text style={styles.sessionType}>
-                      {session.session_type?.replace('_', ' ').toUpperCase()}
-                    </Text>
+
+                  <View style={styles.sessionDivider} />
+
+                  <View style={styles.sessionDetails}>
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>📅 Scheduled</Text>
+                      <Text style={styles.detailValue}>
+                        {formatDate(session.scheduled_at)}
+                      </Text>
+                    </View>
+                    
+                    {session.session_duration_minutes && (
+                      <View style={styles.detailRow}>
+                        <Text style={styles.detailLabel}>⏱ Duration</Text>
+                        <Text style={styles.detailValue}>
+                          {session.session_duration_minutes} minutes
+                        </Text>
+                      </View>
+                    )}
+                    
+                    {session.completed_at && (
+                      <View style={styles.detailRow}>
+                        <Text style={styles.detailLabel}>✅ Completed</Text>
+                        <Text style={styles.detailValue}>
+                          {formatDate(session.completed_at)}
+                        </Text>
+                      </View>
+                    )}
+                    
+                    {session.session_rating && (
+                      <View style={styles.detailRow}>
+                        <Text style={styles.detailLabel}>★ Your Rating</Text>
+                        <Text style={styles.detailValue}>
+                          {'★'.repeat(session.session_rating)}
+                        </Text>
+                      </View>
+                    )}
                   </View>
-                </View>
 
-                <View style={styles.sessionMeta}>
-                  <Text style={styles.sessionDate}>
-                    📅{' '}
-                    {new Date(session.scheduled_at || '').toLocaleDateString()}
-                  </Text>
-                  <Text style={styles.sessionPrice}>₹500</Text>
-                </View>
+                  {session.notes && (
+                    <View style={styles.notesContainer}>
+                      <Text style={styles.notesLabel}>Your Notes:</Text>
+                      <Text style={styles.sessionNotes} numberOfLines={2}>
+                        {session.notes}
+                      </Text>
+                    </View>
+                  )}
+                  
+                  {session.session_feedback && (
+                    <View style={styles.notesContainer}>
+                      <Text style={styles.notesLabel}>Your Feedback:</Text>
+                      <Text style={styles.sessionNotes} numberOfLines={2}>
+                        {session.session_feedback}
+                      </Text>
+                    </View>
+                  )}
 
-                {session.notes && (
-                  <Text style={styles.sessionNotes} numberOfLines={2}>
-                    {session.notes}
-                  </Text>
-                )}
-
-                <View style={styles.sessionActions}>
-                  {getStatusBadge(session.status)}
-                  <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <View style={styles.sessionActions}>
                     <TouchableOpacity
-                      style={styles.actionButton}
+                      style={[styles.actionButton, styles.viewButton]}
                       onPress={() => handleViewSession(session)}
                     >
-                      <Text style={styles.actionButtonText}>View Details</Text>
+                      <Text style={styles.viewButtonText}>View Full Details</Text>
                     </TouchableOpacity>
-                    {session.status === 'SCHEDULED' && (
+                    
+                    {(session.status === 'SCHEDULED' ||
+                      session.status === 'PENDING') && (
                       <TouchableOpacity
                         style={[styles.actionButton, styles.cancelButton]}
                         onPress={() => handleCancelSession(session)}
                       >
-                        <Text
-                          style={[
-                            styles.actionButtonText,
-                            styles.cancelButtonText,
-                          ]}
-                        >
-                          Cancel
+                        <Text style={styles.cancelButtonText}>
+                          Cancel Session
                         </Text>
                       </TouchableOpacity>
                     )}
+                    
+                    {session.status === 'COMPLETED' &&
+                      !session.session_rating && (
+                        <TouchableOpacity
+                          style={[styles.actionButton, styles.rateButton]}
+                          onPress={() => handleRateSession(session)}
+                        >
+                          <Text style={styles.rateButtonText}>★ Rate Session</Text>
+                        </TouchableOpacity>
+                      )}
                   </View>
-                </View>
-              </Card>
-            ))
+                </Card>
+              );
+            })
           )}
         </View>
       </ScrollView>
+
+      {/* Rating Modal */}
+      {selectedSessionForRating && (
+        <RateSessionModal
+          visible={ratingModalVisible}
+          sessionId={selectedSessionForRating.session_id}
+          mentorName="Mentor"
+          onClose={() => {
+            setRatingModalVisible(false);
+            setSelectedSessionForRating(null);
+          }}
+          onSuccess={handleRatingSuccess}
+        />
+      )}
     </View>
   );
 }

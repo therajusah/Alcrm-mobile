@@ -8,9 +8,10 @@ import {
   StyleSheet,
   Alert,
   Modal,
-  Platform,
   TextInput,
+  Platform,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useMentorshipStore } from '../../stores/mentorshipStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -19,45 +20,63 @@ import Badge from '../../components/Badge';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import Button from '../../components/Button';
 
-// Optional: Import DateTimePicker only if available
-let DateTimePicker: any = null;
-try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  DateTimePicker = require('@react-native-community/datetimepicker').default;
-} catch (e) {
-  console.log('@react-native-community/datetimepicker not available');
-}
-
 interface MentorDetailScreenProps {
-  route?: {
-    params?: {
-      mentorId?: string;
-    };
-  };
-  navigation?: {
-    navigate?: (screen: string, params?: any) => void;
-    goBack?: () => void;
-  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  route: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  navigation: any;
 }
 
 export default function MentorDetailScreen({
   route,
   navigation,
 }: MentorDetailScreenProps) {
-  const { mentorId } = route?.params || { mentorId: '' };
+  const { mentorId } = route.params;
   const { selectedMentor, fetchMentorDetail, bookSession, isLoading } =
     useMentorshipStore();
   const { user } = useAuthStore();
   const { colors } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [showDateTimePicker, setShowDateTimePicker] = useState(false);
-  const [selectedDateTime, setSelectedDateTime] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [bookingData, setBookingData] = useState({
     session_type: 'video_call',
     scheduled_at: '',
     notes: '',
   });
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const handleDateChange = (_event: any, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setSelectedDate(selectedDate);
+      setBookingData({ 
+        ...bookingData, 
+        scheduled_at: selectedDate.toISOString() 
+      });
+    }
+  };
+
+  const validateDate = (date: Date) => {
+    const now = new Date();
+    return date > now;
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -183,6 +202,25 @@ export default function MentorDetailScreen({
       fontSize: 16,
       marginBottom: 16,
     },
+    dateButton: {
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: 8,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      marginBottom: 16,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    dateButtonText: {
+      color: colors.text,
+      fontSize: 16,
+      flex: 1,
+    },
+    dateButtonIcon: {
+      fontSize: 16,
+      color: colors.textSecondary,
+    },
     sessionTypeContainer: {
       flexDirection: 'row',
       gap: 12,
@@ -215,20 +253,12 @@ export default function MentorDetailScreen({
   });
 
   const loadMentorDetail = useCallback(async () => {
-    if (mentorId) {
-      await fetchMentorDetail(mentorId);
-    }
+    await fetchMentorDetail(mentorId);
   }, [fetchMentorDetail, mentorId]);
 
   useEffect(() => {
-    if (!mentorId) {
-      Alert.alert('Error', 'Mentor ID not found', [
-        { text: 'OK', onPress: () => navigation?.goBack?.() }
-      ]);
-      return;
-    }
     loadMentorDetail();
-  }, [loadMentorDetail, mentorId, navigation]);
+  }, [loadMentorDetail]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -242,19 +272,19 @@ export default function MentorDetailScreen({
       return;
     }
 
-    if (!mentorId) {
-      Alert.alert('Error', 'Mentor ID not found');
-      return;
-    }
-
     if (!bookingData.scheduled_at) {
       Alert.alert('Required', 'Please select a date and time');
       return;
     }
 
+    if (!validateDate(selectedDate)) {
+      Alert.alert('Invalid Date', 'Please select a future date and time');
+      return;
+    }
+
     Alert.alert(
       'Confirm Booking',
-      `Book a ${bookingData.session_type.replace('_', ' ')} session with ${selectedMentor?.user?.first_name}?`,
+      `Book a ${bookingData.session_type.replace('_', ' ')} session with ${selectedMentor?.user?.first_name || 'this mentor'}?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -263,14 +293,13 @@ export default function MentorDetailScreen({
             try {
               await bookSession({
                 mentor_id: mentorId,
-                user_id: user.id,
                 session_type: bookingData.session_type,
                 scheduled_at: bookingData.scheduled_at,
                 notes: bookingData.notes,
               });
               setShowBookingModal(false);
               Alert.alert('Success', 'Session booked successfully!');
-              navigation?.navigate?.('MySessions');
+              navigation.navigate('MySessions');
             } catch (error: unknown) {
               const errorMessage =
                 error instanceof Error
@@ -322,7 +351,7 @@ export default function MentorDetailScreen({
             {selectedMentor.domain || 'Career Mentor'}
           </Text>
           <Text style={styles.mentorRating}>
-            ⭐ {selectedMentor.rating || 4.5} • {selectedMentor.experience_years}+ years experience
+            ⭐ 4.5 • {selectedMentor.experience_years}+ years experience
           </Text>
         </View>
 
@@ -330,11 +359,11 @@ export default function MentorDetailScreen({
         <Card>
           <View style={styles.mentorStats}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{selectedMentor.total_sessions || 0}</Text>
+              <Text style={styles.statValue}>0</Text>
               <Text style={styles.statLabel}>Sessions</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>₹{selectedMentor.hourly_rate || 500}</Text>
+              <Text style={styles.statValue}>₹500</Text>
               <Text style={styles.statLabel}>Per Hour</Text>
             </View>
             <View style={styles.statItem}>
@@ -428,32 +457,25 @@ export default function MentorDetailScreen({
 
             <Text style={styles.inputLabel}>Date & Time</Text>
             <TouchableOpacity
-              style={styles.textInput}
-              onPress={() => setShowDateTimePicker(true)}
+              style={styles.dateButton}
+              onPress={() => setShowDatePicker(true)}
             >
-              <Text style={{ color: bookingData.scheduled_at ? colors.text : colors.inputPlaceholder }}>
-                {bookingData.scheduled_at
-                  ? new Date(bookingData.scheduled_at).toLocaleString()
-                  : 'Select date and time'}
+              <Text style={styles.dateButtonText}>
+                {bookingData.scheduled_at 
+                  ? `${formatDate(selectedDate)} at ${formatTime(selectedDate)}`
+                  : 'Select date and time'
+                }
               </Text>
+              <Text style={styles.dateButtonIcon}>📅</Text>
             </TouchableOpacity>
 
-            {showDateTimePicker && DateTimePicker && (
+            {showDatePicker && (
               <DateTimePicker
-                value={selectedDateTime}
+                value={selectedDate}
                 mode="datetime"
                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleDateChange}
                 minimumDate={new Date()}
-                onChange={(event: any, date?: Date) => {
-                  setShowDateTimePicker(Platform.OS === 'ios');
-                  if (date && event.type !== 'dismissed') {
-                    setSelectedDateTime(date);
-                    setBookingData({
-                      ...bookingData,
-                      scheduled_at: date.toISOString(),
-                    });
-                  }
-                }}
               />
             )}
 

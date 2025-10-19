@@ -199,7 +199,7 @@ export default function CareerGuidanceScreen() {
       id: 'interview-prep',
       title: 'Interview Preparation',
       description: 'Mock interviews and domain-specific coaching sessions',
-      icon: '🎯',
+      icon: '◯',
       price: '₹1,999-3,999',
       duration: '30-60 min',
       color: colors.success,
@@ -283,14 +283,6 @@ export default function CareerGuidanceScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Career Guidance</Text>
-          <Text style={styles.headerSubtitle}>
-            Professional career development services to accelerate your growth
-          </Text>
-        </View>
-
         {/* Success Stats */}
         <Card>
           <View style={styles.statsContainer}>

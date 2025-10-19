@@ -206,6 +206,7 @@ export default function MentorshipSessionDetailScreen({
 
   const loadSessionDetail = useCallback(async () => {
     try {
+      setIsLoading(true);
       const sessionData = await userApi.getSessionDetail(sessionId);
       setSession(sessionData);
 

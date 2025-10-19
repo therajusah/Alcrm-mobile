@@ -96,31 +96,31 @@ export default function SettingsScreen({
       marginBottom: 12,
     },
     label: {
-      color: '#4B5563',
+      color: colors.textSecondary,
       fontSize: 14,
       marginBottom: 4,
     },
     value: {
-      color: '#111827',
+      color: colors.text,
       fontWeight: '600',
     },
     userIdValue: {
-      color: '#111827',
+      color: colors.text,
       fontFamily: 'monospace',
       fontSize: 12,
     },
     aboutText: {
-      color: '#4B5563',
+      color: colors.textSecondary,
       fontSize: 14,
       marginBottom: 8,
     },
     aboutVersion: {
-      color: '#4B5563',
+      color: colors.textSecondary,
       fontSize: 14,
       marginBottom: 16,
     },
     copyright: {
-      color: '#6B7280',
+      color: colors.textTertiary,
       fontSize: 12,
     },
   });

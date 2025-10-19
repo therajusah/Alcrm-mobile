@@ -14,6 +14,7 @@ import { authApi } from '../../services/api';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { NavigationProp } from '../../types';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface SignupScreenProps {
   navigation: NavigationProp;
@@ -28,6 +29,7 @@ interface SignupErrors {
 }
 
 export default function SignupScreen({ navigation }: SignupScreenProps) {
+  const { colors } = useTheme();
   const [step, setStep] = useState<'email' | 'otp' | 'details'>('email');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -148,6 +150,116 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
       setIsLoading(false);
     }
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      paddingHorizontal: 24,
+      paddingVertical: 40,
+    },
+    logoContainer: {
+      alignItems: 'center',
+      marginBottom: 40,
+    },
+    logoText: {
+      fontSize: 42,
+      fontWeight: 'bold',
+      color: colors.primary,
+      letterSpacing: -1,
+    },
+    logoSubtext: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginTop: 4,
+      letterSpacing: 2,
+      textTransform: 'uppercase',
+    },
+    header: {
+      marginBottom: 24,
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 8,
+      textAlign: 'center',
+    },
+    subtitle: {
+      color: colors.textSecondary,
+      fontSize: 16,
+      textAlign: 'center',
+    },
+    stepIndicator: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 32,
+    },
+    stepDot: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    stepActive: {
+      backgroundColor: colors.primary,
+    },
+    stepCompleted: {
+      backgroundColor: colors.success,
+    },
+    stepInactive: {
+      backgroundColor: colors.border,
+    },
+    stepNumber: {
+      color: colors.textInverse,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    stepLine: {
+      width: 40,
+      height: 2,
+      backgroundColor: colors.border,
+    },
+    formCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      padding: 24,
+      marginBottom: 24,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    signInLink: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: 16,
+    },
+    signInText: {
+      color: colors.textSecondary,
+      fontSize: 15,
+    },
+    signInButton: {
+      color: colors.primary,
+      fontWeight: '600',
+      fontSize: 15,
+    },
+  });
 
   return (
     <KeyboardAvoidingView
@@ -311,113 +423,3 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 40,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  logoText: {
-    fontSize: 42,
-    fontWeight: 'bold',
-    color: '#2563EB',
-    letterSpacing: -1,
-  },
-  logoSubtext: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginTop: 4,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-  },
-  header: {
-    marginBottom: 24,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    color: '#6B7280',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  stepIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 32,
-  },
-  stepDot: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepActive: {
-    backgroundColor: '#2563EB',
-  },
-  stepCompleted: {
-    backgroundColor: '#10B981',
-  },
-  stepInactive: {
-    backgroundColor: '#D1D5DB',
-  },
-  stepNumber: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  stepLine: {
-    width: 40,
-    height: 2,
-    backgroundColor: '#D1D5DB',
-  },
-  formCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  signInLink: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  signInText: {
-    color: '#6B7280',
-    fontSize: 15,
-  },
-  signInButton: {
-    color: '#2563EB',
-    fontWeight: '600',
-    fontSize: 15,
-  },
-});

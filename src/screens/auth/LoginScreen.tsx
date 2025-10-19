@@ -67,7 +67,20 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         loginError instanceof Error
           ? loginError.message
           : 'An error occurred during login';
-      Alert.alert('Login Failed', errorMessage);
+      Alert.alert(
+        'Login Failed', 
+        errorMessage,
+        [
+          {
+            text: 'Try Again',
+            style: 'default',
+          },
+          {
+            text: 'Create Account',
+            onPress: () => navigation.navigate('Signup'),
+          }
+        ]
+      );
     }
   };
 

@@ -229,17 +229,6 @@ export default function MentorshipScreen({
     navigation.navigate('MentorDetail', { mentorId: mentor.mentor_id });
   };
 
-  // const getDomainBadge = (domain: string) => {
-  //   const colors = ['primary', 'success', 'warning', 'info', 'danger'];
-  //   const colorIndex = domain.length % colors.length;
-  //   return colors[colorIndex] as
-  //     | 'primary'
-  //     | 'success'
-  //     | 'warning'
-  //     | 'info'
-  //     | 'danger';
-  // };
-
   if (isLoading && !refreshing && mentors.length === 0) {
     return <LoadingSpinner message="Loading mentors..." />;
   }
@@ -336,8 +325,12 @@ export default function MentorshipScreen({
                 </View>
 
                 <View style={styles.mentorMeta}>
-                  <Text style={styles.mentorRating}>⭐ 4.5 (0 sessions)</Text>
-                  <Text style={styles.mentorPrice}>₹500/hour</Text>
+                  <Text style={styles.mentorRating}>
+                    ⭐ {mentor.rating?.toFixed(1) || '0.0'} ({mentor.total_sessions || 0} sessions)
+                  </Text>
+                  <Text style={styles.mentorPrice}>
+                    ₹{mentor.hourly_rate || 0}/hour
+                  </Text>
                 </View>
 
                 {mentor.bio && (

@@ -297,7 +297,7 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
             onPress={handleThemeToggle}
             style={styles.themeToggle}
           >
-            <Text style={styles.themeIcon}>{isDark ? '🌙' : '☀️'}</Text>
+            <Text style={styles.themeIcon}>{isDark ? '◐' : '◑'}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -492,7 +492,7 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
                     marginBottom: 8,
                   }}
                 >
-                  📄 No resume uploaded
+                  📋 No resume uploaded
                 </Text>
                 <Text
                   style={{
@@ -527,17 +527,19 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
 
         {/* Account Actions */}
         <Card title="Account">
-          <Button
-            title="Change Password"
-            onPress={() => navigation.navigate('ChangePassword')}
-            variant="outline"
-          />
+          <View style={{ gap: 12 }}>
+            <Button
+              title="Change Password"
+              onPress={() => navigation.navigate('ChangePassword')}
+              variant="outline"
+            />
 
-          <Button
-            title="Settings"
-            onPress={() => navigation.navigate('Settings')}
-            variant="outline"
-          />
+            <Button
+              title="Settings"
+              onPress={() => navigation.navigate('Settings')}
+              variant="outline"
+            />
+          </View>
         </Card>
       </View>
     </ScrollView>

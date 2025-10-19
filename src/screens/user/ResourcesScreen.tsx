@@ -13,7 +13,7 @@ import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import EmptyState from '../../components/EmptyState';
-import PDFViewer from '../../components/PDFViewer';
+import SecurePDFViewer from '../../components/SecurePDFViewer';
 import type { FreeResource } from '../../types';
 
 export default function ResourcesScreen() {
@@ -159,11 +159,6 @@ export default function ResourcesScreen() {
       }
     >
       <View style={styles.content}>
-        <Text style={styles.headerTitle}>Free Resources</Text>
-        <Text style={styles.headerSubtitle}>
-          Access learning materials and guides
-        </Text>
-
         {resources.length === 0 ? (
           <EmptyState
             title="No Resources Available"
@@ -203,7 +198,7 @@ export default function ResourcesScreen() {
 
       {/* PDF Viewer Modal */}
       {selectedResource && (
-        <PDFViewer
+        <SecurePDFViewer
           visible={showPDFViewer}
           onClose={closePDFViewer}
           pdfUrl={

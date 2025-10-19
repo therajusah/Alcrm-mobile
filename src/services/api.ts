@@ -271,10 +271,9 @@ export const userApi = {
   },
 
   bookSession: async (data: {
-    mentor_id: string;
-    user_id: string;
+    mentor_id?: string;
     session_type: string;
-    scheduled_at: string;
+    scheduled_at?: string;
     notes?: string;
   }): Promise<MentorshipSession> => {
     const response = await api.post('/user/mentorship-sessions', data);
@@ -288,6 +287,11 @@ export const userApi = {
     session_type?: string;
   }): Promise<GenericList<MentorshipSession>> => {
     const response = await api.get('/user/mentorship-sessions', { params });
+    return response.data;
+  },
+
+  getSessionDetail: async (id: string): Promise<MentorshipSession> => {
+    const response = await api.get(`/user/mentorship-sessions/${id}`);
     return response.data;
   },
 
@@ -453,12 +457,6 @@ export const userApi = {
 
   completeOnboarding: async () => {
     const response = await api.post('/user/onboarding/complete');
-    return response.data;
-  },
-
-  // Mentorship session detail
-  getSessionDetail: async (id: string) => {
-    const response = await api.get(`/user/mentorship-sessions/${id}`);
     return response.data;
   },
 };

@@ -201,7 +201,7 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      {/* Header */}
+      {/* Header removed - using navigation header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Welcome back, {userFirstName}!</Text>
         <Text style={styles.headerSubtitle}>
@@ -219,17 +219,8 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
               style={styles.quickActionCard}
               activeOpacity={0.7}
             >
-              <Text style={styles.quickActionIcon}>💼</Text>
+              <Text style={styles.quickActionIcon}>📄</Text>
               <Text style={styles.quickActionText}>Browse Jobs</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Mentorship')}
-              style={styles.quickActionCard}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.quickActionIcon}>👨‍🏫</Text>
-              <Text style={styles.quickActionText}>Find Mentors</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -237,8 +228,17 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
               style={styles.quickActionCard}
               activeOpacity={0.7}
             >
-              <Text style={styles.quickActionIcon}>🎯</Text>
+              <Text style={styles.quickActionIcon}>◯</Text>
               <Text style={styles.quickActionText}>Career Guidance</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Mentorship')}
+              style={styles.quickActionCard}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.quickActionIcon}>👤</Text>
+              <Text style={styles.quickActionText}>Find Mentors</Text>
             </TouchableOpacity>
 
             <TouchableOpacity

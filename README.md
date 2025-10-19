@@ -146,6 +146,63 @@ expo run:android
 
 ## 🔧 Configuration
 
+### Java/JDK Setup for Android
+
+The Android build requires Java 17 (or the version specified in your project). The project has been configured to use your system's default JDK rather than a hardcoded path.
+
+#### Option 1: Use System Default JDK (Recommended)
+
+Gradle will automatically use the JDK from your `JAVA_HOME` environment variable or the system default JDK.
+
+To verify your Java installation:
+```bash
+java -version
+```
+
+#### Option 2: Specify Custom JDK Location
+
+If you need to use a specific JDK version, you can set it in one of these ways:
+
+**Method 1: Environment Variable (All Platforms)**
+```bash
+# macOS/Linux (add to ~/.bashrc, ~/.zshrc, or ~/.bash_profile)
+export JAVA_HOME=/path/to/your/jdk17
+
+# Windows (add to System Environment Variables or use Command Prompt)
+setx JAVA_HOME "C:\Program Files\Java\jdk-17"
+```
+
+**Method 2: Local gradle.properties (Project-Specific)**
+
+Create a `local.properties` file in the `android/` directory (this file is gitignored):
+```properties
+# android/local.properties
+org.gradle.java.home=/path/to/your/jdk17
+```
+
+**Examples by Platform:**
+
+- **macOS (Homebrew)**: `/opt/homebrew/opt/openjdk@17`
+- **macOS (Manual)**: `/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home`
+- **Linux**: `/usr/lib/jvm/java-17-openjdk` (varies by distro)
+- **Windows**: `C:\Program Files\Java\jdk-17`
+
+**Method 3: Global gradle.properties (User-Wide)**
+
+Edit `~/.gradle/gradle.properties` (create if it doesn't exist):
+```properties
+org.gradle.java.home=/path/to/your/jdk17
+```
+
+#### CI/CD Environment
+
+For CI/CD pipelines, ensure the `JAVA_HOME` environment variable is set correctly in your pipeline configuration:
+```yaml
+# Example for GitHub Actions
+env:
+  JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
+```
+
 ### Backend API
 
 The app connects to your existing ALCRM backend. Make sure your backend is running and accessible:

@@ -33,6 +33,8 @@ import ProfileScreen from '../screens/user/ProfileScreen';
 import SettingsScreen from '../screens/user/SettingsScreen';
 import ChangePasswordScreen from '../screens/user/ChangePasswordScreen';
 import MentorshipSessionDetailScreen from '../screens/user/MentorshipSessionDetailScreen';
+import MentorshipHomeScreen from '../screens/user/MentorshipHomeScreen';
+import BookSessionScreen from '../screens/user/BookSessionScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -101,9 +103,9 @@ function UserTabs() {
       />
       <Tab.Screen
         name="Mentorship"
-        component={MentorshipScreen}
+        component={MentorshipHomeScreen}
         options={{
-          headerTitle: 'Find Mentors',
+          headerTitle: 'Mentorship',
           tabBarIcon: ({ color }) => <TabIcon icon="🎯" color={color} />,
         }}
       />
@@ -261,6 +263,16 @@ function AppNavigatorContent() {
             name="MySessions"
             component={MySessionsScreen}
             options={{ headerTitle: 'My Sessions' }}
+          />
+          <Stack.Screen
+            name="BookSession"
+            component={BookSessionScreen}
+            options={{ headerTitle: 'Book Session' }}
+          />
+          <Stack.Screen
+            name="BrowseMentors"
+            component={MentorshipScreen}
+            options={{ headerTitle: 'Find Mentors' }}
           />
           <Stack.Screen
             name="CareerGuidance"
