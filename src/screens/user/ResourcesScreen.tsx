@@ -11,7 +11,7 @@ import { useResourceStore } from '../../stores/resourceStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { ShimmerScreen } from '../../components/Shimmer';
 import EmptyState from '../../components/EmptyState';
 import SecurePDFViewer from '../../components/SecurePDFViewer';
 import type { FreeResource } from '../../types';
@@ -148,7 +148,7 @@ export default function ResourcesScreen() {
   };
 
   if (isLoading && !refreshing && resources.length === 0) {
-    return <LoadingSpinner message="Loading resources..." />;
+    return <ShimmerScreen type="resources" />;
   }
 
   return (

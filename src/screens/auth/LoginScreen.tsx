@@ -4,7 +4,6 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -13,6 +12,8 @@ import { useAuthStore } from '../../stores/authStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
+import { useModernAlert } from '../../hooks/useModernAlert';
+import ModernAlert from '../../components/ModernAlert';
 
 interface LoginScreenProps {
   navigation: {
@@ -28,6 +29,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   );
 
   const { login, isLoading, clearError } = useAuthStore();
+  const { showAlert, hideAlert, alertState } = useModernAlert();
   const { colors } = useTheme();
 
   const validateForm = () => {
@@ -67,12 +69,13 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         loginError instanceof Error
           ? loginError.message
           : 'An error occurred during login';
-      Alert.alert(
+      showAlert(
         'Login Failed', 
         errorMessage,
         [
           {
             text: 'Try Again',
+            onPress: () => {},
             style: 'default',
           },
           {
@@ -253,6 +256,13 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <ModernAlert
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onClose={hideAlert}
+      />
     </KeyboardAvoidingView>
   );
 }

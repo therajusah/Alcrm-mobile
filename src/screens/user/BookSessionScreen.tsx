@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   TextInput,
   Platform,
 } from 'react-native';
@@ -15,6 +14,8 @@ import { useMentorshipStore } from '../../stores/mentorshipStore';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SessionTypeIcon from '../../components/SessionTypeIcon';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useModernAlert } from '../../hooks/useModernAlert';
+import ModernAlert from '../../components/ModernAlert';
 import type { NavigationProp } from '../../types';
 
 interface RouteParams {
@@ -30,6 +31,7 @@ export default function BookSessionScreen() {
   const { colors } = useTheme();
   const { mentors, fetchMentors, bookSession, isLoading } =
     useMentorshipStore();
+  const { showAlert, hideAlert, alertState } = useModernAlert();
 
   const params = route.params as RouteParams;
   const { serviceType, serviceTitle, price, duration } = params;
@@ -194,7 +196,16 @@ export default function BookSessionScreen() {
 
   const handleBookSession = async () => {
     if (date <= new Date()) {
-      Alert.alert('Invalid Date', 'Please select a future date and time');
+      showAlert(
+        'Invalid Date',
+        'Please select a future date and time',
+        [
+          {
+            text: 'OK',
+            onPress: () => {},
+          },
+        ]
+      );
       return;
     }
 
@@ -208,7 +219,7 @@ export default function BookSessionScreen() {
         notes: notes || undefined,
       });
 
-      Alert.alert(
+      showAlert(
         'Success',
         'Your mentorship session has been booked successfully!',
         [
@@ -224,12 +235,18 @@ export default function BookSessionScreen() {
           },
         ]
       );
-    } catch (error) {
-      Alert.alert(
+    } catch (err) {
+      showAlert(
         'Error',
-        error instanceof Error
-          ? error.message
-          : 'Failed to book session. Please try again.'
+        err instanceof Error
+          ? err.message
+          : 'Failed to book session. Please try again.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {},
+          },
+        ]
       );
     } finally {
       setSubmitting(false);
@@ -412,6 +429,13 @@ export default function BookSessionScreen() {
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
       </ScrollView>
+      <ModernAlert
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onClose={hideAlert}
+      />
     </View>
   );
 }

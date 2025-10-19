@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuthStore } from '../stores/authStore';
 import { userApi } from '../services/api';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
-import LoadingSpinner from '../components/LoadingSpinner';
+import { ShimmerScreen } from '../components/Shimmer';
 import ThemeOnboarding from '../components/ThemeOnboarding';
 
 // Auth Screens
@@ -197,7 +197,7 @@ function AppNavigatorContent() {
   };
 
   if (isLoading || isCheckingOnboarding) {
-    return <LoadingSpinner message="Loading..." />;
+    return <ShimmerScreen type="generic" />;
   }
 
   if (showThemeOnboarding) {

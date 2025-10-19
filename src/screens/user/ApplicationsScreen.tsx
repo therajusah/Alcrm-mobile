@@ -10,7 +10,7 @@ import { useApplicationStore } from '../../stores/applicationStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { ShimmerScreen } from '../../components/Shimmer';
 import EmptyState from '../../components/EmptyState';
 
 export default function ApplicationsScreen() {
@@ -112,7 +112,7 @@ export default function ApplicationsScreen() {
   };
 
   if (isLoading && !refreshing && applications.length === 0) {
-    return <LoadingSpinner message="Loading applications..." />;
+    return <ShimmerScreen type="applications" />;
   }
 
   return (

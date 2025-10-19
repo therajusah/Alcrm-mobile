@@ -17,7 +17,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { ShimmerScreen } from '../../components/Shimmer';
 import Button from '../../components/Button';
 
 interface MentorDetailScreenProps {
@@ -314,7 +314,7 @@ export default function MentorDetailScreen({
   };
 
   if (isLoading && !selectedMentor) {
-    return <LoadingSpinner message="Loading mentor details..." />;
+    return <ShimmerScreen type="generic" />;
   }
 
   if (!selectedMentor) {

@@ -11,7 +11,7 @@ import { useJobStore } from '../../stores/jobStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { ShimmerScreen } from '../../components/Shimmer';
 import EmptyState from '../../components/EmptyState';
 import { NavigationProp } from '../../types';
 
@@ -107,7 +107,7 @@ export default function JobsScreen({ navigation }: JobsScreenProps) {
   };
 
   if (isLoading && !refreshing && jobs.length === 0) {
-    return <LoadingSpinner message="Loading jobs..." />;
+    return <ShimmerScreen type="jobs" />;
   }
 
   return (

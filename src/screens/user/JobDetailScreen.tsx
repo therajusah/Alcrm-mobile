@@ -15,7 +15,7 @@ import { userApi } from '../../services/api';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { ShimmerScreen } from '../../components/Shimmer';
 
 interface JobDetailScreenProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -318,7 +318,7 @@ export default function JobDetailScreen({
   };
 
   if (isLoading || !selectedJob) {
-    return <LoadingSpinner message="Loading job details..." />;
+    return <ShimmerScreen type="generic" />;
   }
 
   const hasApplied =

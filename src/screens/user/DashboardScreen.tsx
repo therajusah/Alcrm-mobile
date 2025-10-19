@@ -14,7 +14,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { userApi } from '../../services/api';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { ShimmerScreen } from '../../components/Shimmer';
 import type { UserProfile } from '../../types';
 import { NavigationProp } from '../../types';
 
@@ -28,6 +28,7 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
   const { colors } = useTheme();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const styles = StyleSheet.create({
     container: {
@@ -156,6 +157,8 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
       setProfile(profileData);
     } catch {
       // Handle error silently or show user-friendly message
+    } finally {
+      setInitialLoading(false);
     }
   }, [fetchJobs]);
 
@@ -165,8 +168,15 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadData();
-    setRefreshing(false);
+    try {
+      await fetchJobs({ page: 1, pageSize: 5 });
+      const profileData = await userApi.getProfile();
+      setProfile(profileData);
+    } catch {
+      // Handle error silently
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const getJobTypeBadge = (type: string) => {
@@ -190,8 +200,8 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
     user?.email?.split('@')[0] ||
     'User';
 
-  if (isLoading && !refreshing) {
-    return <LoadingSpinner message="Loading dashboard..." />;
+  if (initialLoading || (isLoading && !refreshing)) {
+    return <ShimmerScreen type="dashboard" />;
   }
 
   return (

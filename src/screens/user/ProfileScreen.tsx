@@ -15,7 +15,7 @@ import { userApi } from '../../services/api';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Card from '../../components/Card';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { ShimmerScreen } from '../../components/Shimmer';
 import type { UserProfile } from '../../types';
 import { NavigationProp } from '../../types';
 
@@ -279,7 +279,7 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
   };
 
   if (isLoading) {
-    return <LoadingSpinner message="Loading profile..." />;
+    return <ShimmerScreen type="profile" />;
   }
 
   return (

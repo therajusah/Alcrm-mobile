@@ -12,7 +12,7 @@ import { useMentorshipStore } from '../../stores/mentorshipStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { ShimmerScreen } from '../../components/Shimmer';
 import EmptyState from '../../components/EmptyState';
 import type { CareerMentor } from '../../types';
 import { NavigationProp } from '../../types';
@@ -230,7 +230,7 @@ export default function MentorshipScreen({
   };
 
   if (isLoading && !refreshing && mentors.length === 0) {
-    return <LoadingSpinner message="Loading mentors..." />;
+    return <ShimmerScreen type="mentors" />;
   }
 
   return (
