@@ -12,12 +12,14 @@ import {
 } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { useAuthStore } from '../../stores/authStore';
-import { userApi } from '../../services/api';
+import { userApi, TOKEN_KEY } from '../../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import Card from '../../components/Card';
 import type { OnboardingState } from '../../types';
 import { NavigationProp } from '../../types';
+import { CommonActions } from '@react-navigation/native';
 
 interface OnboardingScreenProps {
   navigation: NavigationProp;
@@ -72,16 +74,41 @@ export default function OnboardingScreen({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date(2000, 0, 1));
 
-  const { updateUserProfile } = useAuthStore();
+  const { updateUserProfile, isAuthenticated } = useAuthStore();
+
+  const navigateToHomeOrLogin = () => {
+    if (isAuthenticated) {
+      // Ensure we land inside the Tab navigator so the tab bar is visible
+      const action = CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'UserTabs' as never } as any],
+      });
+      const parent = navigation.getParent();
+      if (parent) {
+        parent.dispatch(action);
+      } else {
+        navigation.dispatch(action);
+      }
+    } else {
+      // In auth stack, send to Login
+      navigation.navigate('Login');
+    }
+  };
 
   const loadOnboardingState = useCallback(async () => {
     try {
+      // Ensure token exists; otherwise redirect to Login
+      const token = await AsyncStorage.getItem(TOKEN_KEY);
+      if (!token) {
+        navigateToHomeOrLogin();
+        return;
+      }
       const state = await userApi.getOnboardingState();
       setOnboardingState(state);
 
       // If user has completed onboarding, redirect to main app
       if (state.is_completed) {
-        navigation.navigate('UserTabs' as never);
+        navigateToHomeOrLogin();
         return;
       }
 
@@ -308,7 +335,7 @@ export default function OnboardingScreen({
       Alert.alert('Welcome!', 'Your profile has been completed successfully.', [
         {
           text: 'Get Started',
-          onPress: () => navigation.navigate('UserTabs' as never),
+          onPress: () => navigateToHomeOrLogin(),
         },
       ]);
     } catch (error: unknown) {
@@ -563,7 +590,7 @@ export default function OnboardingScreen({
 
           {/* Skip Option */}
           <TouchableOpacity
-            onPress={() => navigation.navigate('UserTabs' as never)}
+            onPress={navigateToHomeOrLogin}
             style={styles.skipButton}
           >
             <Text style={styles.skipText}>
