@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/icon-a-compass.svg",
+      "image": "./assets/icon-compass-monochrome.svg",
       "resizeMode": "contain",
       "backgroundColor": "#F8F9FA"
     },
@@ -17,9 +17,9 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.alcrm.mobile",
-      "icon": "./assets/icon-a-compass.svg"
+      "icon": "./assets/icon-compass-monochrome.svg"
     },
-    "icon": "./assets/icon-a-compass.svg",
+    "icon": "./assets/icon-compass-monochrome.svg",
     "android": {
       "package": "com.alcrm.mobile",
       "versionCode": 1,
@@ -30,22 +30,23 @@
         "android.permission.ACCESS_NETWORK_STATE"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon-a-compass.svg",
+        "foregroundImage": "./assets/icon-compass-monochrome.svg",
         "backgroundColor": "#F8F9FA"
       },
       "playStoreUrl": "https://play.google.com/store/apps/details?id=com.alcrm.mobile"
     },
     "web": {},
     "scheme": "alcrm",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "plugins": [
       "expo-document-picker",
       "expo-asset"
     ],
     "extra": {
       "eas": {
-        "projectId": "your-project-id-here"
+        "projectId": "5e0f5cb4-ebda-4ee2-82dc-0b21649902bc"
       }
-    }
+    },
+    "owner": "therajusah"
   }
 }

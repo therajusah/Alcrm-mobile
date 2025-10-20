@@ -250,6 +250,7 @@ export const ShimmerScreen: React.FC<{
   type?:
     | 'dashboard'
     | 'jobs'
+    | 'jobDetail'
     | 'mentors'
     | 'sessions'
     | 'profile'
@@ -272,7 +273,7 @@ export const ShimmerScreen: React.FC<{
             ]}
           >
             {/* Header Section */}
-            <View style={styles.dashboardHeader}>
+            <View style={[styles.dashboardHeader, { backgroundColor: colors.primary }]}>
               <Shimmer width="70%" height={28} style={{ marginBottom: 8 }} />
               <Shimmer width="85%" height={16} />
             </View>
@@ -323,6 +324,49 @@ export const ShimmerScreen: React.FC<{
             {/* Jobs List */}
             <View style={styles.jobsContent}>
               <ShimmerJobList count={8} />
+            </View>
+          </View>
+        );
+
+      case 'jobDetail':
+        return (
+          <View
+            style={[
+              styles.screenContainer,
+              { backgroundColor: colors.background },
+              style,
+            ]}
+          >
+            <View style={{ paddingHorizontal: 24, paddingTop: 16 }}>
+              {/* Title and Company */}
+              <Shimmer width="80%" height={26} style={{ marginBottom: 8 }} />
+              <Shimmer width="50%" height={16} style={{ marginBottom: 16 }} />
+
+              {/* Badges */}
+              <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
+                <Shimmer width={80} height={28} borderRadius={14} />
+                <Shimmer width={70} height={28} borderRadius={14} />
+              </View>
+
+              {/* Meta rows */}
+              <View style={{ marginBottom: 16 }}>
+                <Shimmer width="40%" height={14} style={{ marginBottom: 8 }} />
+                <Shimmer width="35%" height={14} style={{ marginBottom: 8 }} />
+                <Shimmer width="30%" height={14} />
+              </View>
+
+              {/* Description block */}
+              <View style={{ marginTop: 8 }}>
+                <Shimmer width="100%" height={12} style={{ marginBottom: 6 }} />
+                <Shimmer width="95%" height={12} style={{ marginBottom: 6 }} />
+                <Shimmer width="90%" height={12} style={{ marginBottom: 6 }} />
+                <Shimmer width="60%" height={12} />
+              </View>
+
+              {/* Apply button placeholder */}
+              <View style={{ marginTop: 24 }}>
+                <Shimmer width="100%" height={48} borderRadius={999} />
+              </View>
             </View>
           </View>
         );

@@ -152,22 +152,29 @@ function AuthStack() {
 
 // Main App Navigator
 function AppNavigatorContent() {
-  const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
+  const { isAuthenticated, checkAuth } = useAuthStore();
   const { colors } = useTheme();
   const [showThemeOnboarding, setShowThemeOnboarding] = useState(false);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [needsProfileOnboarding, setNeedsProfileOnboarding] = useState(false);
 
   useEffect(() => {
-    checkAuth();
+    (async () => {
+      try {
+        await checkAuth();
+      } finally {
+        setIsAuthChecking(false);
+      }
+    })();
     checkOnboardingStatus();
   }, [checkAuth]);
 
   useEffect(() => {
-    if (isAuthenticated && !isLoading) {
+    if (isAuthenticated && !isAuthChecking) {
       checkProfileOnboarding();
     }
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isAuthChecking]);
 
   const checkOnboardingStatus = async () => {
     try {
@@ -197,7 +204,7 @@ function AppNavigatorContent() {
     setShowThemeOnboarding(false);
   };
 
-  if (isLoading || isCheckingOnboarding) {
+  if (isAuthChecking || isCheckingOnboarding) {
     return <ShimmerScreen type="generic" />;
   }
 

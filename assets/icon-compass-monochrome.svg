@@ -1,0 +1,35 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer circle -->
+  <circle cx="512" cy="512" r="480" stroke="#374151" stroke-width="32" fill="none"/>
+  
+  <!-- Inner circle -->
+  <circle cx="512" cy="512" r="400" stroke="#374151" stroke-width="16" fill="none"/>
+  
+  <!-- Compass needle pointing North -->
+  <path d="M512 200 L480 280 L512 360 L544 280 Z" fill="#374151"/>
+  
+  <!-- Compass needle pointing South -->
+  <path d="M512 664 L480 584 L512 504 L544 584 Z" fill="#6B7280"/>
+  
+  <!-- Center dot -->
+  <circle cx="512" cy="512" r="24" fill="#374151"/>
+  
+  <!-- Cardinal direction markers -->
+  <!-- North -->
+  <text x="512" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#374151">N</text>
+  
+  <!-- East -->
+  <text x="864" y="520" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#374151">E</text>
+  
+  <!-- South -->
+  <text x="512" y="880" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#374151">S</text>
+  
+  <!-- West -->
+  <text x="160" y="520" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#374151">W</text>
+  
+  <!-- Small tick marks -->
+  <line x1="512" y1="120" x2="512" y2="140" stroke="#374151" stroke-width="8"/>
+  <line x1="512" y1="884" x2="512" y2="904" stroke="#374151" stroke-width="8"/>
+  <line x1="120" y1="512" x2="140" y2="512" stroke="#374151" stroke-width="8"/>
+  <line x1="884" y1="512" x2="904" y2="512" stroke="#374151" stroke-width="8"/>
+</svg>

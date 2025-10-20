@@ -69,16 +69,30 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         loginError instanceof Error
           ? loginError.message
           : 'An error occurred during login';
+
+      const msg = (errorMessage || '').toLowerCase();
+      const isUserMissing = /user\s*(not\s*)?found|does\s*not\s*exist|no\s*account/.test(msg);
+      const isInvalidCreds = /invalid|wrong|incorrect|unauthori/.test(msg);
+
+      if (isUserMissing) {
+        showAlert('Account Not Found', 'We could not find an account for this email. Create one now?', [
+          { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+          { text: 'Sign Up', onPress: () => navigation.navigate('Signup') },
+        ]);
+        return;
+      }
+
+      if (isInvalidCreds) {
+        showAlert('Invalid Credentials', 'Email or password is incorrect. Please try again.', [
+          { text: 'Try Again', onPress: () => {}, style: 'default' },
+          { text: 'Forgot Password', onPress: () => navigation.navigate('ForgotPassword') },
+        ]);
+        return;
+      }
+
       showAlert('Login Failed', errorMessage, [
-        {
-          text: 'Try Again',
-          onPress: () => {},
-          style: 'default',
-        },
-        {
-          text: 'Create Account',
-          onPress: () => navigation.navigate('Signup'),
-        },
+        { text: 'Try Again', onPress: () => {}, style: 'default' },
+        { text: 'Create Account', onPress: () => navigation.navigate('Signup') },
       ]);
     }
   };

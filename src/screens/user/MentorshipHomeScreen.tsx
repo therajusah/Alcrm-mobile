@@ -68,6 +68,7 @@ export default function MentorshipHomeScreen() {
     'services'
   );
   const [refreshing, setRefreshing] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   const styles = StyleSheet.create({
     container: {
@@ -323,7 +324,26 @@ export default function MentorshipHomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      onStartShouldSetResponder={() => true}
+      onResponderGrant={e => setTouchStartX(e.nativeEvent.pageX)}
+      onResponderRelease={e => {
+        if (touchStartX === null) return;
+        const dx = e.nativeEvent.pageX - touchStartX;
+        const SWIPE_THRESHOLD = 50;
+        if (Math.abs(dx) > SWIPE_THRESHOLD) {
+          if (dx < 0) {
+            // swipe left → next tab
+            setActiveTab(prev => (prev === 'services' ? 'sessions' : 'sessions'));
+          } else {
+            // swipe right → previous tab
+            setActiveTab(prev => (prev === 'sessions' ? 'services' : 'services'));
+          }
+        }
+        setTouchStartX(null);
+      }}
+    >
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'services' && styles.activeTab]}

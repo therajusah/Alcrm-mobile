@@ -70,13 +70,13 @@ export default function Button({
   const getSizeStyles = () => {
     switch (size) {
       case 'sm':
-        return { paddingVertical: 8, paddingHorizontal: 16 };
+        return { paddingVertical: 8, paddingHorizontal: 14 };
       case 'md':
-        return { paddingVertical: 12, paddingHorizontal: 24 };
+        return { paddingVertical: 12, paddingHorizontal: 20 };
       case 'lg':
-        return { paddingVertical: 16, paddingHorizontal: 32 };
+        return { paddingVertical: 16, paddingHorizontal: 28 };
       default:
-        return { paddingVertical: 12, paddingHorizontal: 24 };
+        return { paddingVertical: 12, paddingHorizontal: 20 };
     }
   };
 
@@ -97,7 +97,7 @@ export default function Button({
 
   const styles = StyleSheet.create({
     button: {
-      borderRadius: 8,
+      borderRadius: 9999,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',

@@ -1,6 +1,7 @@
 import { create, StateCreator } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authApi, TOKEN_KEY } from '../services/api';
+import { useJobStore } from './jobStore';
 import type { AuthUser } from '../types';
 
 interface AuthState {
@@ -31,6 +32,8 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
     try {
       console.log('AuthStore: Starting login process');
       set({ isLoading: true, error: null });
+
+      // 1) Sign in and persist token
       const response = await authApi.signin(email, password);
       console.log('AuthStore: Login API response:', response);
 
@@ -39,12 +42,32 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
         console.log('AuthStore: Token stored successfully');
       }
 
+      // 2) Fetch fresh profile before marking authenticated so the
+      //    home screen has data and the login button keeps showing loader
+      let resolvedUser = response.user as AuthUser | null;
+      try {
+        const profile = await authApi.getProfile();
+        if (profile?.user) {
+          resolvedUser = profile.user as AuthUser;
+        }
+      } catch (profileError) {
+        console.log('AuthStore: Failed to prefetch profile, using login payload user if available.', profileError);
+      }
+
+      // 3) Prefetch initial jobs for dashboard to avoid skeleton after login
+      try {
+        const fetchJobs = useJobStore.getState().fetchJobs;
+        await fetchJobs({ page: 1, pageSize: 5 });
+      } catch (prefetchError) {
+        console.log('AuthStore: Prefetch jobs failed, continuing.', prefetchError);
+      }
+
       set({
-        user: response.user,
+        user: resolvedUser ?? null,
         isAuthenticated: true,
         isLoading: false,
       });
-      console.log('AuthStore: Login successful, user authenticated');
+      console.log('AuthStore: Login successful, user authenticated (profile prefetched)');
     } catch (error) {
       console.log('AuthStore: Login error:', error);
       const message = error instanceof Error ? error.message : 'Login failed';

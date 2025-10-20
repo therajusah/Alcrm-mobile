@@ -315,7 +315,7 @@ export default function JobDetailScreen() {
   };
 
   if (isLoading || !selectedJob) {
-    return <ShimmerScreen type="generic" />;
+    return <ShimmerScreen type="jobDetail" />;
   }
 
   const hasApplied =

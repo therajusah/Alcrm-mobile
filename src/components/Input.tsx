@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   TextInput,
   Text,
   TextInputProps,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -13,8 +14,9 @@ interface InputProps extends TextInputProps {
   error?: string;
 }
 
-export default function Input({ label, error, ...props }: InputProps) {
+export default function Input({ label, error, secureTextEntry, ...props }: InputProps) {
   const { colors } = useTheme();
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const styles = StyleSheet.create({
     container: {
@@ -26,15 +28,32 @@ export default function Input({ label, error, ...props }: InputProps) {
       marginBottom: 8,
       fontSize: 16,
     },
-    input: {
+    inputWrapper: {
       borderWidth: 1,
       borderColor: error ? colors.error : colors.inputBorder,
       borderRadius: 8,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
+      backgroundColor: colors.inputBackground,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 8,
+    },
+    input: {
+      paddingHorizontal: 12,
+      paddingVertical: 10,
       color: colors.text,
       backgroundColor: colors.inputBackground,
       fontSize: 16,
+      flex: 1,
+      borderWidth: 0,
+    },
+    eyeButton: {
+      paddingHorizontal: 8,
+      paddingVertical: 8,
+    },
+    eyeText: {
+      color: colors.textSecondary,
+      fontSize: 16,
+      fontWeight: '600',
     },
     error: {
       color: colors.error,
@@ -46,11 +65,24 @@ export default function Input({ label, error, ...props }: InputProps) {
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <TextInput
-        style={styles.input}
-        placeholderTextColor={colors.inputPlaceholder}
-        {...props}
-      />
+      <View style={styles.inputWrapper}>
+        <TextInput
+          style={styles.input}
+          placeholderTextColor={colors.inputPlaceholder}
+          secureTextEntry={secureTextEntry ? !isPasswordVisible : undefined}
+          {...props}
+        />
+        {secureTextEntry ? (
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={isPasswordVisible ? 'Hide password' : 'Show password'}
+            onPress={() => setIsPasswordVisible(v => !v)}
+            style={styles.eyeButton}
+          >
+            <Text style={styles.eyeText}>{isPasswordVisible ? '🙈' : '👁️'}</Text>
+          </TouchableOpacity>
+        ) : null}
+      </View>
       {error && <Text style={styles.error}>{error}</Text>}
     </View>
   );
