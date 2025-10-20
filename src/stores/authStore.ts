@@ -62,11 +62,14 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
         console.log('AuthStore: Prefetch jobs failed, continuing.', prefetchError);
       }
 
-      set({
-        user: resolvedUser ?? null,
-        isAuthenticated: true,
-        isLoading: false,
-      });
+      // 4) Enforce role: only USER can access the app
+      if (resolvedUser && (resolvedUser as any).role && (resolvedUser as any).role !== 'USER') {
+        await AsyncStorage.removeItem(TOKEN_KEY);
+        set({ user: null, isAuthenticated: false, isLoading: false, error: 'Only USER accounts can use this app.' });
+        throw new Error('Only USER accounts can use this app.');
+      }
+
+      set({ user: resolvedUser ?? null, isAuthenticated: true, isLoading: false });
       console.log('AuthStore: Login successful, user authenticated (profile prefetched)');
     } catch (error) {
       console.log('AuthStore: Login error:', error);
@@ -132,11 +135,13 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
       }
 
       const response = await authApi.getProfile();
-      set({
-        user: response.user,
-        isAuthenticated: true,
-        isLoading: false,
-      });
+      const nextUser = response.user as any;
+      if (nextUser?.role && nextUser.role !== 'USER') {
+        await AsyncStorage.removeItem(TOKEN_KEY);
+        set({ user: null, isAuthenticated: false, isLoading: false });
+        return;
+      }
+      set({ user: response.user, isAuthenticated: true, isLoading: false });
     } catch {
       await AsyncStorage.removeItem(TOKEN_KEY);
       set({
