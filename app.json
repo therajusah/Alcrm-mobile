@@ -1,21 +1,25 @@
 {
   "expo": {
-    "name": "ALCRM Mobile",
+    "name": "Alcrm",
     "slug": "alcrm-mobile-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "splash": {
+      "image": "./assets/icon-a-compass.svg",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#F8F9FA"
     },
     "assetBundlePatterns": [
-      "**/*"
+      "assets/**/*",
+      "src/assets/**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.alcrm.mobile"
+      "bundleIdentifier": "com.alcrm.mobile",
+      "icon": "./assets/icon-a-compass.svg"
     },
+    "icon": "./assets/icon-a-compass.svg",
     "android": {
       "package": "com.alcrm.mobile",
       "versionCode": 1,
@@ -24,7 +28,12 @@
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.ACCESS_NETWORK_STATE"
-      ]
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon-a-compass.svg",
+        "backgroundColor": "#F8F9FA"
+      },
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.alcrm.mobile"
     },
     "web": {},
     "scheme": "alcrm",
@@ -32,6 +41,11 @@
     "plugins": [
       "expo-document-picker",
       "expo-asset"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-here"
+      }
+    }
   }
 }

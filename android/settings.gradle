@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'ALCRM Mobile'
+rootProject.name = 'Alcrm'
 
 dependencyResolutionManagement {
   versionCatalogs {

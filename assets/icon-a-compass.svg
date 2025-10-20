@@ -1,0 +1,15 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#F8F9FA"/>
+  
+  <!-- Letter A -->
+  <path d="M256 80L200 400h40l15-60h82l15 60h40L256 80zM256 140l25 100h-50l25-100z" fill="#374151"/>
+  
+  <!-- Compass accent -->
+  <circle cx="256" cy="320" r="40" stroke="#6B7280" stroke-width="3" fill="none"/>
+  <path d="M256 280v8" stroke="#6B7280" stroke-width="3" stroke-linecap="round"/>
+  <path d="M256 352v8" stroke="#6B7280" stroke-width="3" stroke-linecap="round"/>
+  <path d="M216 320h8" stroke="#6B7280" stroke-width="3" stroke-linecap="round"/>
+  <path d="M288 320h8" stroke="#6B7280" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="256" cy="320" r="3" fill="#6B7280"/>
+</svg>

@@ -96,6 +96,11 @@ android {
         
         // Enable multi-dex to handle large number of methods
         multiDexEnabled true
+        
+        // Target only essential architectures for size reduction
+        ndk {
+            abiFilters "arm64-v8a", "x86_64"
+        }
     }
     signingConfigs {
         debug {
@@ -115,12 +120,18 @@ android {
             signingConfig signingConfigs.debug
             shrinkResources true
             minifyEnabled true
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             crunchPngs true
             
-            // Additional optimizations
+            // Additional optimizations for Play Store
             zipAlignEnabled true
             debuggable false
+            
+            // R8 is enabled by default in newer Android Gradle Plugin versions
+            
+            // Additional build optimizations
+            buildConfigField "boolean", "DEBUG", "false"
+            buildConfigField "boolean", "RELEASE", "true"
         }
     }
     packagingOptions {
