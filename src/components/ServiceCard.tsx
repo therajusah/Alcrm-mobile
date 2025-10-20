@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useTheme } from '../contexts/ThemeContext';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 interface ServiceCardProps {
@@ -19,24 +20,25 @@ export default function ServiceCard({
   description,
   onPress,
 }: ServiceCardProps) {
+  const { colors } = useTheme();
   return (
-    <View style={styles.card}>
-      <View style={styles.iconContainer}>
-        <Icon name={icon} size={28} color="#FFF" />
+    <View style={[styles.card, { backgroundColor: colors.surface }]}>
+      <View style={[styles.iconContainer, { backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border }]}>
+        <Icon name={icon} size={28} color={colors.primary} />
       </View>
 
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
       {description && (
-        <Text style={styles.description} numberOfLines={2}>
+        <Text style={[styles.description, { color: colors.textSecondary }]} numberOfLines={2}>
           {description}
         </Text>
       )}
-      <Text style={styles.duration}>{duration} minutes</Text>
+      <Text style={[styles.duration, { color: colors.textTertiary }]}>{duration} minutes</Text>
 
-      <Text style={styles.price}>₹{price.toLocaleString()}</Text>
+      <Text style={[styles.price, { color: colors.primary }]}>₹{price.toLocaleString()}</Text>
 
-      <TouchableOpacity style={styles.button} onPress={onPress}>
-        <Text style={styles.buttonText}>Book Now</Text>
+      <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary, borderRadius: 9999 }]} onPress={onPress}>
+        <Text style={[styles.buttonText, { color: colors.textInverse }]}>Book Now</Text>
       </TouchableOpacity>
     </View>
   );
@@ -61,7 +63,6 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#388E3C',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -87,18 +88,15 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#388E3C',
     marginBottom: 16,
   },
   button: {
-    backgroundColor: '#388E3C',
     paddingVertical: 10,
     paddingHorizontal: 24,
     borderRadius: 10,
     width: '100%',
   },
   buttonText: {
-    color: '#FFF',
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',
