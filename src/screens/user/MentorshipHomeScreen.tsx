@@ -7,7 +7,7 @@ import {
   StyleSheet,
   RefreshControl,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useMentorshipStore } from '../../stores/mentorshipStore';
 import ServiceCard from '../../components/ServiceCard';
@@ -69,6 +69,14 @@ export default function MentorshipHomeScreen() {
   );
   const [refreshing, setRefreshing] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  // When coming back from other screens (e.g., My Sessions), default to Services
+  useFocusEffect(
+    React.useCallback(() => {
+      setActiveTab('services');
+      return undefined;
+    }, [])
+  );
 
   const styles = StyleSheet.create({
     container: {
