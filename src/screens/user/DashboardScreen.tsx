@@ -133,11 +133,14 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: 8,
+      flexWrap: 'wrap',
     },
     jobMetaText: {
       color: colors.textSecondary,
       fontSize: 14,
       marginRight: 16,
+      flex: 1,
+      minWidth: 0,
     },
     jobFooter: {
       flexDirection: 'row',

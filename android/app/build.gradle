@@ -19,9 +19,6 @@ react {
     cliFile = new File(["node", "--print", "require.resolve('@expo/cli', { paths: [require.resolve('expo/package.json')] })"].execute(null, rootDir).text.trim())
     bundleCommand = "export:embed"
 
-    // Disable new architecture to avoid CMake issues
-    newArchEnabled = false
-
     /* Folders */
      //   The root of your project, i.e. where "package.json" lives. Default is '../..'
     // root = file("../../")
@@ -89,21 +86,23 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.alcrm.mobile'
+    namespace "com.alcrm"
     defaultConfig {
-        applicationId 'com.alcrm.mobile'
+        applicationId "com.alcrm"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0"
         
-        // Enable multi-dex to handle large number of methods
-        multiDexEnabled true
-        
-        // Target only ARM64 for smaller APK size (most common architecture)
+        // Support most devices: ARM32 + ARM64 (excludes x86 for smaller size)
         ndk {
-            abiFilters "arm64-v8a"
+            abiFilters "armeabi-v7a", "arm64-v8a"
         }
+        
+        // Disable unused features
+        buildConfigField "boolean", "ENABLE_CRASHLYTICS", "false"
+        buildConfigField "boolean", "ENABLE_ANALYTICS", "false"
+        buildConfigField "boolean", "ENABLE_FIREBASE", "false"
     }
     signingConfigs {
         debug {
@@ -121,33 +120,31 @@ android {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.debug
+            
+            // AGGRESSIVE OPTIMIZATION FOR MINIMAL SIZE
             shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             crunchPngs true
             
-            // Additional optimizations for Play Store
+            // Additional optimizations
             zipAlignEnabled true
             debuggable false
             
-            // R8 is enabled by default in newer Android Gradle Plugin versions
-            
-            // Additional build optimizations
+            // Build optimizations
             buildConfigField "boolean", "DEBUG", "false"
             buildConfigField "boolean", "RELEASE", "true"
             
             // Disable unused features
             buildConfigField "boolean", "ENABLE_CRASHLYTICS", "false"
             buildConfigField "boolean", "ENABLE_ANALYTICS", "false"
+            buildConfigField "boolean", "ENABLE_FIREBASE", "false"
         }
     }
     packagingOptions {
         jniLibs {
             useLegacyPackaging (findProperty('expo.useLegacyPackaging')?.toBoolean() ?: false)
         }
-        pickFirst '**/libreactnative.so'
-        pickFirst '**/libjsc.so'
-        pickFirst '**/libhermes.so'
     }
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'

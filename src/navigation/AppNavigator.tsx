@@ -54,11 +54,12 @@ function UserTabs() {
           borderTopColor: colors.border,
           paddingBottom: 8,
           paddingTop: 8,
-          height: 60,
+          height: 70,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '600',
+          marginTop: 2,
         },
         headerStyle: {
           backgroundColor: colors.surface,
@@ -91,6 +92,7 @@ function UserTabs() {
         component={ApplicationsScreen}
         options={{
           headerTitle: 'My Applications',
+          tabBarLabel: 'Applied',
           tabBarIcon: ({ color }) => <TabIcon icon="📋" color={color} />,
         }}
       />
@@ -99,6 +101,7 @@ function UserTabs() {
         component={ResourcesScreen}
         options={{
           headerTitle: 'Free Resources',
+          tabBarLabel: 'Resources',
           tabBarIcon: ({ color }) => <TabIcon icon="📚" color={color} />,
         }}
       />
@@ -107,6 +110,7 @@ function UserTabs() {
         component={MentorshipHomeScreen}
         options={{
           headerTitle: 'Mentorship',
+          tabBarLabel: 'Mentors',
           tabBarIcon: ({ color }) => <TabIcon icon="🎯" color={color} />,
         }}
       />

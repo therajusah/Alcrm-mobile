@@ -170,6 +170,7 @@ export default function JobsScreen({ navigation }: JobsScreenProps) {
                     flexDirection: 'row',
                     alignItems: 'center',
                     marginBottom: 12,
+                    flexWrap: 'wrap',
                   }}
                 >
                   <Text
@@ -177,7 +178,10 @@ export default function JobsScreen({ navigation }: JobsScreenProps) {
                       color: colors.textSecondary,
                       fontSize: 14,
                       marginRight: 16,
+                      flex: 1,
+                      minWidth: 0,
                     }}
+                    numberOfLines={1}
                   >
                     📍 {job.location}
                   </Text>
@@ -185,7 +189,10 @@ export default function JobsScreen({ navigation }: JobsScreenProps) {
                     style={{
                       color: colors.textSecondary,
                       fontSize: 14,
+                      flex: 1,
+                      minWidth: 0,
                     }}
+                    numberOfLines={1}
                   >
                     💰 {job.salary ? `₹${job.salary}L` : 'Salary not specified'}
                   </Text>

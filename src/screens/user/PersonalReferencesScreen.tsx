@@ -578,7 +578,17 @@ export default function PersonalReferencesScreen() {
         let parsedNotes: any = {};
         try {
           parsedNotes = session.notes ? JSON.parse(session.notes) : {};
-        } catch {
+        } catch (error) {
+          // Log the JSON parsing error with context for debugging
+          console.error('Failed to parse session notes JSON:', {
+            sessionId: session.session_id,
+            sessionType: session.session_type,
+            rawNotes: session.notes,
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+            timestamp: new Date().toISOString()
+          });
+          
           // If parsing fails, use the notes as-is
           parsedNotes = { message: session.notes };
         }
