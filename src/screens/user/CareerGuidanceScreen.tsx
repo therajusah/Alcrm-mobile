@@ -138,7 +138,7 @@ export default function CareerGuidanceScreen() {
       marginBottom: 4,
     },
     statLabel: {
-      fontSize: 12,
+      fontSize:10,
       color: colors.textSecondary,
       textAlign: 'center',
     },
