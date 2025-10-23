@@ -5,12 +5,15 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   TextInput,
+  Modal,
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
+import { useModernAlert } from '../../hooks/useModernAlert';
+import ModernAlert from '../../components/ModernAlert';
+import { userApi } from '../../services/api';
 
 interface ReferenceSession {
   session_id: string;
@@ -30,6 +33,7 @@ interface ReferenceSession {
 
 export default function PersonalReferencesScreen() {
   const { colors } = useTheme();
+  const { showAlert, hideAlert, alertState } = useModernAlert();
   const [isLoading, setIsLoading] = useState(false);
   const [referenceSessions, setReferenceSessions] = useState<
     ReferenceSession[]
@@ -44,6 +48,11 @@ export default function PersonalReferencesScreen() {
     experience_level: '',
     target_role: '',
   });
+  const [dropdownVisible, setDropdownVisible] = useState({
+    organization: false,
+    experience: false,
+    role: false,
+  });
 
   const styles = StyleSheet.create({
     container: {
@@ -51,8 +60,8 @@ export default function PersonalReferencesScreen() {
       backgroundColor: colors.background,
     },
     content: {
-      paddingHorizontal: 24,
-      paddingVertical: 24,
+      paddingHorizontal: 20,
+      paddingVertical: 20,
     },
     header: {
       marginBottom: 24,
@@ -69,71 +78,78 @@ export default function PersonalReferencesScreen() {
       lineHeight: 24,
     },
     usageTracker: {
-      backgroundColor: `${colors.info}10`,
-      borderRadius: 12,
-      padding: 16,
+      backgroundColor: `${colors.info}15`,
+      borderRadius: 16,
+      padding: 20,
       marginBottom: 24,
       borderWidth: 1,
-      borderColor: `${colors.info}20`,
+      borderColor: `${colors.info}30`,
     },
     usageTitle: {
-      fontSize: 14,
-      fontWeight: '600',
+      fontSize: 16,
+      fontWeight: '700',
       color: colors.info,
       marginBottom: 8,
     },
     usageText: {
-      fontSize: 12,
+      fontSize: 14,
       color: colors.textSecondary,
     },
     formTitle: {
-      fontSize: 20,
+      fontSize: 22,
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 8,
     },
     formDescription: {
-      fontSize: 14,
+      fontSize: 16,
       color: colors.textSecondary,
-      marginBottom: 20,
+      marginBottom: 24,
+      lineHeight: 22,
     },
     formSection: {
-      marginBottom: 20,
+      marginBottom: 24,
     },
     formLabel: {
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: '600',
       color: colors.text,
-      marginBottom: 8,
+      marginBottom: 12,
     },
     formInput: {
       backgroundColor: colors.surfaceSecondary,
-      borderRadius: 8,
+      borderRadius: 12,
       paddingHorizontal: 16,
-      paddingVertical: 12,
-      fontSize: 14,
+      paddingVertical: 16,
+      fontSize: 16,
       color: colors.text,
       marginBottom: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     formTextArea: {
       backgroundColor: colors.surfaceSecondary,
-      borderRadius: 8,
+      borderRadius: 12,
       paddingHorizontal: 16,
-      paddingVertical: 12,
-      fontSize: 14,
+      paddingVertical: 16,
+      fontSize: 16,
       color: colors.text,
       marginBottom: 16,
       minHeight: 120,
       textAlignVertical: 'top',
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     organizationSelector: {
       backgroundColor: colors.surfaceSecondary,
-      borderRadius: 8,
+      borderRadius: 12,
       marginBottom: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     organizationItem: {
       paddingVertical: 16,
-      paddingHorizontal: 16,
+      paddingHorizontal: 20,
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
     },
@@ -144,10 +160,10 @@ export default function PersonalReferencesScreen() {
       fontSize: 16,
       fontWeight: '600',
       color: colors.text,
-      marginBottom: 4,
+      marginBottom: 6,
     },
     organizationDescription: {
-      fontSize: 12,
+      fontSize: 14,
       color: colors.textSecondary,
       marginBottom: 8,
     },
@@ -158,20 +174,22 @@ export default function PersonalReferencesScreen() {
     },
     companyBadge: {
       backgroundColor: `${colors.primary}20`,
-      paddingHorizontal: 8,
+      paddingHorizontal: 10,
       paddingVertical: 4,
       borderRadius: 12,
     },
     companyBadgeText: {
-      fontSize: 10,
+      fontSize: 12,
       color: colors.primary,
       fontWeight: '500',
     },
     selectedOrgInfo: {
       backgroundColor: colors.surfaceSecondary,
-      borderRadius: 8,
-      padding: 12,
+      borderRadius: 12,
+      padding: 16,
       marginBottom: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     selectedOrgTitle: {
       fontSize: 14,
@@ -186,17 +204,26 @@ export default function PersonalReferencesScreen() {
     },
     submitButton: {
       backgroundColor: colors.info,
-      paddingVertical: 16,
-      borderRadius: 8,
+      paddingVertical: 18,
+      borderRadius: 30,
       alignItems: 'center',
+      marginBottom: 24,
+      shadowColor: colors.info,
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
     },
     submitButtonText: {
       color: colors.textInverse,
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: '600',
     },
     serviceTitle: {
-      fontSize: 18,
+      fontSize: 20,
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 16,
@@ -207,9 +234,9 @@ export default function PersonalReferencesScreen() {
       marginBottom: 12,
     },
     featureIcon: {
-      width: 20,
-      height: 20,
-      borderRadius: 10,
+      width: 24,
+      height: 24,
+      borderRadius: 12,
       backgroundColor: `${colors.success}20`,
       alignItems: 'center',
       justifyContent: 'center',
@@ -217,28 +244,30 @@ export default function PersonalReferencesScreen() {
     },
     featureText: {
       flex: 1,
-      fontSize: 14,
+      fontSize: 16,
       color: colors.textSecondary,
     },
     pricingCard: {
-      backgroundColor: `${colors.info}10`,
-      borderRadius: 12,
-      padding: 16,
+      backgroundColor: `${colors.info}15`,
+      borderRadius: 16,
+      padding: 20,
       marginBottom: 16,
+      borderWidth: 1,
+      borderColor: `${colors.info}30`,
     },
     pricingTitle: {
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: 'bold',
       color: colors.info,
       marginBottom: 8,
     },
     pricingAmount: {
-      fontSize: 24,
+      fontSize: 32,
       fontWeight: 'bold',
       color: colors.info,
     },
     pricingDescription: {
-      fontSize: 12,
+      fontSize: 14,
       color: colors.textSecondary,
       marginTop: 4,
     },
@@ -246,7 +275,7 @@ export default function PersonalReferencesScreen() {
       marginTop: 24,
     },
     requestsTitle: {
-      fontSize: 20,
+      fontSize: 22,
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 16,
@@ -264,6 +293,7 @@ export default function PersonalReferencesScreen() {
     requestDate: {
       fontSize: 12,
       color: colors.textTertiary,
+      marginLeft: 8,
     },
     requestActions: {
       flexDirection: 'row',
@@ -272,7 +302,7 @@ export default function PersonalReferencesScreen() {
     actionButton: {
       paddingHorizontal: 12,
       paddingVertical: 6,
-      borderRadius: 6,
+      borderRadius: 8,
       borderWidth: 1,
       borderColor: colors.border,
     },
@@ -293,7 +323,7 @@ export default function PersonalReferencesScreen() {
       marginTop: 12,
     },
     ratingTitle: {
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: '600',
       color: colors.text,
       marginBottom: 8,
@@ -303,47 +333,168 @@ export default function PersonalReferencesScreen() {
       marginBottom: 8,
     },
     starButton: {
-      width: 24,
-      height: 24,
+      width: 32,
+      height: 32,
       alignItems: 'center',
       justifyContent: 'center',
       marginRight: 4,
     },
     starText: {
-      fontSize: 16,
+      fontSize: 20,
     },
     ratingInput: {
       backgroundColor: colors.surfaceSecondary,
-      borderRadius: 8,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      fontSize: 14,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      fontSize: 16,
       color: colors.text,
       marginBottom: 8,
-      minHeight: 60,
+      minHeight: 80,
       textAlignVertical: 'top',
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     ratingSubmitButton: {
       backgroundColor: colors.primary,
-      paddingVertical: 8,
-      paddingHorizontal: 16,
-      borderRadius: 6,
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderRadius: 8,
       alignSelf: 'flex-start',
     },
     ratingSubmitText: {
       color: colors.textInverse,
-      fontSize: 12,
+      fontSize: 14,
       fontWeight: '500',
     },
     completedRating: {
-      backgroundColor: `${colors.success}10`,
-      borderRadius: 8,
-      padding: 12,
+      backgroundColor: `${colors.success}15`,
+      borderRadius: 12,
+      padding: 16,
       marginTop: 12,
+      borderWidth: 1,
+      borderColor: `${colors.success}30`,
     },
     completedRatingText: {
-      fontSize: 12,
+      fontSize: 14,
       color: colors.success,
+      fontWeight: '500',
+    },
+    selectorItem: {
+      paddingVertical: 14,
+      paddingHorizontal: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    selectorItemLast: {
+      borderBottomWidth: 0,
+    },
+    selectorText: {
+      fontSize: 16,
+      color: colors.text,
+    },
+    selectorTextSelected: {
+      color: colors.primary,
+      fontWeight: '600',
+    },
+    tipText: {
+      fontSize: 12,
+      color: colors.textTertiary,
+      fontStyle: 'italic',
+      marginTop: 4,
+    },
+    feedbackSection: {
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: 12,
+      padding: 16,
+      marginTop: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    feedbackTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 8,
+    },
+    feedbackText: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      lineHeight: 22,
+    },
+    dropdownContainer: {
+      position: 'relative',
+    },
+    dropdownButton: {
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    dropdownButtonText: {
+      fontSize: 16,
+      color: colors.text,
+    },
+    dropdownButtonPlaceholder: {
+      fontSize: 16,
+      color: colors.inputPlaceholder,
+    },
+    dropdownArrow: {
+      fontSize: 16,
+      color: colors.textSecondary,
+    },
+    dropdownModal: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    dropdownContent: {
+      backgroundColor: colors.surfaceSecondary,
+      borderRadius: 12,
+      marginHorizontal: 20,
+      maxHeight: 400,
+      width: '90%',
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    dropdownItem: {
+      paddingVertical: 16,
+      paddingHorizontal: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    dropdownItemLast: {
+      borderBottomWidth: 0,
+    },
+    dropdownItemText: {
+      fontSize: 16,
+      color: colors.text,
+    },
+    dropdownItemSelected: {
+      backgroundColor: `${colors.primary}10`,
+    },
+    dropdownItemTextSelected: {
+      color: colors.primary,
+      fontWeight: '600',
+    },
+    dropdownCloseButton: {
+      backgroundColor: colors.primary,
+      paddingVertical: 16,
+      paddingHorizontal: 20,
+      borderRadius: 12,
+      margin: 20,
+      alignItems: 'center',
+    },
+    dropdownCloseButtonText: {
+      color: colors.textInverse,
+      fontSize: 16,
+      fontWeight: '600',
     },
   });
 
@@ -414,34 +565,46 @@ export default function PersonalReferencesScreen() {
 
   const loadReferenceSessions = useCallback(async () => {
     try {
-      // Mock data for now - replace with actual API call
-      const mockSessions = [
-        {
-          session_id: '1',
-          session_type: 'PERSONAL_REFERENCE',
-          status: 'PENDING',
-          created_at: new Date().toISOString(),
-          notes:
-            'Organization: Big 4 Firms, Experience: Mid Level, Message: Looking for audit role',
-          session_rating: null,
-          session_feedback: null,
-        },
-        {
-          session_id: '2',
-          session_type: 'PERSONAL_REFERENCE',
-          status: 'COMPLETED',
-          created_at: new Date(
-            Date.now() - 10 * 24 * 60 * 60 * 1000
-          ).toISOString(),
-          notes:
-            'Organization: Banks & Financial Services, Experience: Senior Level, Message: Seeking management role',
-          session_rating: 5,
-          session_feedback: 'Excellent service!',
-        },
-      ];
-      setReferenceSessions(mockSessions);
+      // Load personal reference sessions from API
+      const response = await userApi.getMySessions({
+        session_type: 'PERSONAL_REFERENCE',
+        page: 1,
+        pageSize: 50,
+      });
+      
+      // Transform the response to match our interface
+      const sessions = response.items.map(session => {
+        // Parse the notes field to extract personal reference data
+        let parsedNotes: any = {};
+        try {
+          parsedNotes = session.notes ? JSON.parse(session.notes) : {};
+        } catch {
+          // If parsing fails, use the notes as-is
+          parsedNotes = { message: session.notes };
+        }
+        
+        return {
+          session_id: session.session_id,
+          session_type: session.session_type,
+          status: session.status,
+          created_at: session.created_at,
+          notes: session.notes,
+          session_rating: session.session_rating,
+          session_feedback: session.session_feedback,
+          target_organization: parsedNotes.target_organization,
+          specific_company: parsedNotes.specific_company,
+          experience_level: parsedNotes.experience_level,
+          target_role: parsedNotes.target_role,
+          message: parsedNotes.message,
+          mentor_notes: session.mentor_notes,
+        };
+      });
+      
+      setReferenceSessions(sessions);
     } catch (error) {
       console.error('Error loading reference sessions:', error);
+      // Fallback to empty array if API fails
+      setReferenceSessions([]);
     }
   }, []);
 
@@ -451,15 +614,26 @@ export default function PersonalReferencesScreen() {
 
   const handleSubmitRequest = async () => {
     if (requestsRemaining <= 0) {
-      Alert.alert(
+      showAlert(
         'Limit Reached',
-        'You have reached the maximum number of reference requests (3)'
+        'You have reached the maximum number of reference requests (3)',
+        [
+          {
+            text: 'OK',
+            onPress: hideAlert,
+          },
+        ]
       );
       return;
     }
 
     if (!formData.target_organization || !formData.message.trim()) {
-      Alert.alert('Required', 'Please fill in all required fields');
+      showAlert('Required', 'Please fill in all required fields', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       return;
     }
 
@@ -470,9 +644,15 @@ export default function PersonalReferencesScreen() {
         s.session_type === 'PERSONAL_REFERENCE'
     );
     if (duplicate) {
-      Alert.alert(
+      showAlert(
         'Duplicate',
-        'You already have a pending reference request in progress'
+        'You already have a pending reference request in progress',
+        [
+          {
+            text: 'OK',
+            onPress: hideAlert,
+          },
+        ]
       );
       return;
     }
@@ -480,12 +660,24 @@ export default function PersonalReferencesScreen() {
     try {
       setIsLoading(true);
 
-      // Mock API call - replace with actual implementation
-      await new Promise<void>(resolve => {
-        global.setTimeout(resolve, 1000);
+      // Submit personal reference request via API
+      await userApi.bookSession({
+        session_type: 'PERSONAL_REFERENCE',
+        notes: JSON.stringify({
+          target_organization: formData.target_organization,
+          specific_company: formData.specific_company,
+          experience_level: formData.experience_level,
+          target_role: formData.target_role,
+          message: formData.message,
+        }),
       });
 
-      Alert.alert('Success', 'Reference request submitted successfully!');
+      showAlert('Success', 'Reference request submitted successfully!', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       setFormData({
         target_organization: '',
         specific_company: '',
@@ -496,53 +688,96 @@ export default function PersonalReferencesScreen() {
       loadReferenceSessions();
     } catch (error) {
       console.error('Error requesting reference:', error);
-      Alert.alert('Error', 'Failed to submit reference request');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit reference request';
+      showAlert('Error', errorMessage, [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const submitRating = async (_id: string) => {
-    const rs = ratingState[_id];
+  const submitRating = async (sessionId: string) => {
+    const rs = ratingState[sessionId];
     if (!rs || rs.submitting || (!rs.rating && !rs.feedback)) return;
 
-    setRatingState(prev => ({ ...prev, [_id]: { ...rs, submitting: true } }));
+    setRatingState(prev => ({ ...prev, [sessionId]: { ...rs, submitting: true } }));
     try {
-      // Mock API call - replace with actual implementation
-      await new Promise<void>(resolve => {
-        global.setTimeout(resolve, 1000);
-      });
-      Alert.alert('Success', 'Feedback submitted');
+      // Submit rating via API
+      await userApi.rateSession(sessionId, rs.rating, rs.feedback);
+      
+      showAlert('Success', 'Feedback submitted', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       loadReferenceSessions();
-    } catch {
-      Alert.alert('Error', 'Failed to submit feedback');
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit feedback';
+      showAlert('Error', errorMessage, [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
     } finally {
       setRatingState(prev => ({
         ...prev,
-        [_id]: { ...prev[_id], submitting: false },
+        [sessionId]: { ...prev[sessionId], submitting: false },
       }));
     }
   };
 
-  const cancelSession = async (_id: string) => {
-    Alert.alert(
+  const cancelSession = async (sessionId: string) => {
+    showAlert(
       'Cancel Request',
       'Are you sure you want to cancel this reference request?',
       [
-        { text: 'No', style: 'cancel' },
+        { 
+          text: 'No', 
+          style: 'cancel', 
+          onPress: () => {
+            hideAlert();
+          }
+        },
         {
           text: 'Yes, Cancel',
           style: 'destructive',
           onPress: async () => {
+            hideAlert();
             try {
-              // Mock API call - replace with actual implementation
-              await new Promise<void>(resolve => {
-                global.setTimeout(resolve, 1000);
-              });
-              Alert.alert('Success', 'Request cancelled successfully');
-              loadReferenceSessions();
-            } catch {
-              Alert.alert('Error', 'Failed to cancel request');
+              // Call the real API to cancel the session
+              await userApi.cancelSession(sessionId);
+              
+              // Update the session status to cancelled
+              setReferenceSessions(prev => 
+                prev.map(session => 
+                  session.session_id === sessionId 
+                    ? { ...session, status: 'CANCELLED' }
+                    : session
+                )
+              );
+              
+              showAlert('Success', 'Request cancelled successfully', [
+                {
+                  text: 'OK',
+                  onPress: hideAlert,
+                },
+              ]);
+            } catch (error) {
+              console.error('Error cancelling session:', error);
+              const errorMessage = error instanceof Error ? error.message : 'Failed to cancel request';
+              showAlert('Error', errorMessage, [
+                {
+                  text: 'OK',
+                  onPress: hideAlert,
+                },
+              ]);
             }
           },
         },
@@ -569,6 +804,86 @@ export default function PersonalReferencesScreen() {
     org => org.id === formData.target_organization
   );
 
+  const DropdownComponent = ({ 
+    label, 
+    placeholder, 
+    options, 
+    selectedValue, 
+    onSelect, 
+    isVisible, 
+    onClose,
+    renderItem 
+  }: {
+    label: string;
+    placeholder: string;
+    options: any[];
+    selectedValue: string;
+    onSelect: (value: string) => void;
+    isVisible: boolean;
+    onClose: () => void;
+    renderItem?: (item: any, isSelected: boolean) => React.ReactNode;
+  }) => {
+    const selectedOption = options.find(opt => opt.id === selectedValue || opt === selectedValue);
+    
+    return (
+      <View style={styles.formSection}>
+        <Text style={styles.formLabel}>{label}</Text>
+        <TouchableOpacity
+          style={styles.dropdownButton}
+          onPress={() => onClose()}
+        >
+          <Text style={selectedOption ? styles.dropdownButtonText : styles.dropdownButtonPlaceholder}>
+            {selectedOption ? (selectedOption.name || selectedOption) : placeholder}
+          </Text>
+          <Text style={styles.dropdownArrow}>▼</Text>
+        </TouchableOpacity>
+
+        <Modal
+          visible={isVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={onClose}
+        >
+          <View style={styles.dropdownModal}>
+            <View style={styles.dropdownContent}>
+              <ScrollView>
+                {options.map((option, index) => {
+                  const isSelected = (option.id || option) === selectedValue;
+                  return (
+                    <TouchableOpacity
+                      key={option.id || index}
+                      style={[
+                        styles.dropdownItem,
+                        index === options.length - 1 && styles.dropdownItemLast,
+                        isSelected && styles.dropdownItemSelected,
+                      ]}
+                      onPress={() => {
+                        onSelect(option.id || option);
+                        onClose();
+                      }}
+                    >
+                      {renderItem ? renderItem(option, isSelected) : (
+                        <Text style={[
+                          styles.dropdownItemText,
+                          isSelected && styles.dropdownItemTextSelected,
+                        ]}>
+                          {option.name || option}
+                        </Text>
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+              <TouchableOpacity style={styles.dropdownCloseButton} onPress={onClose}>
+                <Text style={styles.dropdownCloseButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    );
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
@@ -583,291 +898,199 @@ export default function PersonalReferencesScreen() {
           </Text>
         </View>
 
-        <View style={{ flexDirection: 'row', gap: 16 }}>
-          {/* Request Form */}
-          <View style={{ flex: 1 }}>
-            <Card>
-              <Text style={styles.formTitle}>Submit Reference Request</Text>
-              <Text style={styles.formDescription}>
-                Get connected to hiring managers and decision makers at your
-                target organizations
+        {/* Request Form */}
+        <Card>
+          <Text style={styles.formTitle}>Submit Reference Request</Text>
+          <Text style={styles.formDescription}>
+            Get connected to hiring managers and decision makers at your
+            target organizations
+          </Text>
+
+          {requestsRemaining <= 0 ? (
+            <View
+              style={{
+                padding: 16,
+                backgroundColor: `${colors.error}10`,
+                borderRadius: 8,
+              }}
+            >
+              <Text style={{ color: colors.error, fontSize: 14 }}>
+                You have reached the maximum number of reference requests
+                (3). Please wait for your current requests to be processed.
               </Text>
+            </View>
+          ) : (
+            <>
+              {/* Target Organization */}
+              <DropdownComponent
+                label="Target Organization Type *"
+                placeholder="Select Organization Type"
+                options={organizations}
+                selectedValue={formData.target_organization}
+                onSelect={(value) => setFormData(prev => ({ ...prev, target_organization: value }))}
+                isVisible={dropdownVisible.organization}
+                onClose={() => setDropdownVisible(prev => ({ ...prev, organization: !prev.organization }))}
+                renderItem={(org, isSelected) => (
+                  <View>
+                    <Text style={[
+                      styles.dropdownItemText,
+                      isSelected && styles.dropdownItemTextSelected,
+                    ]}>
+                      {org.name}
+                    </Text>
+                    <Text style={[styles.organizationDescription, { marginTop: 4 }]}>
+                      {org.description}
+                    </Text>
+                    <View style={styles.organizationCompanies}>
+                      {org.companies.slice(0, 3).map((company: string) => (
+                        <View key={company} style={styles.companyBadge}>
+                          <Text style={styles.companyBadgeText}>
+                            {company}
+                          </Text>
+                        </View>
+                      ))}
+                      {org.companies.length > 3 && (
+                        <View style={styles.companyBadge}>
+                          <Text style={styles.companyBadgeText}>
+                            +{org.companies.length - 3} more
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                )}
+              />
 
-              {requestsRemaining <= 0 ? (
-                <View
-                  style={{
-                    padding: 16,
-                    backgroundColor: `${colors.error}10`,
-                    borderRadius: 8,
-                  }}
-                >
-                  <Text style={{ color: colors.error, fontSize: 14 }}>
-                    You have reached the maximum number of reference requests
-                    (3). Please wait for your current requests to be processed.
+              {selectedOrg && (
+                <View style={styles.selectedOrgInfo}>
+                  <Text style={styles.selectedOrgTitle}>
+                    Popular companies in this category:
                   </Text>
-                </View>
-              ) : (
-                <>
-                  {/* Target Organization */}
-                  <View style={styles.formSection}>
-                    <Text style={styles.formLabel}>
-                      Target Organization Type *
-                    </Text>
-                    <View style={styles.organizationSelector}>
-                      {organizations.map((org, index) => (
-                        <TouchableOpacity
-                          key={org.id}
-                          style={[
-                            styles.organizationItem,
-                            index === organizations.length - 1 &&
-                              styles.organizationItemLast,
-                          ]}
-                          onPress={() =>
-                            setFormData(prev => ({
-                              ...prev,
-                              target_organization: org.id,
-                            }))
-                          }
-                        >
-                          <Text
-                            style={[
-                              styles.organizationName,
-                              {
-                                color:
-                                  formData.target_organization === org.id
-                                    ? colors.primary
-                                    : colors.text,
-                              },
-                            ]}
-                          >
-                            {org.name}
-                          </Text>
-                          <Text style={styles.organizationDescription}>
-                            {org.description}
-                          </Text>
-                          <View style={styles.organizationCompanies}>
-                            {org.companies.slice(0, 4).map(company => (
-                              <View key={company} style={styles.companyBadge}>
-                                <Text style={styles.companyBadgeText}>
-                                  {company}
-                                </Text>
-                              </View>
-                            ))}
-                            {org.companies.length > 4 && (
-                              <View style={styles.companyBadge}>
-                                <Text style={styles.companyBadgeText}>
-                                  +{org.companies.length - 4} more
-                                </Text>
-                              </View>
-                            )}
-                          </View>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-
-                  {selectedOrg && (
-                    <View style={styles.selectedOrgInfo}>
-                      <Text style={styles.selectedOrgTitle}>
-                        Popular companies in this category:
-                      </Text>
-                      <View style={styles.selectedOrgCompanies}>
-                        {selectedOrg.companies.map(company => (
-                          <View key={company} style={styles.companyBadge}>
-                            <Text style={styles.companyBadgeText}>
-                              {company}
-                            </Text>
-                          </View>
-                        ))}
+                  <View style={styles.selectedOrgCompanies}>
+                    {selectedOrg.companies.map(company => (
+                      <View key={company} style={styles.companyBadge}>
+                        <Text style={styles.companyBadgeText}>
+                          {company}
+                        </Text>
                       </View>
-                    </View>
-                  )}
-
-                  {/* Specific Company */}
-                  <View style={styles.formSection}>
-                    <Text style={styles.formLabel}>
-                      Specific Company (Optional)
-                    </Text>
-                    <TextInput
-                      style={styles.formInput}
-                      placeholder="Enter specific company name if you have a preference..."
-                      placeholderTextColor={colors.inputPlaceholder}
-                      value={formData.specific_company}
-                      onChangeText={(text: string) =>
-                        setFormData(prev => ({
-                          ...prev,
-                          specific_company: text,
-                        }))
-                      }
-                    />
+                    ))}
                   </View>
-
-                  {/* Experience Level */}
-                  <View style={styles.formSection}>
-                    <Text style={styles.formLabel}>Your Experience Level</Text>
-                    <View
-                      style={{
-                        backgroundColor: colors.surfaceSecondary,
-                        borderRadius: 8,
-                        marginBottom: 16,
-                      }}
-                    >
-                      {experienceLevels.map((level, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={{
-                            paddingVertical: 12,
-                            paddingHorizontal: 16,
-                            borderBottomWidth:
-                              index < experienceLevels.length - 1 ? 1 : 0,
-                            borderBottomColor: colors.border,
-                          }}
-                          onPress={() =>
-                            setFormData(prev => ({
-                              ...prev,
-                              experience_level: level,
-                            }))
-                          }
-                        >
-                          <Text
-                            style={{
-                              color:
-                                formData.experience_level === level
-                                  ? colors.primary
-                                  : colors.text,
-                              fontWeight:
-                                formData.experience_level === level
-                                  ? '600'
-                                  : '400',
-                            }}
-                          >
-                            {level}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-
-                  {/* Target Role */}
-                  <View style={styles.formSection}>
-                    <Text style={styles.formLabel}>Target Role (Optional)</Text>
-                    <View
-                      style={{
-                        backgroundColor: colors.surfaceSecondary,
-                        borderRadius: 8,
-                        marginBottom: 16,
-                      }}
-                    >
-                      {targetRoles.map((role, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={{
-                            paddingVertical: 12,
-                            paddingHorizontal: 16,
-                            borderBottomWidth:
-                              index < targetRoles.length - 1 ? 1 : 0,
-                            borderBottomColor: colors.border,
-                          }}
-                          onPress={() =>
-                            setFormData(prev => ({
-                              ...prev,
-                              target_role: role,
-                            }))
-                          }
-                        >
-                          <Text
-                            style={{
-                              color:
-                                formData.target_role === role
-                                  ? colors.primary
-                                  : colors.text,
-                              fontWeight:
-                                formData.target_role === role ? '600' : '400',
-                            }}
-                          >
-                            {role}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-
-                  {/* Message */}
-                  <View style={styles.formSection}>
-                    <Text style={styles.formLabel}>
-                      Your Background & Requirements *
-                    </Text>
-                    <TextInput
-                      style={styles.formTextArea}
-                      placeholder="Please describe your background, experience, and what you're looking for. Include any specific requirements or preferences..."
-                      placeholderTextColor={colors.inputPlaceholder}
-                      value={formData.message}
-                      onChangeText={(text: string) =>
-                        setFormData(prev => ({ ...prev, message: text }))
-                      }
-                      multiline
-                    />
-                    <Text style={{ fontSize: 12, color: colors.textTertiary }}>
-                      Tip: Include your domain expertise, career goals, and why
-                      you&apos;re interested in this organization
-                    </Text>
-                  </View>
-
-                  <TouchableOpacity
-                    style={styles.submitButton}
-                    onPress={handleSubmitRequest}
-                    disabled={isLoading || requestsRemaining <= 0}
-                  >
-                    <Text style={styles.submitButtonText}>
-                      {isLoading ? 'Submitting...' : 'Submit Reference Request'}
-                    </Text>
-                  </TouchableOpacity>
-                </>
+                </View>
               )}
-            </Card>
+
+              {/* Specific Company */}
+              <View style={styles.formSection}>
+                <Text style={styles.formLabel}>
+                  Specific Company (Optional)
+                </Text>
+                <TextInput
+                  style={styles.formInput}
+                  placeholder="Enter specific company name if you have a preference..."
+                  placeholderTextColor={colors.inputPlaceholder}
+                  value={formData.specific_company}
+                  onChangeText={(text: string) =>
+                    setFormData(prev => ({
+                      ...prev,
+                      specific_company: text,
+                    }))
+                  }
+                />
+              </View>
+
+              {/* Experience Level */}
+              <DropdownComponent
+                label="Your Experience Level"
+                placeholder="Select Experience Level"
+                options={experienceLevels}
+                selectedValue={formData.experience_level}
+                onSelect={(value) => setFormData(prev => ({ ...prev, experience_level: value }))}
+                isVisible={dropdownVisible.experience}
+                onClose={() => setDropdownVisible(prev => ({ ...prev, experience: !prev.experience }))}
+              />
+
+              {/* Target Role */}
+              <DropdownComponent
+                label="Target Role (Optional)"
+                placeholder="Select Target Role"
+                options={targetRoles}
+                selectedValue={formData.target_role}
+                onSelect={(value) => setFormData(prev => ({ ...prev, target_role: value }))}
+                isVisible={dropdownVisible.role}
+                onClose={() => setDropdownVisible(prev => ({ ...prev, role: !prev.role }))}
+              />
+
+              {/* Message */}
+              <View style={styles.formSection}>
+                <Text style={styles.formLabel}>
+                  Your Background & Requirements *
+                </Text>
+                <TextInput
+                  style={styles.formTextArea}
+                  placeholder="Please describe your background, experience, and what you're looking for. Include any specific requirements or preferences..."
+                  placeholderTextColor={colors.inputPlaceholder}
+                  value={formData.message}
+                  onChangeText={(text: string) =>
+                    setFormData(prev => ({ ...prev, message: text }))
+                  }
+                  multiline
+                />
+                <Text style={styles.tipText}>
+                  Tip: Include your domain expertise, career goals, and why
+                  you&apos;re interested in this organization
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={handleSubmitRequest}
+                disabled={isLoading || requestsRemaining <= 0}
+              >
+                <Text style={styles.submitButtonText}>
+                  {isLoading ? 'Submitting...' : 'Submit Reference Request'}
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </Card>
+
+        {/* Service Details */}
+        <Card>
+          <Text style={styles.serviceTitle}>What You Get</Text>
+
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              <Text style={{ color: colors.success, fontSize: 10 }}>✓</Text>
+            </View>
+            <Text style={styles.featureText}>Direct Referrals</Text>
           </View>
 
-          {/* Service Details */}
-          <View style={{ flex: 1 }}>
-            <Card>
-              <Text style={styles.serviceTitle}>What You Get</Text>
-
-              <View style={styles.featureItem}>
-                <View style={styles.featureIcon}>
-                  <Text style={{ color: colors.success, fontSize: 12 }}>✓</Text>
-                </View>
-                <Text style={styles.featureText}>Direct Referrals</Text>
-              </View>
-
-              <View style={styles.featureItem}>
-                <View style={styles.featureIcon}>
-                  <Text style={{ color: colors.success, fontSize: 12 }}>✓</Text>
-                </View>
-                <Text style={styles.featureText}>Priority Consideration</Text>
-              </View>
-
-              <View style={styles.featureItem}>
-                <View style={styles.featureIcon}>
-                  <Text style={{ color: colors.success, fontSize: 12 }}>✓</Text>
-                </View>
-                <Text style={styles.featureText}>Insider Information</Text>
-              </View>
-
-              <View style={styles.featureItem}>
-                <View style={styles.featureIcon}>
-                  <Text style={{ color: colors.success, fontSize: 12 }}>✓</Text>
-                </View>
-                <Text style={styles.featureText}>Network Access</Text>
-              </View>
-
-              <View style={styles.pricingCard}>
-                <Text style={styles.pricingTitle}>Pricing</Text>
-                <Text style={styles.pricingAmount}>₹4,999</Text>
-                <Text style={styles.pricingDescription}>per organization</Text>
-              </View>
-            </Card>
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              <Text style={{ color: colors.success, fontSize: 10 }}>✓</Text>
+            </View>
+            <Text style={styles.featureText}>Priority Consideration</Text>
           </View>
-        </View>
+
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              <Text style={{ color: colors.success, fontSize: 10 }}>✓</Text>
+            </View>
+            <Text style={styles.featureText}>Insider Information</Text>
+          </View>
+
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              <Text style={{ color: colors.success, fontSize: 10 }}>✓</Text>
+            </View>
+            <Text style={styles.featureText}>Network Access</Text>
+          </View>
+
+          <View style={styles.pricingCard}>
+            <Text style={styles.pricingTitle}>Pricing</Text>
+            <Text style={styles.pricingAmount}>₹4,999</Text>
+            <Text style={styles.pricingDescription}>per organization</Text>
+          </View>
+        </Card>
 
         {/* Previous Requests */}
         {referenceSessions.length > 0 && (
@@ -904,21 +1127,12 @@ export default function PersonalReferencesScreen() {
                 </View>
 
                 <View style={styles.requestDetails}>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: colors.textSecondary,
-                      backgroundColor: colors.surfaceSecondary,
-                      padding: 12,
-                      borderRadius: 8,
-                    }}
-                  >
-                    <Text style={{ fontWeight: '600', color: colors.text }}>
-                      Request Details:
+                  <View style={styles.feedbackSection}>
+                    <Text style={styles.feedbackTitle}>Request Details:</Text>
+                    <Text style={styles.feedbackText}>
+                      {session.notes}
                     </Text>
-                    {'\n'}
-                    {session.notes}
-                  </Text>
+                  </View>
                 </View>
 
                 {session.status === 'COMPLETED' && !session.session_rating && (
@@ -1007,6 +1221,14 @@ export default function PersonalReferencesScreen() {
             ))}
           </View>
         )}
+
+        <ModernAlert
+          visible={alertState.visible}
+          title={alertState.title}
+          message={alertState.message}
+          buttons={alertState.buttons}
+          onClose={hideAlert}
+        />
       </View>
     </ScrollView>
   );

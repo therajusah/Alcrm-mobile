@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   TextInput,
 } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
@@ -13,6 +12,8 @@ import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
 import { userApi } from '../../services/api';
+import { useModernAlert } from '../../hooks/useModernAlert';
+import ModernAlert from '../../components/ModernAlert';
 
 interface ReviewRequest {
   session_id: string;
@@ -33,6 +34,7 @@ interface FileData {
 
 export default function CVReviewScreen() {
   const { colors } = useTheme();
+  const { showAlert, hideAlert, alertState } = useModernAlert();
   const [isLoading, setIsLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [reviewRequests, setReviewRequests] = useState<ReviewRequest[]>([]);
@@ -54,8 +56,8 @@ export default function CVReviewScreen() {
       backgroundColor: colors.background,
     },
     content: {
-      paddingHorizontal: 24,
-      paddingVertical: 24,
+      paddingHorizontal: 20,
+      paddingVertical: 20,
     },
     header: {
       marginBottom: 24,
@@ -72,36 +74,37 @@ export default function CVReviewScreen() {
       lineHeight: 24,
     },
     usageTracker: {
-      backgroundColor: `${colors.primary}10`,
-      borderRadius: 12,
-      padding: 16,
+      backgroundColor: `${colors.primary}15`,
+      borderRadius: 16,
+      padding: 20,
       marginBottom: 24,
       borderWidth: 1,
-      borderColor: `${colors.primary}20`,
+      borderColor: `${colors.primary}30`,
     },
     usageTitle: {
-      fontSize: 14,
-      fontWeight: '600',
+      fontSize: 16,
+      fontWeight: '700',
       color: colors.primary,
       marginBottom: 8,
     },
     usageText: {
-      fontSize: 12,
+      fontSize: 14,
       color: colors.textSecondary,
     },
     formTitle: {
-      fontSize: 20,
+      fontSize: 22,
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 8,
     },
     formDescription: {
-      fontSize: 14,
+      fontSize: 16,
       color: colors.textSecondary,
-      marginBottom: 20,
+      marginBottom: 24,
+      lineHeight: 22,
     },
     radioGroup: {
-      marginBottom: 20,
+      marginBottom: 24,
     },
     radioOption: {
       flexDirection: 'row',
@@ -131,7 +134,7 @@ export default function CVReviewScreen() {
     },
     radioLabel: {
       flex: 1,
-      fontSize: 14,
+      fontSize: 16,
       color: colors.text,
     },
     statusBadge: {
@@ -157,10 +160,10 @@ export default function CVReviewScreen() {
       color: colors.error,
     },
     fileInput: {
-      marginBottom: 20,
+      marginBottom: 24,
     },
     fileInputLabel: {
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: '600',
       color: colors.text,
       marginBottom: 8,
@@ -169,36 +172,45 @@ export default function CVReviewScreen() {
       backgroundColor: colors.surfaceSecondary,
       borderWidth: 1,
       borderColor: colors.border,
-      borderRadius: 8,
-      paddingVertical: 12,
+      borderRadius: 12,
+      paddingVertical: 16,
       paddingHorizontal: 16,
       alignItems: 'center',
     },
     fileButtonText: {
       color: colors.text,
-      fontSize: 14,
+      fontSize: 16,
     },
     selectedFile: {
       marginTop: 8,
-      fontSize: 12,
+      fontSize: 14,
       color: colors.success,
     },
     notesInput: {
-      marginBottom: 20,
+      marginBottom: 24,
     },
     submitButton: {
       backgroundColor: colors.primary,
-      paddingVertical: 16,
-      borderRadius: 8,
+      paddingVertical: 18,
+      borderRadius: 25,
       alignItems: 'center',
+      marginBottom: 24,
+      shadowColor: colors.primary,
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
     },
     submitButtonText: {
       color: colors.textInverse,
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: '600',
     },
     serviceTitle: {
-      fontSize: 18,
+      fontSize: 20,
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 16,
@@ -209,9 +221,9 @@ export default function CVReviewScreen() {
       marginBottom: 12,
     },
     featureIcon: {
-      width: 20,
-      height: 20,
-      borderRadius: 10,
+      width: 24,
+      height: 24,
+      borderRadius: 12,
       backgroundColor: `${colors.success}20`,
       alignItems: 'center',
       justifyContent: 'center',
@@ -219,28 +231,30 @@ export default function CVReviewScreen() {
     },
     featureText: {
       flex: 1,
-      fontSize: 14,
+      fontSize: 16,
       color: colors.textSecondary,
     },
     pricingCard: {
-      backgroundColor: `${colors.primary}10`,
-      borderRadius: 12,
-      padding: 16,
+      backgroundColor: `${colors.primary}15`,
+      borderRadius: 16,
+      padding: 20,
       marginBottom: 16,
+      borderWidth: 1,
+      borderColor: `${colors.primary}30`,
     },
     pricingTitle: {
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: 'bold',
       color: colors.primary,
       marginBottom: 8,
     },
     pricingAmount: {
-      fontSize: 24,
+      fontSize: 32,
       fontWeight: 'bold',
       color: colors.primary,
     },
     pricingDescription: {
-      fontSize: 12,
+      fontSize: 14,
       color: colors.textSecondary,
       marginTop: 4,
     },
@@ -248,7 +262,7 @@ export default function CVReviewScreen() {
       marginTop: 24,
     },
     requestsTitle: {
-      fontSize: 20,
+      fontSize: 22,
       fontWeight: 'bold',
       color: colors.text,
       marginBottom: 16,
@@ -266,6 +280,7 @@ export default function CVReviewScreen() {
     requestDate: {
       fontSize: 12,
       color: colors.textTertiary,
+      marginLeft: 8,
     },
     requestActions: {
       flexDirection: 'row',
@@ -274,7 +289,7 @@ export default function CVReviewScreen() {
     actionButton: {
       paddingHorizontal: 12,
       paddingVertical: 6,
-      borderRadius: 6,
+      borderRadius: 8,
       borderWidth: 1,
       borderColor: colors.border,
     },
@@ -308,26 +323,28 @@ export default function CVReviewScreen() {
     },
     feedbackSection: {
       backgroundColor: colors.surfaceSecondary,
-      borderRadius: 8,
-      padding: 12,
-      marginTop: 12,
+      borderRadius: 12,
+      padding: 16,
+      marginTop: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     feedbackTitle: {
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: '600',
       color: colors.text,
       marginBottom: 8,
     },
     feedbackText: {
-      fontSize: 14,
+      fontSize: 16,
       color: colors.textSecondary,
-      lineHeight: 20,
+      lineHeight: 22,
     },
     ratingSection: {
       marginTop: 12,
     },
     ratingTitle: {
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: '600',
       color: colors.text,
       marginBottom: 8,
@@ -337,47 +354,52 @@ export default function CVReviewScreen() {
       marginBottom: 8,
     },
     starButton: {
-      width: 24,
-      height: 24,
+      width: 32,
+      height: 32,
       alignItems: 'center',
       justifyContent: 'center',
       marginRight: 4,
     },
     starText: {
-      fontSize: 16,
+      fontSize: 20,
     },
     ratingInput: {
       backgroundColor: colors.surfaceSecondary,
-      borderRadius: 8,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      fontSize: 14,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      fontSize: 16,
       color: colors.text,
       marginBottom: 8,
-      minHeight: 60,
+      minHeight: 80,
       textAlignVertical: 'top',
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     ratingSubmitButton: {
       backgroundColor: colors.primary,
-      paddingVertical: 8,
-      paddingHorizontal: 16,
-      borderRadius: 6,
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderRadius: 8,
       alignSelf: 'flex-start',
     },
     ratingSubmitText: {
       color: colors.textInverse,
-      fontSize: 12,
+      fontSize: 14,
       fontWeight: '500',
     },
     completedRating: {
-      backgroundColor: `${colors.success}10`,
-      borderRadius: 8,
-      padding: 12,
+      backgroundColor: `${colors.success}15`,
+      borderRadius: 12,
+      padding: 16,
       marginTop: 12,
+      borderWidth: 1,
+      borderColor: `${colors.success}30`,
     },
     completedRatingText: {
-      fontSize: 12,
+      fontSize: 14,
       color: colors.success,
+      fontWeight: '500',
     },
   });
 
@@ -387,35 +409,30 @@ export default function CVReviewScreen() {
 
   const loadReviewRequests = useCallback(async () => {
     try {
-      // Mock data for now - replace with actual API call
-      const mockRequests = [
-        {
-          session_id: '1',
-          status: 'PENDING',
-          session_type: 'CV_REVIEW',
-          created_at: new Date().toISOString(),
-          notes: 'Please focus on ATS optimization',
-          mentor_notes: null,
-          session_rating: null,
-          session_feedback: null,
-        },
-        {
-          session_id: '2',
-          status: 'COMPLETED',
-          session_type: 'CV_REVIEW',
-          created_at: new Date(
-            Date.now() - 7 * 24 * 60 * 60 * 1000
-          ).toISOString(),
-          notes: 'General review needed',
-          mentor_notes:
-            'Your resume has good content but needs better formatting. I have enhanced the structure and optimized for ATS.',
-          session_rating: 5,
-          session_feedback: 'Excellent service!',
-        },
-      ];
-      setReviewRequests(mockRequests);
+      // Load CV review sessions from API
+      const response = await userApi.getMySessions({
+        session_type: 'CV_REVIEW',
+        page: 1,
+        pageSize: 50,
+      });
+      
+      // Transform the response to match our interface
+      const sessions = response.items.map(session => ({
+        session_id: session.session_id,
+        session_type: session.session_type,
+        status: session.status,
+        created_at: session.created_at,
+        notes: session.notes,
+        session_rating: session.session_rating,
+        session_feedback: session.session_feedback,
+        mentor_notes: session.mentor_notes,
+      }));
+      
+      setReviewRequests(sessions);
     } catch (error) {
       console.error('Error loading review requests:', error);
+      // Fallback to empty array if API fails
+      setReviewRequests([]);
     }
   }, []);
 
@@ -458,7 +475,12 @@ export default function CVReviewScreen() {
         // Validate file size (max 10MB)
         const maxSize = 10 * 1024 * 1024; // 10MB in bytes
         if (file.size && file.size > maxSize) {
-          Alert.alert('Error', 'File size must be less than 10MB');
+          showAlert('Error', 'File size must be less than 10MB', [
+            {
+              text: 'OK',
+              onPress: hideAlert,
+            },
+          ]);
           return;
         }
 
@@ -469,7 +491,12 @@ export default function CVReviewScreen() {
           'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         ];
         if (file.mimeType && !validTypes.includes(file.mimeType)) {
-          Alert.alert('Error', 'Please select a PDF, DOC, or DOCX file');
+          showAlert('Error', 'Please select a PDF, DOC, or DOCX file', [
+            {
+              text: 'OK',
+              onPress: hideAlert,
+            },
+          ]);
           return;
         }
 
@@ -481,20 +508,32 @@ export default function CVReviewScreen() {
       }
     } catch (error) {
       console.error('Error selecting file:', error);
-      Alert.alert('Error', 'Failed to select file');
+      showAlert('Error', 'Failed to select file', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
     }
   };
 
-  const handleFileUpload = async (_file: unknown) => {
+  const handleFileUpload = async (file: FileData) => {
     try {
       setUploading(true);
-      // Mock file upload - replace with actual implementation
-      const mockUrl = 'https://example.com/resume.pdf';
-      setProfileResumeUrl(mockUrl);
-      return mockUrl;
+      // Upload file using the real API
+      const result = await userApi.uploadResume(file.uri, file.name);
+      const uploadedUrl = result.resume_url || result.url;
+      setProfileResumeUrl(uploadedUrl);
+      return uploadedUrl;
     } catch (error) {
       console.error('Error uploading file:', error);
-      Alert.alert('Error', 'Failed to upload resume');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload resume';
+      showAlert('Error', errorMessage, [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       return null;
     } finally {
       setUploading(false);
@@ -503,26 +542,47 @@ export default function CVReviewScreen() {
 
   const handleSubmitRequest = async () => {
     if (requestsRemaining <= 0) {
-      Alert.alert(
+      showAlert(
         'Limit Reached',
-        'You have reached the maximum number of CV review requests (2)'
+        'You have reached the maximum number of CV review requests (2)',
+        [
+          {
+            text: 'OK',
+            onPress: hideAlert,
+          },
+        ]
       );
       return;
     }
 
     if (!formData.session_type) {
-      Alert.alert('Required', 'Please fill in all required fields');
+      showAlert('Required', 'Please fill in all required fields', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       return;
     }
 
     if (formData.use_current_resume) {
       if (!profileResumeUrl) {
-        Alert.alert('Error', 'No resume on file. Please upload a new resume.');
+        showAlert('Error', 'No resume on file. Please upload a new resume.', [
+          {
+            text: 'OK',
+            onPress: hideAlert,
+          },
+        ]);
         return;
       }
     } else {
       if (!selectedFile) {
-        Alert.alert('Error', 'Please select a resume file to upload');
+        showAlert('Error', 'Please select a resume file to upload', [
+          {
+            text: 'OK',
+            onPress: hideAlert,
+          },
+        ]);
         return;
       }
       const uploaded = await handleFileUpload(selectedFile);
@@ -531,11 +591,19 @@ export default function CVReviewScreen() {
 
     try {
       setIsLoading(true);
-      // Mock API call - replace with actual implementation
-      await new Promise<void>(resolve => {
-        global.setTimeout(resolve, 1000);
+      
+      // Submit CV review request via API
+      await userApi.bookSession({
+        session_type: 'CV_REVIEW',
+        notes: formData.notes || 'CV review requested',
       });
-      Alert.alert('Success', 'CV review request submitted successfully!');
+      
+      showAlert('Success', 'CV review request submitted successfully!', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       setFormData({
         session_type: 'CV_REVIEW',
         notes: '',
@@ -545,53 +613,96 @@ export default function CVReviewScreen() {
       loadReviewRequests();
     } catch (error) {
       console.error('Error submitting request:', error);
-      Alert.alert('Error', 'Failed to submit CV review request');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit CV review request';
+      showAlert('Error', errorMessage, [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const submitRating = async (_id: string) => {
-    const rs = ratingState[_id];
+  const submitRating = async (sessionId: string) => {
+    const rs = ratingState[sessionId];
     if (!rs || rs.submitting || (!rs.rating && !rs.feedback)) return;
 
-    setRatingState(prev => ({ ...prev, [_id]: { ...rs, submitting: true } }));
+    setRatingState(prev => ({ ...prev, [sessionId]: { ...rs, submitting: true } }));
     try {
-      // Mock API call - replace with actual implementation
-      await new Promise<void>(resolve => {
-        global.setTimeout(resolve, 1000);
-      });
-      Alert.alert('Success', 'Feedback submitted');
+      // Submit rating via API
+      await userApi.rateSession(sessionId, rs.rating, rs.feedback);
+      
+      showAlert('Success', 'Feedback submitted', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       loadReviewRequests();
-    } catch {
-      Alert.alert('Error', 'Failed to submit feedback');
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit feedback';
+      showAlert('Error', errorMessage, [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
     } finally {
       setRatingState(prev => ({
         ...prev,
-        [_id]: { ...prev[_id], submitting: false },
+        [sessionId]: { ...prev[sessionId], submitting: false },
       }));
     }
   };
 
-  const cancelSession = async (_id: string) => {
-    Alert.alert(
+  const cancelSession = async (sessionId: string) => {
+    showAlert(
       'Cancel Request',
       'Are you sure you want to cancel this CV review request?',
       [
-        { text: 'No', style: 'cancel' },
+        { 
+          text: 'No', 
+          style: 'cancel', 
+          onPress: () => {
+            hideAlert();
+          }
+        },
         {
           text: 'Yes, Cancel',
           style: 'destructive',
           onPress: async () => {
+            hideAlert();
             try {
-              // Mock API call - replace with actual implementation
-              await new Promise<void>(resolve => {
-                global.setTimeout(resolve, 1000);
-              });
-              Alert.alert('Success', 'Request cancelled successfully');
-              loadReviewRequests();
-            } catch {
-              Alert.alert('Error', 'Failed to cancel request');
+              // Call the real API to cancel the session
+              await userApi.cancelSession(sessionId);
+              
+              // Update the session status to cancelled
+              setReviewRequests(prev => 
+                prev.map(request => 
+                  request.session_id === sessionId 
+                    ? { ...request, status: 'CANCELLED' }
+                    : request
+                )
+              );
+              
+              showAlert('Success', 'Request cancelled successfully', [
+                {
+                  text: 'OK',
+                  onPress: hideAlert,
+                },
+              ]);
+            } catch (error) {
+              console.error('Error cancelling session:', error);
+              const errorMessage = error instanceof Error ? error.message : 'Failed to cancel request';
+              showAlert('Error', errorMessage, [
+                {
+                  text: 'OK',
+                  onPress: hideAlert,
+                },
+              ]);
             }
           },
         },
@@ -628,234 +739,228 @@ export default function CVReviewScreen() {
           </Text>
         </View>
 
-        <View style={{ flexDirection: 'row', gap: 16 }}>
-          {/* Request Form */}
-          <View style={{ flex: 1 }}>
-            <Card>
-              <Text style={styles.formTitle}>Submit CV Review Request</Text>
-              <Text style={styles.formDescription}>
-                Get expert feedback on your resume structure, content, and
-                formatting
-              </Text>
+        {/* Request Form */}
+        <Card>
+          <Text style={styles.formTitle}>Submit CV Review Request</Text>
+          <Text style={styles.formDescription}>
+            Get expert feedback on your resume structure, content, and
+            formatting
+          </Text>
 
-              {requestsRemaining <= 0 ? (
-                <View
+          {requestsRemaining <= 0 ? (
+            <View
+              style={{
+                padding: 16,
+                backgroundColor: `${colors.error}10`,
+                borderRadius: 8,
+              }}
+            >
+              <Text style={{ color: colors.error, fontSize: 14 }}>
+                You have reached the maximum number of CV review requests
+                (2). Please wait for your current requests to be completed.
+              </Text>
+            </View>
+          ) : (
+            <>
+              {/* Resume Source */}
+              <View style={styles.radioGroup}>
+                <Text
                   style={{
-                    padding: 16,
-                    backgroundColor: `${colors.error}10`,
-                    borderRadius: 8,
+                    fontSize: 13,
+                    fontWeight: '600',
+                    color: colors.text,
+                    marginBottom: 10,
                   }}
                 >
-                  <Text style={{ color: colors.error, fontSize: 14 }}>
-                    You have reached the maximum number of CV review requests
-                    (2). Please wait for your current requests to be completed.
-                  </Text>
-                </View>
-              ) : (
-                <>
-                  {/* Resume Source */}
-                  <View style={styles.radioGroup}>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        fontWeight: '600',
-                        color: colors.text,
-                        marginBottom: 12,
-                      }}
-                    >
-                      Resume Source
-                    </Text>
+                  Resume Source
+                </Text>
 
-                    <TouchableOpacity
-                      style={styles.radioOption}
-                      onPress={() =>
-                        setFormData(prev => ({
-                          ...prev,
-                          use_current_resume: true,
-                        }))
-                      }
-                    >
-                      <View
-                        style={[
-                          styles.radioButton,
-                          formData.use_current_resume &&
-                            styles.radioButtonSelected,
-                        ]}
-                      >
-                        {formData.use_current_resume && (
-                          <View style={styles.radioButtonInner} />
-                        )}
-                      </View>
-                      <Text style={styles.radioLabel}>
-                        Use my current resume
-                        {profileLoading && (
-                          <Text style={{ color: colors.textTertiary }}>
-                            {' '}
-                            (checking...)
-                          </Text>
-                        )}
-                        {!profileLoading && profileResumeUrl && (
-                          <View
-                            style={[styles.statusBadge, styles.statusAvailable]}
-                          >
-                            <Text
-                              style={[
-                                styles.statusText,
-                                styles.statusTextAvailable,
-                              ]}
-                            >
-                              Available
-                            </Text>
-                          </View>
-                        )}
-                        {!profileLoading && !profileResumeUrl && (
-                          <View
-                            style={[
-                              styles.statusBadge,
-                              styles.statusUnavailable,
-                            ]}
-                          >
-                            <Text
-                              style={[
-                                styles.statusText,
-                                styles.statusTextUnavailable,
-                              ]}
-                            >
-                              None uploaded
-                            </Text>
-                          </View>
-                        )}
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.radioOption}
-                      onPress={() =>
-                        setFormData(prev => ({
-                          ...prev,
-                          use_current_resume: false,
-                        }))
-                      }
-                    >
-                      <View
-                        style={[
-                          styles.radioButton,
-                          !formData.use_current_resume &&
-                            styles.radioButtonSelected,
-                        ]}
-                      >
-                        {!formData.use_current_resume && (
-                          <View style={styles.radioButtonInner} />
-                        )}
-                      </View>
-                      <Text style={styles.radioLabel}>Upload new resume</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {!formData.use_current_resume && (
-                    <View style={styles.fileInput}>
-                      <Text style={styles.fileInputLabel}>
-                        Upload Resume (PDF, DOC, DOCX)
-                      </Text>
-                      <TouchableOpacity
-                        style={styles.fileButton}
-                        onPress={handleSelectFile}
-                      >
-                        <Text style={styles.fileButtonText}>Select File</Text>
-                      </TouchableOpacity>
-                      {selectedFile && (
-                        <Text style={styles.selectedFile}>
-                          Selected: {selectedFile.name}
-                        </Text>
-                      )}
-                    </View>
-                  )}
-
-                  {/* Notes */}
-                  <View style={styles.notesInput}>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        fontWeight: '600',
-                        color: colors.text,
-                        marginBottom: 8,
-                      }}
-                    >
-                      Additional Notes (Optional)
-                    </Text>
-                    <TextInput
-                      style={[styles.ratingInput, { minHeight: 80 }]}
-                      placeholder="Any specific areas you'd like us to focus on? (e.g., formatting, content structure, industry-specific keywords)"
-                      placeholderTextColor={colors.inputPlaceholder}
-                      value={formData.notes}
-                      onChangeText={text =>
-                        setFormData(prev => ({ ...prev, notes: text }))
-                      }
-                      multiline
-                    />
-                  </View>
-
-                  <TouchableOpacity
-                    style={styles.submitButton}
-                    onPress={handleSubmitRequest}
-                    disabled={isLoading || uploading || requestsRemaining <= 0}
+                <TouchableOpacity
+                  style={styles.radioOption}
+                  onPress={() =>
+                    setFormData(prev => ({
+                      ...prev,
+                      use_current_resume: true,
+                    }))
+                  }
+                >
+                  <View
+                    style={[
+                      styles.radioButton,
+                      formData.use_current_resume &&
+                        styles.radioButtonSelected,
+                    ]}
                   >
-                    <Text style={styles.submitButtonText}>
-                      {isLoading || uploading
-                        ? 'Submitting...'
-                        : 'Submit Review Request'}
-                    </Text>
+                    {formData.use_current_resume && (
+                      <View style={styles.radioButtonInner} />
+                    )}
+                  </View>
+                  <Text style={styles.radioLabel}>
+                    Use my current resume
+                    {profileLoading && (
+                      <Text style={{ color: colors.textTertiary }}>
+                        {' '}
+                        (checking...)
+                      </Text>
+                    )}
+                    {!profileLoading && profileResumeUrl && (
+                      <View
+                        style={[styles.statusBadge, styles.statusAvailable]}
+                      >
+                        <Text
+                          style={[
+                            styles.statusText,
+                            styles.statusTextAvailable,
+                          ]}
+                        >
+                          Available
+                        </Text>
+                      </View>
+                    )}
+                    {!profileLoading && !profileResumeUrl && (
+                      <View
+                        style={[
+                          styles.statusBadge,
+                          styles.statusUnavailable,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.statusText,
+                            styles.statusTextUnavailable,
+                          ]}
+                        >
+                          None uploaded
+                        </Text>
+                      </View>
+                    )}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.radioOption}
+                  onPress={() =>
+                    setFormData(prev => ({
+                      ...prev,
+                      use_current_resume: false,
+                    }))
+                  }
+                >
+                  <View
+                    style={[
+                      styles.radioButton,
+                      !formData.use_current_resume &&
+                        styles.radioButtonSelected,
+                    ]}
+                  >
+                    {!formData.use_current_resume && (
+                      <View style={styles.radioButtonInner} />
+                    )}
+                  </View>
+                  <Text style={styles.radioLabel}>Upload new resume</Text>
+                </TouchableOpacity>
+              </View>
+
+              {!formData.use_current_resume && (
+                <View style={styles.fileInput}>
+                  <Text style={styles.fileInputLabel}>
+                    Upload Resume (PDF, DOC, DOCX)
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.fileButton}
+                    onPress={handleSelectFile}
+                  >
+                    <Text style={styles.fileButtonText}>Select File</Text>
                   </TouchableOpacity>
-                </>
+                  {selectedFile && (
+                    <Text style={styles.selectedFile}>
+                      Selected: {selectedFile.name}
+                    </Text>
+                  )}
+                </View>
               )}
-            </Card>
+
+              {/* Notes */}
+              <View style={styles.notesInput}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: '600',
+                    color: colors.text,
+                    marginBottom: 6,
+                  }}
+                >
+                  Additional Notes (Optional)
+                </Text>
+                <TextInput
+                  style={[styles.ratingInput, { minHeight: 70 }]}
+                  placeholder="Any specific areas you'd like us to focus on? (e.g., formatting, content structure, industry-specific keywords)"
+                  placeholderTextColor={colors.inputPlaceholder}
+                  value={formData.notes}
+                  onChangeText={text =>
+                    setFormData(prev => ({ ...prev, notes: text }))
+                  }
+                  multiline
+                />
+              </View>
+
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={handleSubmitRequest}
+                disabled={isLoading || uploading || requestsRemaining <= 0}
+              >
+                <Text style={styles.submitButtonText}>
+                  {isLoading || uploading
+                    ? 'Submitting...'
+                    : 'Submit Review Request'}
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </Card>
+
+        {/* Service Details */}
+        <Card>
+          <Text style={styles.serviceTitle}>What You&apos;ll Get</Text>
+
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              <Text style={{ color: colors.success, fontSize: 10 }}>✓</Text>
+            </View>
+            <Text style={styles.featureText}>Comprehensive Review</Text>
           </View>
 
-          {/* Service Details */}
-          <View style={{ flex: 1 }}>
-            <Card>
-              <Text style={styles.serviceTitle}>What You&apos;ll Get</Text>
-
-              <View style={styles.featureItem}>
-                <View style={styles.featureIcon}>
-                  <Text style={{ color: colors.success, fontSize: 12 }}>✓</Text>
-                </View>
-                <Text style={styles.featureText}>Comprehensive Review</Text>
-              </View>
-
-              <View style={styles.featureItem}>
-                <View style={styles.featureIcon}>
-                  <Text style={{ color: colors.success, fontSize: 12 }}>✓</Text>
-                </View>
-                <Text style={styles.featureText}>
-                  Industry-Specific Feedback
-                </Text>
-              </View>
-
-              <View style={styles.featureItem}>
-                <View style={styles.featureIcon}>
-                  <Text style={{ color: colors.success, fontSize: 12 }}>✓</Text>
-                </View>
-                <Text style={styles.featureText}>Enhanced Version</Text>
-              </View>
-
-              <View style={styles.featureItem}>
-                <View style={styles.featureIcon}>
-                  <Text style={{ color: colors.success, fontSize: 12 }}>✓</Text>
-                </View>
-                <Text style={styles.featureText}>ATS Optimization</Text>
-              </View>
-
-              <View style={styles.pricingCard}>
-                <Text style={styles.pricingTitle}>Pricing</Text>
-                <Text style={styles.pricingAmount}>₹2,999</Text>
-                <Text style={styles.pricingDescription}>
-                  Professional CV enhancement by industry experts
-                </Text>
-              </View>
-            </Card>
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              <Text style={{ color: colors.success, fontSize: 10 }}>✓</Text>
+            </View>
+            <Text style={styles.featureText}>
+              Industry-Specific Feedback
+            </Text>
           </View>
-        </View>
+
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              <Text style={{ color: colors.success, fontSize: 10 }}>✓</Text>
+            </View>
+            <Text style={styles.featureText}>Enhanced Version</Text>
+          </View>
+
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              <Text style={{ color: colors.success, fontSize: 10 }}>✓</Text>
+            </View>
+            <Text style={styles.featureText}>ATS Optimization</Text>
+          </View>
+
+          <View style={styles.pricingCard}>
+            <Text style={styles.pricingTitle}>Pricing</Text>
+            <Text style={styles.pricingAmount}>₹2,999</Text>
+            <Text style={styles.pricingDescription}>
+              Professional CV enhancement by industry experts
+            </Text>
+          </View>
+        </Card>
 
         {/* Previous Requests */}
         {reviewRequests.length > 0 && (
@@ -1010,6 +1115,14 @@ export default function CVReviewScreen() {
             ))}
           </View>
         )}
+
+        <ModernAlert
+          visible={alertState.visible}
+          title={alertState.title}
+          message={alertState.message}
+          buttons={alertState.buttons}
+          onClose={hideAlert}
+        />
       </View>
     </ScrollView>
   );

@@ -5,12 +5,14 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   TextInput,
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
 import Badge from '../../components/Badge';
+import { userApi } from '../../services/api';
+import { useModernAlert } from '../../hooks/useModernAlert';
+import ModernAlert from '../../components/ModernAlert';
 
 interface InterviewSession {
   session_id: string;
@@ -31,6 +33,7 @@ interface InterviewSession {
 
 export default function InterviewPrepScreen() {
   const { colors } = useTheme();
+  const { showAlert, hideAlert, alertState } = useModernAlert();
   const [isLoading, setIsLoading] = useState(false);
   const [interviewSessions, setInterviewSessions] = useState<
     InterviewSession[]
@@ -92,7 +95,7 @@ export default function InterviewPrepScreen() {
     tabContainer: {
       flexDirection: 'row',
       backgroundColor: colors.surfaceSecondary,
-      borderRadius: 8,
+      borderRadius: 20,
       padding: 4,
       marginBottom: 24,
     },
@@ -100,7 +103,7 @@ export default function InterviewPrepScreen() {
       flex: 1,
       paddingVertical: 12,
       paddingHorizontal: 16,
-      borderRadius: 6,
+      borderRadius: 20,
       alignItems: 'center',
     },
     tabButtonActive: {
@@ -201,9 +204,9 @@ export default function InterviewPrepScreen() {
       marginBottom: 16,
     },
     submitButton: {
-      backgroundColor: colors.success,
+      backgroundColor: colors.primary,
       paddingVertical: 16,
-      borderRadius: 8,
+      borderRadius: 25,
       alignItems: 'center',
     },
     submitButtonText: {
@@ -246,7 +249,7 @@ export default function InterviewPrepScreen() {
     actionButton: {
       paddingHorizontal: 12,
       paddingVertical: 6,
-      borderRadius: 6,
+      borderRadius: 15,
       borderWidth: 1,
       borderColor: colors.border,
     },
@@ -298,7 +301,7 @@ export default function InterviewPrepScreen() {
       backgroundColor: colors.primary,
       paddingVertical: 8,
       paddingHorizontal: 16,
-      borderRadius: 6,
+      borderRadius: 15,
       alignSelf: 'flex-start',
     },
     ratingSubmitText: {
@@ -411,36 +414,47 @@ export default function InterviewPrepScreen() {
 
   const loadInterviewSessions = useCallback(async () => {
     try {
-      // Mock data for now - replace with actual API call
-      const mockSessions = [
-        {
-          session_id: '1',
-          session_type: 'MOCK_INTERVIEW',
-          status: 'PENDING',
-          created_at: new Date().toISOString(),
-          scheduled_at: null,
-          notes: 'Domain: Accounting & Finance, Experience: Mid Level',
-          session_rating: null,
-          session_feedback: null,
-        },
-        {
-          session_id: '2',
-          session_type: 'DOMAIN_COACHING',
-          status: 'COMPLETED',
-          created_at: new Date(
-            Date.now() - 5 * 24 * 60 * 60 * 1000
-          ).toISOString(),
-          scheduled_at: new Date(
-            Date.now() - 3 * 24 * 60 * 60 * 1000
-          ).toISOString(),
-          notes: 'Domain: Technology & IT, Experience: Senior Level',
-          session_rating: 5,
-          session_feedback: 'Great session!',
-        },
-      ];
-      setInterviewSessions(mockSessions);
+      // Load interview prep sessions from API
+      const response = await userApi.getMySessions({
+        session_type: 'MOCK_INTERVIEW,DOMAIN_COACHING,BEHAVIORAL_PREP',
+        page: 1,
+        pageSize: 50,
+      });
+      
+      // Transform the response to match our interface
+      const sessions = response.items.map(session => {
+        // Parse the notes field to extract interview prep data
+        let parsedNotes: any = {};
+        try {
+          parsedNotes = session.notes ? JSON.parse(session.notes) : {};
+        } catch {
+          // If parsing fails, use the notes as-is
+          parsedNotes = { message: session.notes };
+        }
+        
+        return {
+          session_id: session.session_id,
+          session_type: session.session_type,
+          status: session.status,
+          created_at: session.created_at,
+          scheduled_at: session.scheduled_at,
+          notes: session.notes,
+          session_rating: session.session_rating,
+          session_feedback: session.session_feedback,
+          mentor_notes: session.mentor_notes,
+          domain: parsedNotes.domain,
+          experience_level: parsedNotes.experience_level,
+          target_role: parsedNotes.target_role,
+          specific_focus: parsedNotes.specific_focus,
+          preferred_date: parsedNotes.preferred_date,
+        };
+      });
+      
+      setInterviewSessions(sessions);
     } catch (error) {
       console.error('Error loading interview sessions:', error);
+      // Fallback to empty array if API fails
+      setInterviewSessions([]);
     }
   }, []);
 
@@ -450,15 +464,26 @@ export default function InterviewPrepScreen() {
 
   const handleSubmitRequest = async () => {
     if (requestsRemaining <= 0) {
-      Alert.alert(
+      showAlert(
         'Limit Reached',
-        'You have reached the maximum number of interview prep sessions (3)'
+        'You have reached the maximum number of interview prep sessions (3)',
+        [
+          {
+            text: 'OK',
+            onPress: hideAlert,
+          },
+        ]
       );
       return;
     }
 
     if (!formData.domain || !formData.experience_level) {
-      Alert.alert('Required', 'Please fill in all required fields');
+      showAlert('Required', 'Please fill in all required fields', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       return;
     }
 
@@ -468,9 +493,15 @@ export default function InterviewPrepScreen() {
         ['PENDING', 'SCHEDULED'].includes(s.status)
     );
     if (duplicate) {
-      Alert.alert(
+      showAlert(
         'Duplicate',
-        'You already have a pending session of this type in progress'
+        'You already have a pending session of this type in progress',
+        [
+          {
+            text: 'OK',
+            onPress: hideAlert,
+          },
+        ]
       );
       return;
     }
@@ -478,12 +509,24 @@ export default function InterviewPrepScreen() {
     try {
       setIsLoading(true);
 
-      // Mock API call - replace with actual implementation
-      await new Promise<void>(resolve => {
-        global.setTimeout(resolve, 1000);
+      // Submit interview prep session via API
+      await userApi.bookSession({
+        session_type: formData.session_type,
+        notes: JSON.stringify({
+          domain: formData.domain,
+          experience_level: formData.experience_level,
+          target_role: formData.target_role,
+          specific_focus: formData.specific_focus,
+          preferred_date: formData.preferred_date,
+        }),
       });
 
-      Alert.alert('Success', 'Interview prep session booked successfully!');
+      showAlert('Success', 'Interview prep session booked successfully!', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       setFormData({
         session_type: 'MOCK_INTERVIEW',
         domain: '',
@@ -495,53 +538,96 @@ export default function InterviewPrepScreen() {
       loadInterviewSessions();
     } catch (error) {
       console.error('Error booking session:', error);
-      Alert.alert('Error', 'Failed to book interview prep session');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to book interview prep session';
+      showAlert('Error', errorMessage, [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const submitRating = async (_id: string) => {
-    const rs = ratingState[_id];
+  const submitRating = async (sessionId: string) => {
+    const rs = ratingState[sessionId];
     if (!rs || rs.submitting || (!rs.rating && !rs.feedback)) return;
 
-    setRatingState(prev => ({ ...prev, [_id]: { ...rs, submitting: true } }));
+    setRatingState(prev => ({ ...prev, [sessionId]: { ...rs, submitting: true } }));
     try {
-      // Mock API call - replace with actual implementation
-      await new Promise<void>(resolve => {
-        global.setTimeout(resolve, 1000);
-      });
-      Alert.alert('Success', 'Feedback submitted');
+      // Submit rating via API
+      await userApi.rateSession(sessionId, rs.rating, rs.feedback);
+      
+      showAlert('Success', 'Feedback submitted', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       loadInterviewSessions();
-    } catch {
-      Alert.alert('Error', 'Failed to submit feedback');
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit feedback';
+      showAlert('Error', errorMessage, [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
     } finally {
       setRatingState(prev => ({
         ...prev,
-        [_id]: { ...prev[_id], submitting: false },
+        [sessionId]: { ...prev[sessionId], submitting: false },
       }));
     }
   };
 
-  const cancelSession = async (_id: string) => {
-    Alert.alert(
+  const cancelSession = async (sessionId: string) => {
+    showAlert(
       'Cancel Session',
       'Are you sure you want to cancel this session?',
       [
-        { text: 'No', style: 'cancel' },
+        { 
+          text: 'No', 
+          style: 'cancel', 
+          onPress: () => {
+            hideAlert();
+          }
+        },
         {
           text: 'Yes, Cancel',
           style: 'destructive',
           onPress: async () => {
+            hideAlert();
             try {
-              // Mock API call - replace with actual implementation
-              await new Promise<void>(resolve => {
-                global.setTimeout(resolve, 1000);
-              });
-              Alert.alert('Success', 'Session cancelled successfully');
-              loadInterviewSessions();
-            } catch {
-              Alert.alert('Error', 'Failed to cancel session');
+              // Call the real API to cancel the session
+              await userApi.cancelSession(sessionId);
+              
+              // Update the session status to cancelled
+              setInterviewSessions(prev => 
+                prev.map(session => 
+                  session.session_id === sessionId 
+                    ? { ...session, status: 'CANCELLED' }
+                    : session
+                )
+              );
+              
+              showAlert('Success', 'Session cancelled successfully', [
+                {
+                  text: 'OK',
+                  onPress: hideAlert,
+                },
+              ]);
+            } catch (error) {
+              console.error('Error cancelling session:', error);
+              const errorMessage = error instanceof Error ? error.message : 'Failed to cancel session';
+              showAlert('Error', errorMessage, [
+                {
+                  text: 'OK',
+                  onPress: hideAlert,
+                },
+              ]);
             }
           },
         },
@@ -999,6 +1085,14 @@ export default function InterviewPrepScreen() {
           )}
         </View>
       </View>
+
+      <ModernAlert
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onClose={hideAlert}
+      />
     </ScrollView>
   );
 }

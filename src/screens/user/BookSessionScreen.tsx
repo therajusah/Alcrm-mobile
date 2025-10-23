@@ -164,7 +164,7 @@ export default function BookSessionScreen() {
     bookButton: {
       backgroundColor: colors.primary,
       padding: 16,
-      borderRadius: 8,
+      borderRadius: 25,
       alignItems: 'center',
       marginTop: 24,
     },
@@ -410,7 +410,7 @@ export default function BookSessionScreen() {
           <Text style={styles.bookButtonText}>
             {submitting
               ? 'Booking...'
-              : `Book Session - ₹${price.toLocaleString()}`}
+              : `Book Session`}
           </Text>
         </TouchableOpacity>
 

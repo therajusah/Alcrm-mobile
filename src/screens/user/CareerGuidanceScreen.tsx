@@ -103,7 +103,7 @@ export default function CareerGuidanceScreen() {
       backgroundColor: colors.primary,
       paddingVertical: 12,
       paddingHorizontal: 24,
-      borderRadius: 8,
+      borderRadius: 25,
       alignItems: 'center',
       marginTop: 12,
     },
