@@ -273,7 +273,12 @@ export const ShimmerScreen: React.FC<{
             ]}
           >
             {/* Header Section */}
-            <View style={[styles.dashboardHeader, { backgroundColor: colors.primary }]}>
+            <View
+              style={[
+                styles.dashboardHeader,
+                { backgroundColor: colors.primary },
+              ]}
+            >
               <Shimmer width="70%" height={28} style={{ marginBottom: 8 }} />
               <Shimmer width="85%" height={16} />
             </View>

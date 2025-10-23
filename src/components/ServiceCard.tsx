@@ -23,22 +23,46 @@ export default function ServiceCard({
   const { colors } = useTheme();
   return (
     <View style={[styles.card, { backgroundColor: colors.surface }]}>
-      <View style={[styles.iconContainer, { backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border }]}>
+      <View
+        style={[
+          styles.iconContainer,
+          {
+            backgroundColor: colors.surfaceSecondary,
+            borderWidth: 1,
+            borderColor: colors.border,
+          },
+        ]}
+      >
         <Icon name={icon} size={28} color={colors.primary} />
       </View>
 
       <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
       {description && (
-        <Text style={[styles.description, { color: colors.textSecondary }]} numberOfLines={2}>
+        <Text
+          style={[styles.description, { color: colors.textSecondary }]}
+          numberOfLines={2}
+        >
           {description}
         </Text>
       )}
-      <Text style={[styles.duration, { color: colors.textTertiary }]}>{duration} minutes</Text>
+      <Text style={[styles.duration, { color: colors.textTertiary }]}>
+        {duration} minutes
+      </Text>
 
-      <Text style={[styles.price, { color: colors.primary }]}>₹{price.toLocaleString()}</Text>
+      <Text style={[styles.price, { color: colors.primary }]}>
+        ₹{price.toLocaleString()}
+      </Text>
 
-      <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary, borderRadius: 9999 }]} onPress={onPress}>
-        <Text style={[styles.buttonText, { color: colors.textInverse }]}>Book Now</Text>
+      <TouchableOpacity
+        style={[
+          styles.button,
+          { backgroundColor: colors.primary, borderRadius: 9999 },
+        ]}
+        onPress={onPress}
+      >
+        <Text style={[styles.buttonText, { color: colors.textInverse }]}>
+          Book Now
+        </Text>
       </TouchableOpacity>
     </View>
   );

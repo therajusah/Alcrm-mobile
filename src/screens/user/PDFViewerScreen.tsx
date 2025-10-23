@@ -33,12 +33,9 @@ const PDFViewerScreen: React.FC = () => {
       console.log('Downloading PDF locally:', pdfUrl);
       const fileName = `pdf_${Date.now()}.pdf`;
       const localUri = `${FileSystem.cacheDirectory}${fileName}`;
-      
-      const downloadResult = await FileSystem.downloadAsync(
-        pdfUrl,
-        localUri
-      );
-      
+
+      const downloadResult = await FileSystem.downloadAsync(pdfUrl, localUri);
+
       console.log('PDF downloaded successfully:', downloadResult.uri);
       setLocalPdfUri(downloadResult.uri);
       setLoading(false);
@@ -53,11 +50,13 @@ const PDFViewerScreen: React.FC = () => {
   useEffect(() => {
     // Start downloading PDF immediately
     downloadPdfLocally();
-    
+
     const timeout = setTimeout(() => {
       if (loading) {
         console.log('PDF loading timeout reached');
-        setError('PDF is taking too long to load. Please try opening in browser.');
+        setError(
+          'PDF is taking too long to load. Please try opening in browser.'
+        );
         setLoading(false);
       }
     }, 15000); // 15 second timeout for download
@@ -89,7 +88,7 @@ const PDFViewerScreen: React.FC = () => {
     console.log('Navigation state changed:', {
       url: navState.url,
       loading: navState.loading,
-      title: navState.title
+      title: navState.title,
     });
   };
 
@@ -220,9 +219,7 @@ const PDFViewerScreen: React.FC = () => {
           </View>
         </View>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>
-            Downloading PDF...
-          </Text>
+          <Text style={styles.loadingText}>Downloading PDF...</Text>
           {downloadProgress > 0 && (
             <Text style={styles.progressText}>
               {downloadProgress.toFixed(1)}% complete
@@ -232,7 +229,9 @@ const PDFViewerScreen: React.FC = () => {
             style={styles.browserButton}
             onPress={openInBrowser}
           >
-            <Text style={styles.browserButtonText}>Open in Browser Instead</Text>
+            <Text style={styles.browserButtonText}>
+              Open in Browser Instead
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -315,15 +314,15 @@ const PDFViewerScreen: React.FC = () => {
           thirdPartyCookiesEnabled={true}
           allowsBackForwardNavigationGestures={false}
           userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
-          onShouldStartLoadWithRequest={(request) => {
+          onShouldStartLoadWithRequest={request => {
             console.log('WebView should start load request:', request.url);
             return true;
           }}
-          onHttpError={(event) => {
+          onHttpError={event => {
             console.error('HTTP Error:', event.nativeEvent.statusCode);
             handleError(`HTTP Error: ${event.nativeEvent.statusCode}`);
           }}
-          onMessage={(event) => {
+          onMessage={event => {
             console.log('WebView message:', event.nativeEvent.data);
           }}
           injectedJavaScript={`

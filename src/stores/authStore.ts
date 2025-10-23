@@ -51,7 +51,10 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
           resolvedUser = profile.user as AuthUser;
         }
       } catch (profileError) {
-        console.log('AuthStore: Failed to prefetch profile, using login payload user if available.', profileError);
+        console.log(
+          'AuthStore: Failed to prefetch profile, using login payload user if available.',
+          profileError
+        );
       }
 
       // 3) Prefetch initial jobs for dashboard to avoid skeleton after login
@@ -59,18 +62,36 @@ const createAuthState: StateCreator<AuthState> = (set, get) => ({
         const fetchJobs = useJobStore.getState().fetchJobs;
         await fetchJobs({ page: 1, pageSize: 5 });
       } catch (prefetchError) {
-        console.log('AuthStore: Prefetch jobs failed, continuing.', prefetchError);
+        console.log(
+          'AuthStore: Prefetch jobs failed, continuing.',
+          prefetchError
+        );
       }
 
       // 4) Enforce role: only USER can access the app
-      if (resolvedUser && (resolvedUser as any).role && (resolvedUser as any).role !== 'USER') {
+      if (
+        resolvedUser &&
+        (resolvedUser as any).role &&
+        (resolvedUser as any).role !== 'USER'
+      ) {
         await AsyncStorage.removeItem(TOKEN_KEY);
-        set({ user: null, isAuthenticated: false, isLoading: false, error: 'Only USER accounts can use this app.' });
+        set({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: 'Only USER accounts can use this app.',
+        });
         throw new Error('Only USER accounts can use this app.');
       }
 
-      set({ user: resolvedUser ?? null, isAuthenticated: true, isLoading: false });
-      console.log('AuthStore: Login successful, user authenticated (profile prefetched)');
+      set({
+        user: resolvedUser ?? null,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+      console.log(
+        'AuthStore: Login successful, user authenticated (profile prefetched)'
+      );
     } catch (error) {
       console.log('AuthStore: Login error:', error);
       const message = error instanceof Error ? error.message : 'Login failed';

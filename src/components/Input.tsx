@@ -14,7 +14,12 @@ interface InputProps extends TextInputProps {
   error?: string;
 }
 
-export default function Input({ label, error, secureTextEntry, ...props }: InputProps) {
+export default function Input({
+  label,
+  error,
+  secureTextEntry,
+  ...props
+}: InputProps) {
   const { colors } = useTheme();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -75,11 +80,15 @@ export default function Input({ label, error, secureTextEntry, ...props }: Input
         {secureTextEntry ? (
           <TouchableOpacity
             accessibilityRole="button"
-            accessibilityLabel={isPasswordVisible ? 'Hide password' : 'Show password'}
+            accessibilityLabel={
+              isPasswordVisible ? 'Hide password' : 'Show password'
+            }
             onPress={() => setIsPasswordVisible(v => !v)}
             style={styles.eyeButton}
           >
-            <Text style={styles.eyeText}>{isPasswordVisible ? '🙈' : '👁️'}</Text>
+            <Text style={styles.eyeText}>
+              {isPasswordVisible ? '🙈' : '👁️'}
+            </Text>
           </TouchableOpacity>
         ) : null}
       </View>

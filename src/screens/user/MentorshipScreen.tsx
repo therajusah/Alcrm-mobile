@@ -21,7 +21,9 @@ interface MentorshipScreenProps {
   navigation: NavigationProp;
 }
 
-export default function MentorshipScreen({ navigation }: MentorshipScreenProps) {
+export default function MentorshipScreen({
+  navigation,
+}: MentorshipScreenProps) {
   const { mentors, fetchMentors, isLoading, pagination } = useMentorshipStore();
   const { colors } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
@@ -57,13 +59,24 @@ export default function MentorshipScreen({ navigation }: MentorshipScreenProps) 
       borderWidth: 1,
       borderColor: colors.border,
     },
-    domainButtonActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-    domainButtonText: { color: colors.textSecondary, fontSize: 14, fontWeight: '500' },
+    domainButtonActive: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    domainButtonText: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      fontWeight: '500',
+    },
     domainButtonTextActive: { color: colors.textInverse },
     content: { flex: 1 },
     mentorsList: { paddingHorizontal: 24, paddingVertical: 16 },
     emptyText: { color: colors.textSecondary, marginBottom: 16 },
-    mentorHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+    mentorHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
     mentorAvatar: {
       width: 60,
       height: 60,
@@ -73,21 +86,71 @@ export default function MentorshipScreen({ navigation }: MentorshipScreenProps) 
       justifyContent: 'center',
       marginRight: 16,
     },
-    mentorAvatarText: { fontSize: 24, color: colors.primary, fontWeight: 'bold' },
+    mentorAvatarText: {
+      fontSize: 24,
+      color: colors.primary,
+      fontWeight: 'bold',
+    },
     mentorInfo: { flex: 1 },
-    mentorName: { fontSize: 18, fontWeight: 'bold', color: colors.text, marginBottom: 4 },
+    mentorName: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text,
+      marginBottom: 4,
+    },
     mentorTitle: { color: colors.textSecondary, fontSize: 14, marginBottom: 4 },
     mentorExperience: { color: colors.textTertiary, fontSize: 12 },
-    mentorMeta: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-    mentorRating: { color: colors.textSecondary, fontSize: 14, marginRight: 16 },
+    mentorMeta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    mentorRating: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      marginRight: 16,
+    },
     mentorPrice: { color: colors.primary, fontSize: 14, fontWeight: '600' },
-    mentorDescription: { color: colors.textSecondary, fontSize: 14, lineHeight: 20, marginBottom: 12 },
-    mentorDomains: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 12 },
-    mentorActions: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    bookButton: { backgroundColor: colors.primary, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 9999 },
-    bookButtonText: { color: colors.textInverse, fontSize: 14, fontWeight: '600' },
-    viewProfileButton: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 9999, borderWidth: 1, borderColor: colors.border },
-    viewProfileButtonText: { color: colors.textSecondary, fontSize: 14, fontWeight: '500' },
+    mentorDescription: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      lineHeight: 20,
+      marginBottom: 12,
+    },
+    mentorDomains: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 6,
+      marginBottom: 12,
+    },
+    mentorActions: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    bookButton: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 9999,
+    },
+    bookButtonText: {
+      color: colors.textInverse,
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    viewProfileButton: {
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderRadius: 9999,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    viewProfileButtonText: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      fontWeight: '500',
+    },
   });
 
   const domains = [
@@ -102,10 +165,17 @@ export default function MentorshipScreen({ navigation }: MentorshipScreenProps) 
   ];
 
   const loadMentors = useCallback(async () => {
-    await fetchMentors({ search: searchQuery, domain: selectedDomain, page: 1, pageSize: 20 });
+    await fetchMentors({
+      search: searchQuery,
+      domain: selectedDomain,
+      page: 1,
+      pageSize: 20,
+    });
   }, [fetchMentors, searchQuery, selectedDomain]);
 
-  useEffect(() => { loadMentors(); }, [loadMentors]);
+  useEffect(() => {
+    loadMentors();
+  }, [loadMentors]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -114,9 +184,12 @@ export default function MentorshipScreen({ navigation }: MentorshipScreenProps) 
   };
 
   const handleSearch = (text: string) => setSearchQuery(text);
-  const handleDomainFilter = (domain: string) => setSelectedDomain(selectedDomain === domain ? '' : domain);
-  const handleViewMentor = (mentor: CareerMentor) => navigation.navigate('MentorDetail', { mentorId: mentor.mentor_id });
-  const handleBookSession = (mentor: CareerMentor) => navigation.navigate('MentorDetail', { mentorId: mentor.mentor_id });
+  const handleDomainFilter = (domain: string) =>
+    setSelectedDomain(selectedDomain === domain ? '' : domain);
+  const handleViewMentor = (mentor: CareerMentor) =>
+    navigation.navigate('MentorDetail', { mentorId: mentor.mentor_id });
+  const handleBookSession = (mentor: CareerMentor) =>
+    navigation.navigate('MentorDetail', { mentorId: mentor.mentor_id });
 
   if (isLoading && !refreshing && mentors.length === 0) {
     return <ShimmerScreen type="mentors" />;
@@ -135,18 +208,36 @@ export default function MentorshipScreen({ navigation }: MentorshipScreenProps) 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.domainFilter}>
             <TouchableOpacity
-              style={[styles.domainButton, !selectedDomain && styles.domainButtonActive]}
+              style={[
+                styles.domainButton,
+                !selectedDomain && styles.domainButtonActive,
+              ]}
               onPress={() => handleDomainFilter('')}
             >
-              <Text style={[styles.domainButtonText, !selectedDomain && styles.domainButtonTextActive]}>All</Text>
+              <Text
+                style={[
+                  styles.domainButtonText,
+                  !selectedDomain && styles.domainButtonTextActive,
+                ]}
+              >
+                All
+              </Text>
             </TouchableOpacity>
             {domains.map(domain => (
               <TouchableOpacity
                 key={domain}
-                style={[styles.domainButton, selectedDomain === domain && styles.domainButtonActive]}
+                style={[
+                  styles.domainButton,
+                  selectedDomain === domain && styles.domainButtonActive,
+                ]}
                 onPress={() => handleDomainFilter(domain)}
               >
-                <Text style={[styles.domainButtonText, selectedDomain === domain && styles.domainButtonTextActive]}>
+                <Text
+                  style={[
+                    styles.domainButtonText,
+                    selectedDomain === domain && styles.domainButtonTextActive,
+                  ]}
+                >
                   {domain}
                 </Text>
               </TouchableOpacity>
@@ -157,11 +248,14 @@ export default function MentorshipScreen({ navigation }: MentorshipScreenProps) 
 
       <ScrollView
         style={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         <View style={styles.mentorsList}>
           <Text style={styles.emptyText}>
-            {pagination.mentors.total} mentor{pagination.mentors.total !== 1 ? 's' : ''} available
+            {pagination.mentors.total} mentor
+            {pagination.mentors.total !== 1 ? 's' : ''} available
           </Text>
 
           {mentors.length === 0 ? (
@@ -182,14 +276,23 @@ export default function MentorshipScreen({ navigation }: MentorshipScreenProps) 
                     <Text style={styles.mentorName}>
                       {mentor.user?.first_name} {mentor.user?.last_name}
                     </Text>
-                    <Text style={styles.mentorTitle}>{mentor.domain || 'Career Mentor'}</Text>
-                    <Text style={styles.mentorExperience}>{mentor.experience_years}+ years experience</Text>
+                    <Text style={styles.mentorTitle}>
+                      {mentor.domain || 'Career Mentor'}
+                    </Text>
+                    <Text style={styles.mentorExperience}>
+                      {mentor.experience_years}+ years experience
+                    </Text>
                   </View>
                 </View>
 
                 <View style={styles.mentorMeta}>
-                  <Text style={styles.mentorRating}>⭐ {mentor.rating?.toFixed(1) || '0.0'} ({mentor.total_sessions || 0} sessions)</Text>
-                  <Text style={styles.mentorPrice}>₹{mentor.hourly_rate || 0}/hour</Text>
+                  <Text style={styles.mentorRating}>
+                    ⭐ {mentor.rating?.toFixed(1) || '0.0'} (
+                    {mentor.total_sessions || 0} sessions)
+                  </Text>
+                  <Text style={styles.mentorPrice}>
+                    ₹{mentor.hourly_rate || 0}/hour
+                  </Text>
                 </View>
 
                 {mentor.bio && (
@@ -203,10 +306,18 @@ export default function MentorshipScreen({ navigation }: MentorshipScreenProps) 
                 </View>
 
                 <View style={styles.mentorActions}>
-                  <TouchableOpacity style={styles.viewProfileButton} onPress={() => handleViewMentor(mentor)}>
-                    <Text style={styles.viewProfileButtonText}>View Profile</Text>
+                  <TouchableOpacity
+                    style={styles.viewProfileButton}
+                    onPress={() => handleViewMentor(mentor)}
+                  >
+                    <Text style={styles.viewProfileButtonText}>
+                      View Profile
+                    </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.bookButton} onPress={() => handleBookSession(mentor)}>
+                  <TouchableOpacity
+                    style={styles.bookButton}
+                    onPress={() => handleBookSession(mentor)}
+                  >
                     <Text style={styles.bookButtonText}>Book Session</Text>
                   </TouchableOpacity>
                 </View>

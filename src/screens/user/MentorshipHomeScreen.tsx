@@ -343,10 +343,14 @@ export default function MentorshipHomeScreen() {
         if (Math.abs(dx) > SWIPE_THRESHOLD) {
           if (dx < 0) {
             // swipe left → next tab
-            setActiveTab(prev => (prev === 'services' ? 'sessions' : 'sessions'));
+            setActiveTab(prev =>
+              prev === 'services' ? 'sessions' : 'sessions'
+            );
           } else {
             // swipe right → previous tab
-            setActiveTab(prev => (prev === 'sessions' ? 'services' : 'services'));
+            setActiveTab(prev =>
+              prev === 'sessions' ? 'services' : 'services'
+            );
           }
         }
         setTouchStartX(null);

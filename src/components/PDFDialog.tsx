@@ -36,7 +36,7 @@ export default function PDFDialog({
     // First try Google Docs Viewer
     if (pdfUrl.includes('http')) {
       return {
-        uri: `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`
+        uri: `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`,
       };
     }
     return { uri: pdfUrl };
@@ -159,7 +159,9 @@ export default function PDFDialog({
                   }}
                   onPress={onClose}
                 >
-                  <Text style={{ color: colors.textInverse, fontWeight: '600' }}>
+                  <Text
+                    style={{ color: colors.textInverse, fontWeight: '600' }}
+                  >
                     Close
                   </Text>
                 </TouchableOpacity>
@@ -179,9 +181,7 @@ export default function PDFDialog({
               onError={syntheticEvent => {
                 const { nativeEvent } = syntheticEvent;
                 console.error('WebView error:', nativeEvent);
-                setError(
-                  'Failed to load PDF. You can download it instead.'
-                );
+                setError('Failed to load PDF. You can download it instead.');
               }}
               onHttpError={syntheticEvent => {
                 const { nativeEvent } = syntheticEvent;

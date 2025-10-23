@@ -5,21 +5,14 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/icon-compass-monochrome.svg",
-      "resizeMode": "contain",
-      "backgroundColor": "#F8F9FA"
-    },
     "assetBundlePatterns": [
       "assets/**/*",
       "src/assets/**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.alcrm.mobile",
-      "icon": "./assets/icon-compass-monochrome.svg"
+      "bundleIdentifier": "com.alcrm.mobile"
     },
-    "icon": "./assets/icon-compass-monochrome.svg",
     "android": {
       "package": "com.alcrm.mobile",
       "versionCode": 1,
@@ -28,12 +21,7 @@
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.ACCESS_NETWORK_STATE"
-      ],
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/icon-compass-monochrome.svg",
-        "backgroundColor": "#F8F9FA"
-      },
-      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.alcrm.mobile"
+      ]
     },
     "web": {},
     "scheme": "alcrm",

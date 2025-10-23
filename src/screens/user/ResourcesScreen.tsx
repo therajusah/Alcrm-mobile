@@ -21,7 +21,10 @@ export default function ResourcesScreen() {
   const { colors } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const [pdfDialogVisible, setPdfDialogVisible] = useState(false);
-  const [selectedPdf, setSelectedPdf] = useState<{ url: string; title: string } | null>(null);
+  const [selectedPdf, setSelectedPdf] = useState<{
+    url: string;
+    title: string;
+  } | null>(null);
 
   const styles = StyleSheet.create({
     container: {
