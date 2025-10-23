@@ -4,10 +4,10 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Image,
 } from 'react-native';
 import { useAuthStore } from '../../stores/authStore';
 import { authApi } from '../../services/api';
@@ -15,6 +15,8 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { NavigationProp } from '../../types';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useModernAlert } from '../../hooks/useModernAlert';
+import ModernAlert from '../../components/ModernAlert';
 
 interface SignupScreenProps {
   navigation: NavigationProp;
@@ -30,6 +32,7 @@ interface SignupErrors {
 
 export default function SignupScreen({ navigation }: SignupScreenProps) {
   const { colors } = useTheme();
+  const { showAlert, hideAlert, alertState } = useModernAlert();
   const [step, setStep] = useState<'email' | 'otp' | 'details'>('email');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -90,14 +93,24 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
       console.log('SignupScreen: Requesting OTP for email:', email);
       await authApi.requestOtp(email);
       setStep('otp');
-      Alert.alert('Success', 'OTP sent to your email');
+      showAlert('Success', 'OTP sent to your email', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       setErrors({});
       console.log('SignupScreen: OTP request successful, moved to OTP step');
     } catch (err: unknown) {
       console.log('SignupScreen: OTP request error:', err);
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to send OTP';
-      Alert.alert('Error', errorMessage);
+      showAlert('Error', errorMessage, [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +126,12 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
       console.log('SignupScreen: OTP verification response:', response);
       setPreSignupToken(response.preSignupToken);
       setStep('details');
-      Alert.alert('Success', 'Email verified successfully');
+      showAlert('Success', 'Email verified successfully', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       setErrors({});
       console.log(
         'SignupScreen: OTP verification successful, moved to details step'
@@ -121,7 +139,12 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
     } catch (err: unknown) {
       console.log('SignupScreen: OTP verification error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Invalid OTP';
-      Alert.alert('Error', errorMessage);
+      showAlert('Error', errorMessage, [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -137,15 +160,27 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
         phone,
       });
       await signup(email, password, phone);
-      Alert.alert('Success', 'Account created successfully');
+      showAlert('Success', 'Account created successfully', [
+        {
+          text: 'OK',
+          onPress: () => {
+            hideAlert();
+            navigation.navigate('Onboarding');
+          },
+        },
+      ]);
       console.log('SignupScreen: Signup completed successfully');
       // Navigate to onboarding instead of main app
-      navigation.navigate('Onboarding');
     } catch (err: unknown) {
       console.log('SignupScreen: Signup error:', err);
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to create account';
-      Alert.alert('Error', errorMessage);
+      showAlert('Error', errorMessage, [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -168,6 +203,10 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
     logoContainer: {
       alignItems: 'center',
       marginBottom: 40,
+    },
+    logoImage: {
+      width: 120,
+      height: 120,
     },
     logoText: {
       fontSize: 42,
@@ -274,8 +313,11 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
       >
         {/* Logo */}
         <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>ALCRM</Text>
-          <Text style={styles.logoSubtext}>MOBILE</Text>
+          <Image 
+            source={require('../../../assets/logo.png')} 
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
         </View>
 
         {/* Header */}
@@ -439,6 +481,14 @@ export default function SignupScreen({ navigation }: SignupScreenProps) {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <ModernAlert
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onClose={hideAlert}
+      />
     </KeyboardAvoidingView>
   );
 }

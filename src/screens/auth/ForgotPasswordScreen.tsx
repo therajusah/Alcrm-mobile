@@ -4,16 +4,18 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Image,
 } from 'react-native';
 import { authApi } from '../../services/api';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { NavigationProp } from '../../types';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useModernAlert } from '../../hooks/useModernAlert';
+import ModernAlert from '../../components/ModernAlert';
 
 interface ForgotPasswordScreenProps {
   navigation: NavigationProp;
@@ -30,6 +32,7 @@ export default function ForgotPasswordScreen({
   navigation,
 }: ForgotPasswordScreenProps) {
   const { colors } = useTheme();
+  const { showAlert, hideAlert, alertState } = useModernAlert();
   const [step, setStep] = useState<'email' | 'otp' | 'password'>('email');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -49,12 +52,22 @@ export default function ForgotPasswordScreen({
     try {
       await authApi.requestPasswordReset(email);
       setStep('otp');
-      Alert.alert('Success', 'OTP sent to your email');
+      showAlert('Success', 'OTP sent to your email', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       setErrors({});
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to send OTP';
-      Alert.alert('Error', errorMessage);
+      showAlert('Error', errorMessage, [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -71,11 +84,21 @@ export default function ForgotPasswordScreen({
       const response = await authApi.verifyPasswordResetOtp(email, otp);
       setResetToken(response.resetToken);
       setStep('password');
-      Alert.alert('Success', 'OTP verified successfully');
+      showAlert('Success', 'OTP verified successfully', [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
       setErrors({});
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Invalid OTP';
-      Alert.alert('Error', errorMessage);
+      showAlert('Error', errorMessage, [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -102,13 +125,24 @@ export default function ForgotPasswordScreen({
     setIsLoading(true);
     try {
       await authApi.resetPassword(email, newPassword, resetToken);
-      Alert.alert('Success', 'Password reset successfully', [
-        { text: 'OK', onPress: () => navigation.navigate('Login') },
+      showAlert('Success', 'Password reset successfully', [
+        {
+          text: 'OK',
+          onPress: () => {
+            hideAlert();
+            navigation.navigate('Login');
+          },
+        },
       ]);
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to reset password';
-      Alert.alert('Error', errorMessage);
+      showAlert('Error', errorMessage, [
+        {
+          text: 'OK',
+          onPress: hideAlert,
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -131,6 +165,10 @@ export default function ForgotPasswordScreen({
     logoContainer: {
       alignItems: 'center',
       marginBottom: 40,
+    },
+    logoImage: {
+      width: 120,
+      height: 120,
     },
     logoText: {
       fontSize: 42,
@@ -232,8 +270,11 @@ export default function ForgotPasswordScreen({
       >
         {/* Logo */}
         <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>ALCRM</Text>
-          <Text style={styles.logoSubtext}>MOBILE</Text>
+          <Image 
+            source={require('../../../assets/logo.png')} 
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
         </View>
 
         {/* Header */}
@@ -384,6 +425,14 @@ export default function ForgotPasswordScreen({
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <ModernAlert
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onClose={hideAlert}
+      />
     </KeyboardAvoidingView>
   );
 }

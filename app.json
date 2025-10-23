@@ -5,17 +5,29 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "icon": "./assets/icon-a.svg",
+    "splash": {
+      "image": "./assets/icon-a.svg",
+      "resizeMode": "contain",
+      "backgroundColor": "#3B82F6"
+    },
     "assetBundlePatterns": [
       "assets/**/*",
       "src/assets/**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.alcrm.mobile"
+      "bundleIdentifier": "com.alcrm.mobile",
+      "icon": "./assets/icon-a.svg"
     },
     "android": {
       "package": "com.alcrm.mobile",
       "versionCode": 1,
+      "icon": "./assets/icon-a.svg",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon-a.svg",
+        "backgroundColor": "#3B82F6"
+      },
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -23,7 +35,9 @@
         "android.permission.ACCESS_NETWORK_STATE"
       ]
     },
-    "web": {},
+    "web": {
+      "favicon": "./assets/icon-a.svg"
+    },
     "scheme": "alcrm",
     "newArchEnabled": false,
     "plugins": [

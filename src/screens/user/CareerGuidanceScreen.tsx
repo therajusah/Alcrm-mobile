@@ -12,6 +12,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import Card from '../../components/Card';
 import { NavigationProp } from '../../types';
 import { DASHBOARD_BASE_URL } from '../../config/api';
+const WEB_APP_BASE_URL = `https://www.alcrm.in`
 
 export default function CareerGuidanceScreen() {
   const navigation = useNavigation<NavigationProp>();
@@ -389,7 +390,7 @@ export default function CareerGuidanceScreen() {
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() =>
-              handleWebViewOpen(`${DASHBOARD_BASE_URL}/career-guidance`)
+              handleWebViewOpen(`${WEB_APP_BASE_URL}`)
             }
           >
             <Text style={styles.actionButtonText}>Open Web Dashboard</Text>

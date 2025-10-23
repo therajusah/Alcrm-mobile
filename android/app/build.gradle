@@ -100,9 +100,9 @@ android {
         // Enable multi-dex to handle large number of methods
         multiDexEnabled true
         
-        // Target only essential architectures for size reduction
+        // Target only ARM64 for smaller APK size (most common architecture)
         ndk {
-            abiFilters "arm64-v8a", "x86_64"
+            abiFilters "arm64-v8a"
         }
     }
     signingConfigs {
@@ -135,6 +135,10 @@ android {
             // Additional build optimizations
             buildConfigField "boolean", "DEBUG", "false"
             buildConfigField "boolean", "RELEASE", "true"
+            
+            // Disable unused features
+            buildConfigField "boolean", "ENABLE_CRASHLYTICS", "false"
+            buildConfigField "boolean", "ENABLE_ANALYTICS", "false"
         }
     }
     packagingOptions {

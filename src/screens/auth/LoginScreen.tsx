@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Image,
 } from 'react-native';
 import { useAuthStore } from '../../stores/authStore';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -130,6 +131,10 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       alignItems: 'center',
       marginBottom: 48,
     },
+    logoImage: {
+      width: 120,
+      height: 120,
+    },
     logoText: {
       fontSize: 42,
       fontWeight: 'bold',
@@ -216,8 +221,12 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       >
         {/* Logo */}
         <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>ALCRM</Text>
-          <Text style={styles.logoSubtext}>MOBILE</Text>
+          <Image 
+            source={require('../../../assets/logo.png')} 
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
+
         </View>
 
         {/* Header */}

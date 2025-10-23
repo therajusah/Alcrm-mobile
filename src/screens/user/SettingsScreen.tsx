@@ -3,9 +3,9 @@ import {
   View,
   Text,
   ScrollView,
-  Alert,
   TouchableOpacity,
   StyleSheet,
+  Image,
 } from 'react-native';
 import { useAuthStore } from '../../stores/authStore';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -13,6 +13,8 @@ import Button from '../../components/Button';
 import Card from '../../components/Card';
 import ThemeSelector from '../../components/ThemeSelector';
 import { NavigationProp } from '../../types';
+import { useModernAlert } from '../../hooks/useModernAlert';
+import ModernAlert from '../../components/ModernAlert';
 
 interface SettingsScreenProps {
   navigation: NavigationProp;
@@ -24,19 +26,30 @@ export default function SettingsScreen({
   const { logout, user } = useAuthStore();
   const { colors, themeMode } = useTheme();
   const [showThemeSelector, setShowThemeSelector] = useState(false);
+  const { showAlert, hideAlert, alertState } = useModernAlert();
 
   const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
-      { text: 'Cancel', style: 'cancel' },
+    showAlert('Logout', 'Are you sure you want to logout?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+        onPress: hideAlert,
+      },
       {
         text: 'Logout',
         style: 'destructive',
         onPress: async () => {
+          hideAlert();
           try {
             await logout();
             // Navigation will be handled automatically
           } catch {
-            Alert.alert('Error', 'Failed to logout');
+            showAlert('Error', 'Failed to logout', [
+              {
+                text: 'OK',
+                onPress: hideAlert,
+              },
+            ]);
           }
         },
       },
@@ -109,6 +122,15 @@ export default function SettingsScreen({
       fontFamily: 'monospace',
       fontSize: 12,
     },
+    aboutContainer: {
+      alignItems: 'center',
+      paddingVertical: 16,
+    },
+    aboutLogo: {
+      width: 80,
+      height: 80,
+      marginBottom: 16,
+    },
     aboutText: {
       color: colors.textSecondary,
       fontSize: 14,
@@ -166,11 +188,17 @@ export default function SettingsScreen({
 
         {/* About */}
         <Card title="About">
-          <Text style={styles.aboutText}>ALCRM Mobile</Text>
-          <Text style={styles.aboutVersion}>Version 1.0.0</Text>
-          <Text style={styles.copyright}>
-            © 2025 ALCRM. All rights reserved.
-          </Text>
+          <View style={styles.aboutContainer}>
+            <Image 
+              source={require('../../../assets/logo.png')} 
+              style={styles.aboutLogo}
+              resizeMode="contain"
+            />
+            <Text style={styles.aboutVersion}>Version 1.0.0</Text>
+            <Text style={styles.copyright}>
+              © 2025 ALCRM. All rights reserved.
+            </Text>
+          </View>
         </Card>
 
         {/* Logout */}
@@ -180,6 +208,14 @@ export default function SettingsScreen({
       <ThemeSelector
         visible={showThemeSelector}
         onClose={() => setShowThemeSelector(false)}
+      />
+
+      <ModernAlert
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        buttons={alertState.buttons}
+        onClose={hideAlert}
       />
     </View>
   );
