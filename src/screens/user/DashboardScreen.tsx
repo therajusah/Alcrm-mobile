@@ -223,7 +223,6 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
       </View>
 
       <View style={styles.content}>
-        {/* Quick Actions */}
         <View style={styles.quickActionsContainer}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           <View style={styles.quickActionsGrid}>
@@ -302,9 +301,9 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
                 </View>
 
                 <View style={styles.jobMeta}>
-                  <Text style={styles.jobMetaText}>📍 {job.location}</Text>
+                  <Text style={styles.jobMetaText}>{job.location}</Text>
                   <Text style={styles.jobMetaText}>
-                    💰 {job.salary ? `₹${job.salary}L` : 'Salary not specified'}
+                     {job.salary ? `₹${job.salary}L` : 'Salary not specified'}
                   </Text>
                 </View>
 

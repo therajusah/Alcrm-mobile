@@ -112,7 +112,6 @@ export default function JobsScreen({ navigation }: JobsScreenProps) {
 
   return (
     <View style={styles.container}>
-      {/* Search Bar */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -183,7 +182,7 @@ export default function JobsScreen({ navigation }: JobsScreenProps) {
                     }}
                     numberOfLines={1}
                   >
-                    📍 {job.location}
+                     {job.location}
                   </Text>
                   <Text
                     style={{
@@ -194,7 +193,7 @@ export default function JobsScreen({ navigation }: JobsScreenProps) {
                     }}
                     numberOfLines={1}
                   >
-                    💰 {job.salary ? `₹${job.salary}L` : 'Salary not specified'}
+                     {job.salary ? `₹${job.salary}L` : 'Salary not specified'}
                   </Text>
                 </View>
 

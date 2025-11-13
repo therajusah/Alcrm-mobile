@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from '../stores/authStore';
 import { userApi } from '../services/api';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
@@ -157,7 +158,7 @@ function AuthStack() {
 // Main App Navigator
 function AppNavigatorContent() {
   const { isAuthenticated, checkAuth } = useAuthStore();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const [showThemeOnboarding, setShowThemeOnboarding] = useState(false);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
@@ -217,9 +218,11 @@ function AppNavigatorContent() {
   }
 
   return (
-    <NavigationContainer
+    <>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <NavigationContainer
       theme={{
-        dark: false, // We handle dark mode manually
+        dark: isDark,
         colors: {
           primary: colors.primary,
           background: colors.background,
@@ -331,6 +334,7 @@ function AppNavigatorContent() {
         <AuthStack />
       )}
     </NavigationContainer>
+    </>
   );
 }
 

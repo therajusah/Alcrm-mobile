@@ -499,7 +499,6 @@ export default function PersonalReferencesScreen() {
   });
 
   const MAX_REQUESTS = 3;
-  // Count only active sessions (exclude completed and cancelled)
   const requestsUsed = referenceSessions.filter(
     session =>
       session.status?.toUpperCase() !== 'COMPLETED' &&

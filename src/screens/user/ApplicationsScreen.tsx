@@ -142,14 +142,14 @@ export default function ApplicationsScreen() {
                 </Text>
                 {application.job_location && (
                   <Text style={styles.applicationCompany}>
-                    📍 {application.job_location}
+                     {application.job_location}
                   </Text>
                 )}
               </View>
 
               {application.job_salary && (
                 <Text style={styles.applicationMeta}>
-                  💰 {application.job_salary}
+                   {application.job_salary}
                 </Text>
               )}
 

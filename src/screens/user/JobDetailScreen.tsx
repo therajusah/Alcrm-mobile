@@ -341,12 +341,12 @@ export default function JobDetailScreen() {
 
           <View style={styles.detailsSection}>
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>📍 Location</Text>
+              <Text style={styles.detailLabel}> Location</Text>
               <Text style={styles.detailValue}>{selectedJob.location}</Text>
             </View>
 
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>💰 Salary</Text>
+              <Text style={styles.detailLabel}> Salary</Text>
               <Text style={styles.detailValue}>
                 {selectedJob.salary
                   ? `₹${selectedJob.salary}L`
@@ -355,7 +355,7 @@ export default function JobDetailScreen() {
             </View>
 
             <View>
-              <Text style={styles.detailLabel}>📅 Posted</Text>
+              <Text style={styles.detailLabel}>Posted</Text>
               <Text style={styles.detailValue}>
                 {new Date(selectedJob.postedDate || '').toLocaleDateString()}
               </Text>
@@ -363,12 +363,10 @@ export default function JobDetailScreen() {
           </View>
         </Card>
 
-        {/* Job Description */}
         <Card title="Job Description">
           <Text style={styles.description}>{selectedJob.description}</Text>
         </Card>
 
-        {/* Application Status or Apply Form */}
         {hasApplied ? (
           <Card>
             <View style={styles.statusContainer}>
@@ -430,7 +428,7 @@ export default function JobDetailScreen() {
                   ) : (
                     <View style={styles.resumeEmptyBox}>
                       <Text style={styles.resumeEmptyIcon}>
-                        📄 No resume selected
+                         No resume selected
                       </Text>
                       <Text style={styles.resumeEmptyText}>
                         {user?.resume_url
